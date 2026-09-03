@@ -1,0 +1,72 @@
+{
+  "id": "animals",
+  "title": "Animals",
+  "emoji": "🐾",
+  "audience": "kids",
+  "l1": "ja",
+  "items": [
+    { "id": "dog", "en": "dog", "emoji": "🐶", "l1": { "word": "犬", "romaji": "inu" }, "example": "It is a dog.", "tags": { "sound": "Woof", "habitat": "farm", "move": "Run like a dog!" } },
+    { "id": "cat", "en": "cat", "emoji": "🐱", "l1": { "word": "猫", "romaji": "neko" }, "example": "It is a cat.", "tags": { "sound": "Meow", "habitat": "farm", "move": "Stretch like a cat!" } },
+    { "id": "bird", "en": "bird", "emoji": "🐦", "l1": { "word": "鳥", "romaji": "tori" }, "example": "It is a bird.", "tags": { "sound": "Tweet", "habitat": "jungle", "move": "Flap your wings like a bird!" } },
+    { "id": "fish", "en": "fish", "emoji": "🐟", "l1": { "word": "魚", "romaji": "sakana" }, "example": "It is a fish.", "tags": { "sound": "Blub", "habitat": "ocean", "move": "Wiggle like a fish!" } },
+    { "id": "rabbit", "en": "rabbit", "emoji": "🐰", "l1": { "word": "うさぎ", "romaji": "usagi" }, "example": "It is a rabbit.", "tags": { "sound": "Squeak", "habitat": "farm", "move": "Hop like a rabbit!" } },
+    { "id": "elephant", "en": "elephant", "emoji": "🐘", "l1": { "word": "象", "romaji": "zou" }, "example": "It is an elephant.", "tags": { "sound": "Toot", "habitat": "jungle", "move": "Stomp like an elephant!" } },
+    { "id": "lion", "en": "lion", "emoji": "🦁", "l1": { "word": "ライオン", "romaji": "raion" }, "example": "It is a lion.", "tags": { "sound": "Roar", "habitat": "jungle", "move": "Roar like a lion!" } },
+    { "id": "monkey", "en": "monkey", "emoji": "🐵", "l1": { "word": "猿", "romaji": "saru" }, "example": "It is a monkey.", "tags": { "sound": "Ooh ooh", "habitat": "jungle", "move": "Scratch like a monkey!" } },
+    { "id": "bear", "en": "bear", "emoji": "🐻", "l1": { "word": "熊", "romaji": "kuma" }, "example": "It is a bear.", "tags": { "sound": "Grr", "habitat": "jungle", "move": "Walk like a big bear!" } },
+    { "id": "duck", "en": "duck", "emoji": "🦆", "l1": { "word": "アヒル", "romaji": "ahiru" }, "example": "It is a duck.", "tags": { "sound": "Quack", "habitat": "farm", "move": "Waddle like a duck!" } }
+  ],
+  "blocks": [
+    {
+      "id": "vocab", "type": "cards", "title": "🧠 What Is It?",
+      "hint": "Tap a card to hear it and see the Japanese word.",
+      "items": { "select": "all" }, "front": "emoji", "back": ["en", "l1"]
+    },
+    {
+      "id": "sounds", "type": "cards", "title": "🔊 Now Let's Learn Their Sounds!",
+      "hint": "Tap each animal to hear the sound it makes.",
+      "items": { "select": "tag", "tag": "sound" }, "front": "emoji", "back": ["en", "tag:sound"]
+    },
+    {
+      "id": "pairs", "type": "match", "title": "🎯 Matching Game",
+      "hint": "Tap the picture, then tap the matching word.",
+      "items": { "select": "all" }, "left": "emoji", "right": "en", "count": 6
+    },
+    {
+      "id": "say", "type": "sentence", "title": "💬 Say It Bigger!",
+      "hint": "Choose an animal. Then grow your sentence, one step at a time.",
+      "items": { "select": "all" },
+      "levels": [
+        { "label": "One word", "template": "{en}" },
+        { "label": "It is a…", "template": "{it} {be} {article} {en}." },
+        { "label": "This is a…", "template": "{this} {be} {article} {en}." }
+      ]
+    },
+    {
+      "id": "hear", "type": "listen", "title": "👂 Which One Is It?",
+      "hint": "Listen, then tap the animal you heard.",
+      "items": { "select": "all" }, "choices": 4
+    },
+    {
+      "id": "soundmatch", "type": "match", "title": "🎯 Sound Match",
+      "hint": "Tap an animal, then tap the sound it makes.",
+      "items": { "select": "tag", "tag": "sound" }, "left": "emoji", "right": "tag:sound", "count": 5
+    },
+    {
+      "id": "homes", "type": "sort", "title": "🏡 Where Do They Live?",
+      "hint": "Tap an animal, then tap the home where it lives.",
+      "items": { "select": "all" }, "by": "habitat",
+      "buckets": [
+        { "key": "farm", "label": "Farm", "emoji": "🏡" },
+        { "key": "jungle", "label": "Jungle", "emoji": "🌴" },
+        { "key": "ocean", "label": "Water", "emoji": "🌊" }
+      ]
+    },
+    {
+      "id": "move", "type": "tpr", "title": "🎮 Move Like Me!",
+      "hint": "Listen, then move like that animal!",
+      "items": { "select": "tag", "tag": "move" }, "prompt": "{tag:move}"
+    },
+    { "id": "done", "type": "finish", "title": "🎉 Great job!", "message": "Great job learning animals!" }
+  ]
+}

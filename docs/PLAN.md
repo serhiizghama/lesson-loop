@@ -303,3 +303,9 @@ storage appear. Deliberately kept out of the MVP.
 | D-4 | Tap-tap instead of drag-and-drop | 2026-09-03 |
 | D-5 | Solo mode on connection loss is mandatory | 2026-09-03 |
 | D-6 | Accounts and the lesson editor land in v0.3, not in the MVP | 2026-09-03 |
+| D-7 | OpenSpec adopted (`schema: spec-driven`). A change's `tasks.md` **is** the implementation plan; no separate hand-written one, to avoid a second source of truth. PLAN.md keeps the product context OpenSpec has no place for | 2026-09-03 |
+| D-8 | v0.1 is sliced into three changes: `add-lesson-engine` → `add-synced-rooms` → `add-cloudflare-deploy` | 2026-09-03 |
+| D-9 | Both participants tap and navigate freely; the teacher additionally has a "student view-only" lock toggle for when a child runs ahead | 2026-09-03 |
+| D-10 | v0.1 targets children only. Adult material (`reading`, `gapfill`) becomes its own change in v0.2 | 2026-09-03 |
+| D-11 | A room is not bound to one lesson: the teacher switches lessons in place, so one link covers the whole session | 2026-09-03 |
+| D-12 | Vitest over the shared reducer (the one piece that runs in two places) plus a minimal GitHub Actions typecheck/build | 2026-09-03 |

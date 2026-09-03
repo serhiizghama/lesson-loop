@@ -1,0 +1,374 @@
+/* Shared by every block view. Tap targets never fall below --tap. */
+
+/* ── Cards ────────────────────────────────────────────────────────────────── */
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  gap: 0.75rem;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 8.5rem;
+  padding: 1rem 0.75rem;
+  text-align: center;
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  transition: transform 140ms ease, background 140ms ease;
+}
+
+.card:active {
+  transform: scale(0.97);
+}
+
+.cardRevealed {
+  background: var(--accent-soft);
+}
+
+.cardFront {
+  font-size: 2.6rem;
+  line-height: 1;
+}
+
+.cardBack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.cardLine {
+  font-weight: 700;
+}
+
+.cardLine[data-face='l1'] {
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.cardRomaji {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.speaker {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.6rem;
+  font-size: 0.85rem;
+  opacity: 0.45;
+}
+
+/* ── Tiles, shared by match / sort / listen ───────────────────────────────── */
+
+.tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: var(--tap);
+  padding: 0.5rem 0.75rem;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: transform 120ms ease, background 120ms ease, box-shadow 120ms ease;
+}
+
+.tile:active {
+  transform: scale(0.97);
+}
+
+.tilePicture {
+  font-size: 2.1rem;
+  line-height: 1;
+}
+
+.tileWord {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.tileSelected {
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 3px var(--accent), var(--shadow);
+}
+
+.tilePaired {
+  background: var(--correct-soft);
+  box-shadow: none;
+  opacity: 0.65;
+}
+
+.tileWrong {
+  background: var(--wrong-soft);
+  box-shadow: inset 0 0 0 3px var(--wrong), var(--shadow);
+  animation: shake 320ms ease;
+}
+
+.tick {
+  color: var(--correct);
+  font-size: 1rem;
+}
+
+@keyframes shake {
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-3px); }
+}
+
+/* ── Match ────────────────────────────────────────────────────────────────── */
+
+.matchRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.matchColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* ── Sentence ─────────────────────────────────────────────────────────────── */
+
+.sentence {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pickerRow,
+.levelRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pickerChip {
+  min-width: var(--tap);
+  min-height: var(--tap);
+  font-size: 1.8rem;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.pickerChipOn {
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 3px var(--accent), var(--shadow);
+}
+
+.levelButton {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: var(--tap);
+  padding: 0 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.levelButtonOn {
+  background: var(--accent);
+  color: #fff;
+}
+
+.levelNumber {
+  display: grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  font-size: 0.8rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, currentColor 16%, transparent);
+}
+
+.sentenceOutput {
+  margin: 0;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  font-size: clamp(1.3rem, 6vw, 2rem);
+  font-weight: 700;
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.speakButton {
+  align-self: center;
+  min-height: var(--tap);
+  padding: 0 1.4rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* ── Sort ─────────────────────────────────────────────────────────────────── */
+
+.sort {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.sortPool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  min-height: var(--tap);
+}
+
+.poolEmpty {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.buckets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  gap: 0.75rem;
+}
+
+.bucket {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 7rem;
+  padding: 0.9rem 0.75rem;
+  text-align: center;
+  background: var(--card);
+  border: 2px dashed var(--line);
+  border-radius: var(--radius-lg);
+}
+
+.bucketWrong {
+  border-color: var(--wrong);
+  background: var(--wrong-soft);
+  animation: shake 320ms ease;
+}
+
+.bucketLabel {
+  font-weight: 700;
+}
+
+.bucketItems {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem;
+  font-size: 1.6rem;
+}
+
+/* ── Listen ───────────────────────────────────────────────────────────────── */
+
+.listen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.listenAgain {
+  min-height: var(--tap);
+  padding: 0 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.listenFallback {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.listenChoices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.listenChoices .tile {
+  min-height: 6rem;
+  font-size: 2.8rem;
+}
+
+.counter {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+/* ── Physical response ────────────────────────────────────────────────────── */
+
+.tpr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.tprStage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 2rem 1rem;
+  text-align: center;
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.tprEmoji {
+  font-size: 3.5rem;
+  line-height: 1;
+}
+
+.tprText {
+  margin: 0;
+  font-size: clamp(1.2rem, 5vw, 1.6rem);
+  font-weight: 700;
+}
+
+/* ── Finish ───────────────────────────────────────────────────────────────── */
+
+.finish {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.stars {
+  margin: 0;
+  font-size: 2rem;
+  letter-spacing: 0.15em;
+}
+
+.finishMessage {
+  margin: 0;
+  font-size: clamp(1.3rem, 6vw, 1.8rem);
+  font-weight: 700;
+}
