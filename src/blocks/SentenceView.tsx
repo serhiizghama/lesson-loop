@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { renderTemplate } from '@/shared/text'
 import { resolveItems } from '@/shared/validate'
 import type { BlockView } from './types'
@@ -8,6 +9,12 @@ export const SentenceView: BlockView<'sentence'> = ({ lesson, block, state, disp
   const chosen = items.find((i) => i.id === state.item) ?? null
   const level = block.levels[state.level] ?? block.levels[0]
   const sentence = chosen !== null && level !== undefined ? renderTemplate(level.template, chosen) : null
+
+  // The point of this exercise is hearing the model sentence, so it is spoken whenever
+  // it changes — picking a word or growing a level — not only on the Listen button.
+  useEffect(() => {
+    if (sentence !== null) speech.speak(sentence)
+  }, [sentence, speech])
 
   return (
     <div className={styles.sentence}>
