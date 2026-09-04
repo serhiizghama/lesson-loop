@@ -305,6 +305,7 @@ storage appear. Deliberately kept out of the MVP.
 | Emoji render differently on Windows and iOS, and some read poorly to children | replace the critical ones with an own SVG set in v0.2 |
 | Weak connection on the student's side | optimistic rendering plus solo mode; there are no heavy assets at all |
 | The free tier changes | the cost of moving is low — the DO relay is about 80 lines and ports anywhere |
+| **Room creation is unbounded in production.** `POST /api/rooms` needs no account and makes a Durable Object per request; the platform rate limiter is bound and consulted but never refuses on this account — verified even at two requests per ten seconds (2026-09-04) | the Worker's own check is correct and unit-tested, and fails open by design (D-25). Open until either the limiter is made to work or the fallback is taken: a counter in a Durable Object. The address is not published anywhere and has one user |
 
 ---
 

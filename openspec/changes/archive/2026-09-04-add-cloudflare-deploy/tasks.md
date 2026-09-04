@@ -89,7 +89,7 @@ here enters the repository (design D50).
   only on a push to `main` (design D50, spec "Only a build that passed its checks becomes
   the published app"). **Check:** the workflow file is valid, and the job's condition
   excludes pull requests.
-- [ ] 5.5 Prove CI publishes, and only from green. **Check:** a push to `main` publishes
+- [x] 5.5 Prove CI publishes, and only from green. **Check:** a push to `main` publishes
   and the deployed URL serves the new revision; a pull request runs `check` and shows no
   `deploy` job having run. State which of the two was actually observed if only one was.
 
@@ -133,7 +133,7 @@ here enters the repository (design D50).
   starts being refused with `429`; the lesson on screen stays playable; a room opened
   before the burst is undisturbed; and normal use immediately afterwards is not blocked
   (spec "A refusal does not cost the lesson", "A teacher's own pace is never refused").
-- [ ] 7.7 Report which checks were automated and which were performed by hand, in the
+- [x] 7.7 Report which checks were automated and which were performed by hand, in the
   change's `verification.md`. **Check:** the manual tier is named as manual, never
   presented as test coverage; anything not actually performed — a second device, a second
   network, the pull-request half of 5.5 — is listed as untested.

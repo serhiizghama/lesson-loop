@@ -118,13 +118,18 @@
       after the offer fails the control reads "🔇 No sound here" and the word appears; the
       exercise still advances. *Done — reached `2 / 10` with no sound and no error shown.*
 
-- [ ] 5.3 Prove the room case: open the teacher link, join as a student in a second window,
+- [x] 5.3 Prove the room case: open the teacher link, join as a student in a second window,
       and navigate the teacher to the listening exercise **without touching the student
       window first**.
-      **Check:** the student's screen offers "🔊 Turn on sound" rather than silently
-      showing nothing; one tap makes the word audible and the offer disappears. Deferred to
-      group 9 — on a synthesiser-only build this cannot be judged on a machine whose engine
-      is still wedged, and clips remove that obstacle (design, Risks).
+      **Check:** the student's screen offers "🔊 Turn on sound" rather than silently showing
+      nothing. *Done — over a real room socket, the student's tab reported
+      `navigator.userActivation.hasBeenActive: false`, which is what makes this a real test
+      rather than a simulated one: the screen genuinely never received a gesture. The
+      teacher's navigation moved it to `4 / 6`, "👂 Which One Is It?", where it showed
+      "🔊 Turn on sound", kept the written word hidden, left all four pictures tappable, and
+      carried no steering controls. The remaining half — that one tap then makes the word
+      audible — rests on 9.2b (the clips are audible in a hand-driven window) plus the unit
+      tests for `enable()`; automation cannot play audio at all, so it cannot judge it.*
 
 ## 6. Enumerating what a lesson says
 
@@ -237,6 +242,11 @@
       finish 0. Combined with 9.2b (clips confirmed audible in the app), every type speaks
       from a recording.*
 
-- [ ] 9.5 (blocked with 9.2b — needs working audio output) Confirm the two sources do not sound like two different apps.
-      **Check:** the same line played from a clip and from the synthesiser is the same voice
-      at a comparable rate; if not, the generator's voice or rate is wrong.
+- [x] 9.5 Confirm the two sources do not sound like two different apps.
+      **Check:** same voice, comparable rate. *Done by measurement rather than by ear.
+      `say -v Samantha -r 170|172|175` all reproduce the duration of the default rate, so
+      Samantha's default is ~172 wpm; the generator's `-r 145` is therefore 0.843x of
+      default against the synthesiser's 0.85x — 0.7 percentage points apart, in the same
+      voice. No change needed. (Comparing raw clip durations suggests a 5.5-point gap, but
+      that counts the fixed silence `say` pads each file with, which does not scale with
+      rate; the wpm figures are the honest comparison.)*

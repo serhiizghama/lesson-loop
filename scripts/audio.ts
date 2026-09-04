@@ -28,7 +28,14 @@ const LESSONS = 'lessons'
 const CLIPS = join('public', 'audio')
 const MANIFEST = join('src', 'speech', 'clips.ts')
 const VOICE = process.env['LESSONLOOP_VOICE'] ?? 'Samantha'
-/** Matches the rate the device synthesiser uses, so the two sources sound alike. */
+/**
+ * Matches the rate the device synthesiser uses, so a line falling back to the browser does
+ * not sound like a different app.
+ *
+ * Samantha's default is ~172 wpm (measured: `-r 170`, `172` and `175` all reproduce the
+ * duration of an unrated run), so 145 wpm is 0.843x of default against `speech.ts`'s
+ * 0.85x — under a percentage point apart. Change one and the other wants recomputing.
+ */
 const RATE = 145
 
 /**
