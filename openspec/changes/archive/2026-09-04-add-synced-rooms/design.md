@@ -205,6 +205,34 @@ about eighty lines and is checked by using it.
 worth revisiting in `add-cloudflare-deploy` when there is a deploy to protect. The manual
 tier is reported as manual, never as automated coverage.
 
+### D20 — The room holds the lesson's data, not just its id
+
+`POST /api/rooms` carries the lesson and the `LessonState` the teacher has open, and
+`{ t:'switch-lesson' }` carries the whole lesson rather than a `lessonId` as PLAN §6
+sketched. `RoomCore` keeps it in its state and persists it with the rest.
+
+*Why:* the room has to run `applyAction`, which needs the lesson. `lessons/` is picked up
+by `import.meta.glob`, which is Vite's and not the Worker's, so a Worker with a catalogue
+would need every lesson imported by name — and "a new lesson must require zero new code"
+is the architecture rule this whole project is built on. Sending the lesson keeps the
+catalogue entirely on the client. It costs a few kilobytes once per room, not per message:
+snapshots still carry only the `LessonState`, and each client resolves the lesson by id
+from its own bundle.
+
+*Rejected:* explicit imports in `worker/` — breaks the rule above. *Rejected:* a
+generated catalogue module — a build step and a second source of truth for `lessons/`.
+*Rejected:* putting the lesson in every `state` message — simpler for the client, and it
+would multiply the snapshot size by roughly five for no gain, since both clients ship the
+same bundle.
+
+### D21 — A solo lesson gets a route too
+
+D16's three routes are four: `/l/<lessonId>` carries a lesson opened from the home screen.
+
+*Why:* replacing the `useState` picker with the router means "which lesson is open" is
+address bar state, and without a route for it the back button would leave a lesson by
+reloading the app. Four flat routes are still no router library.
+
 ## Risks / Trade-offs
 
 - **A page reload loses a participant's optimistic-but-unsent action.** → The window is one
