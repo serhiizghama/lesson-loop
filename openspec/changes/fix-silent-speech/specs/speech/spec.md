@@ -3,10 +3,15 @@
 ### Requirement: Speech confirms that it was heard
 
 Asking the device to speak is not evidence that it spoke. The app SHALL observe every
-utterance it requests and determine whether the device actually began speaking it. An
-utterance that reports a failure, or that does not begin within a short grace period,
-SHALL be treated as proof that this device is not delivering sound, and speech SHALL
-report itself unavailable from that moment on.
+request it makes and determine whether the device actually began playing it. A request
+that reports a failure, or that does not begin within a short grace period, SHALL be
+treated as proof that this device is not delivering sound, and speech SHALL report itself
+unavailable from that moment on.
+
+Where a source reports its refusal outright — as a prepared recording does when playback
+is not permitted — that report SHALL be honoured immediately, without waiting out the
+grace period. The grace period exists for a source that fails by going quiet, not as a
+delay imposed on one that says so.
 
 A device that never speaks and a device that speaks perfectly MUST NOT look the same to
 the rest of the app.
@@ -25,6 +30,56 @@ the rest of the app.
 #### Scenario: A word that is actually spoken
 - **WHEN** a requested word begins playing
 - **THEN** speech continues to report itself available and no fallback is offered
+
+#### Scenario: A source that refuses out loud
+- **WHEN** a prepared recording is refused permission to play
+- **THEN** speech reports itself unavailable at once, rather than after the grace period
+
+### Requirement: Speech prefers a prepared recording
+
+Where a recording of the line exists, the app SHALL play it rather than ask the device to
+synthesise the line. Where no recording exists, the app SHALL synthesise the line on the
+device as before. Which source was used SHALL NOT change anything the learner can act on:
+the same lines are spoken, at the same points in the lesson, and every exercise behaves
+identically either way.
+
+A line without a recording SHALL NOT be silent while the device can synthesise it, so a
+lesson whose recordings have not been prepared is still fully playable.
+
+#### Scenario: A line that has been prepared
+- **WHEN** an exercise asks for a line that has a recording
+- **THEN** the recording is played, and the device's own voice is not used
+
+#### Scenario: A line that has not been prepared
+- **WHEN** an exercise asks for a line that has no recording
+- **THEN** the line is synthesised on the device and the exercise proceeds normally
+
+#### Scenario: A lesson added without preparing its recordings
+- **WHEN** a lesson is added and played before any recording has been made for it
+- **THEN** every one of its exercises speaks, using the device's voice throughout
+
+#### Scenario: A recording that will not play
+- **WHEN** a recording exists but cannot be played on this device
+- **THEN** the line is spoken by the device instead where that is possible, and the
+  exercise remains answerable in either case
+
+### Requirement: Every line a lesson can speak is known before the lesson runs
+
+The set of lines a lesson can ever speak SHALL be derivable from the lesson's data alone,
+without running the lesson and without a learner interacting with it. Adding a lesson
+SHALL NOT require new code in order to know what it will say.
+
+This is what makes a line preparable at all: a line that could only be discovered by
+playing the lesson could never have been recorded in advance.
+
+#### Scenario: Enumerating a lesson's speech
+- **WHEN** the lines a lesson can speak are collected from its data
+- **THEN** the collection includes every line any of its exercises would speak, including
+  those composed from a template and a vocabulary item
+
+#### Scenario: A new lesson needs no new code to be enumerated
+- **WHEN** a lesson is added as data only
+- **THEN** its speakable lines can be collected by the same means as every other lesson's
 
 ### Requirement: Speech reports what it is doing
 

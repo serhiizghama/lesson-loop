@@ -15,6 +15,12 @@ export async function createRoom(lesson: Lesson, state: LessonState): Promise<Op
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ lesson, state }),
   })
+  // Being asked to wait is not the room being broken, and the notice the teacher reads
+  // says so (design D49). Everything else keeps its status, which is what a bug report
+  // needs.
+  if (response.status === 429) {
+    throw new Error('rooms are being opened too quickly — wait a moment and ask again')
+  }
   if (!response.ok) throw new Error(`the room service answered ${response.status}`)
 
   const body = (await response.json()) as Partial<OpenedRoom>

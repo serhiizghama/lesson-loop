@@ -1,4 +1,5 @@
 import { lessonFailures, lessonById, lessons } from '@/lessons'
+import type { Lesson } from '@/shared/types'
 import { RoomLesson } from './RoomLesson'
 import { SoloLesson } from './SoloLesson'
 import { homePath, lessonPath, useRoute } from './router'
@@ -35,42 +36,71 @@ export function App() {
 function Home({ onOpen }: { onOpen: (lessonId: string) => void }) {
   return (
     <div className={styles.home}>
-      <h1 className={styles.homeTitle}>
-        LessonLoop <span aria-hidden="true">🔁</span>
-      </h1>
-      <p className={styles.homeSubtitle}>Pick a lesson to begin.</p>
+      {/*
+        The brand sits in a band of its own, so the page has a spine: the mark, the rule
+        under it and the cards all start on the same left edge instead of floating.
+      */}
+      <header className={styles.homeBar}>
+        <div className={styles.homeBarInner}>
+          {/* The mark itself, not a stand-in emoji. `/icon.svg` is its single source
+              (the tab and the home-screen tile draw the same picture), so the page
+              references that file rather than keeping a second copy of the geometry. */}
+          <img className={styles.homeMark} src="/icon.svg" alt="" width={36} height={36} />
+          <span className={styles.homeWordmark}>LessonLoop</span>
+        </div>
+      </header>
 
-      <div className={styles.lessonGrid}>
-        {lessons.map((lesson) => (
-          <button
-            key={lesson.id}
-            type="button"
-            className={styles.lessonCard}
-            onClick={() => onOpen(lesson.id)}
-          >
-            <span className={styles.lessonEmoji}>{lesson.emoji}</span>
-            <span className={styles.lessonName}>{lesson.title}</span>
-          </button>
-        ))}
-      </div>
+      <main className={styles.homeBody}>
+        <h1 className={styles.homeTitle}>Lessons</h1>
+        <p className={styles.homeSubtitle}>Pick a lesson to begin.</p>
 
-      {lessonFailures.length > 0 && (
-        <section className={styles.failures}>
-          <h2>These lessons could not be loaded</h2>
-          {lessonFailures.map((failure) => (
-            <div key={failure.file}>
-              <strong>{failure.file}</strong>
-              <ul>
-                {failure.errors.map((error) => (
-                  <li key={error}>{error}</li>
-                ))}
-              </ul>
-            </div>
+        <div className={styles.lessonGrid}>
+          {lessons.map((lesson) => (
+            <button
+              key={lesson.id}
+              type="button"
+              className={styles.lessonCard}
+              onClick={() => onOpen(lesson.id)}
+            >
+              <span className={styles.lessonEmoji} aria-hidden="true">
+                {lesson.emoji}
+              </span>
+              <span className={styles.lessonText}>
+                <span className={styles.lessonName}>{lesson.title}</span>
+                <span className={styles.lessonMeta}>{lessonSummary(lesson)}</span>
+              </span>
+            </button>
           ))}
-        </section>
-      )}
+        </div>
+
+        {lessonFailures.length > 0 && (
+          <section className={styles.failures}>
+            <h2>These lessons could not be loaded</h2>
+            {lessonFailures.map((failure) => (
+              <div key={failure.file}>
+                <strong>{failure.file}</strong>
+                <ul>
+                  {failure.errors.map((error) => (
+                    <li key={error}>{error}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </section>
+        )}
+      </main>
     </div>
   )
+}
+
+/** What a lesson card says under its name. The closing block is a send-off, not an activity. */
+function lessonSummary(lesson: Lesson): string {
+  const activities = lesson.blocks.filter((block) => block.type !== 'finish').length
+  return `${count(lesson.items.length, 'word')} · ${count(activities, 'activity', 'activities')}`
+}
+
+function count(n: number, one: string, many = `${one}s`): string {
+  return `${n} ${n === 1 ? one : many}`
 }
 
 /** Never a blank screen: say what happened and offer the lesson list (spec). */

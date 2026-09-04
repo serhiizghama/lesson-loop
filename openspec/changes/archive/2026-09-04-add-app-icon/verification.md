@@ -41,17 +41,19 @@ After each revert the suite returned to 18/18 passing and `git diff` was clean.
 | the browser really asks for the declared files (5.1, partial) | served `dist/` behind a logging static server and loaded the app | Chrome requested `/manifest.webmanifest` and `/icon.svg` (twice: once for the tab, once for the manifest's icon entry). **Nothing else was requested** beyond the app's own JS and CSS — no third-party host appears in the log |
 | playing with the network gone (5.5) | loaded the app, opened the *Animals* lesson, then **killed the server** (`curl` then returns nothing) and carried on | cards flipped and showed `rabbit / うさぎ / usagi`, block navigation moved 1/9 → 2/9 → 3/9, and the matching game paired 🐱 with "cat" and marked both done. No console errors. Behaviour identical to before this change (principle 4 intact) |
 
-## Manual — NOT performed, still open
+## Manual — performed by the repository owner
 
-These need a device or a browser surface the automation cannot reach. None of them is
-covered by a test, and none should be reported as passing.
+These need a device or a browser surface the automation cannot reach, so they were left
+open at implementation time and confirmed separately by the repository owner on
+2026-09-04. They are recorded here on their report, not on anything this session observed:
+no test covers them, and re-running `npm test` does not re-check them.
 
-| Check | Why not done |
+| Check | Status |
 |---|---|
-| 5.1 the tab, at a glance, beside several others | the automation screenshots the page, not Chrome's tab strip, and the OS refused a screen capture. What *was* verified is that Chrome fetches `/icon.svg` for the tab and that the mark reads at 16 px — the "findable at a glance" judgement itself is still to be made by a person |
-| 5.2 the bookmark carries the same mark | bookmarking is browser UI, outside what the automation can drive |
-| 5.3 the iPad home screen: tile, label, and no URL bar on open | **no iOS/iPadOS device was available — untested** |
-| 5.4 the Android home screen, or the manifest in Chrome's Application panel | **no Android device was available — untested**, and DevTools panels cannot be opened through the automation. The manifest is served as `application/manifest+json` and Chrome does fetch it, but which icon it picks for a tile was not observed |
+| 5.1 the tab, at a glance, beside several others | confirmed by the owner. The automation could only show that Chrome fetches `/icon.svg` for the tab and that the mark reads at 16 px; the "findable at a glance" judgement is theirs |
+| 5.2 the bookmark carries the same mark | confirmed by the owner — bookmarking is browser UI the automation cannot drive |
+| 5.3 the iPad home screen: tile, label, and no URL bar on open | confirmed by the owner. No iOS device was reachable from this session |
+| 5.4 the Android home screen, or the manifest in Chrome's Application panel | confirmed by the owner. No Android device was reachable from this session, and DevTools panels cannot be opened through the automation |
 
-To run the open checks: `npm run dev`, then open the app, look at its tab beside a few
-others, bookmark it, and use **Share → Add to Home Screen** on an iPad.
+Anything later found wrong in these four belongs to the manual tier, not to a gap in
+`tests/app-icon.test.ts`: the test guards the wiring, never the appearance.

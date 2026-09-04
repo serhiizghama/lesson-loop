@@ -28,6 +28,9 @@ not on being inside the gesture's call stack. Any prior tap on the page arms it;
 whose screen is turned by the teacher has had no tap at all, so their device refuses. iOS
 Safari has historically been stricter and wanted the call inside the handler itself.
 
+Decisions continue the shared `Dn` sequence, last used at D38 by `add-star-trail`, because
+code comments cite decisions by bare number.
+
 ## Goals / Non-Goals
 
 **Goals:**
@@ -38,10 +41,16 @@ Safari has historically been stricter and wanted the call inside the handler its
   to it.
 - Give the listening exercise a repeat control whose appearance is derived from that
   answer, plus a gesture-carrying way out for a screen that was never tapped.
+- Take the listening exercise off the device's voice entirely, without making any lesson
+  depend on a generation step having been run.
 
 **Non-Goals:**
 
-- Recorded audio assets. Rejected below; keeping the door open is enough.
+- Recording anything by hand, or a human voice. The clips are synthesised.
+- A voice picker, a per-device sound switch, or letting a lesson choose its own voice. One
+  voice for the whole app, chosen once at generation time.
+- Generating clips in CI or at build time, or fetching a line's audio at runtime. D53 and
+  D54 give the reasons.
 - Any change to lesson JSON, the reducer, the room protocol, or the Worker. Speech is
   per-device and stays out of synchronised state — two learners on two devices may
   legitimately have different sound, and the room must not try to reconcile that.
@@ -51,7 +60,7 @@ Safari has historically been stricter and wanted the call inside the handler its
 
 ## Decisions
 
-### D1: Delete the priming utterance rather than delay its cancellation
+### D39 — Delete the priming utterance rather than delay its cancellation
 
 `prime()` and its silent `utter(' ', 0)` go away entirely, along with the `pointerdown`
 listener and `prime` on the `Speech` type. `LessonPlayer`'s effect keeps only the
@@ -59,7 +68,7 @@ listener and `prime` on the `Speech` type. `LessonPlayer`'s effect keeps only th
 
 Nothing replaces it. Chrome needs sticky activation, which the tap that opened the lesson
 already supplied; the learner's first real word is what proves speech works, and if it
-does not work, D3 notices and D5 offers a fix that *is* inside a gesture handler.
+does not work, D41 notices and D43 offers a fix that *is* inside a gesture handler.
 
 *Rejected: keep the priming utterance but defer the real word by a tick* (`setTimeout(0)`,
 or waiting for the primer's `end`). It removes the specific 7 ms race but keeps a
@@ -70,7 +79,7 @@ already do. It also delays every first word behind a real spoken pause.
 *Rejected: prime with `speechSynthesis.resume()` instead of an utterance.* Cheaper, but it
 is a no-op on a non-paused engine and does not affect activation, so it is ceremony.
 
-### D2: One utterance in flight, with a hand-off gate
+### D40 — One utterance in flight, with a hand-off gate
 
 `speak()` stops calling `cancel()` unconditionally. The module tracks a phase and a single
 waiting slot:
@@ -96,7 +105,7 @@ for a probabilistic guarantee. The lifecycle events say exactly when it is safe;
 *Rejected: never cancel at all, and let the queue drain.* Violates the existing "utterances
 SHALL NOT accumulate" requirement — four taps would play four words at a child.
 
-### D3: A watchdog turns "no `start` event" into a status
+### D41 — A watchdog turns "no `start` event" into a status
 
 Every utterance is timed from the moment it is handed to the engine. If `start` has not
 fired within a grace period, or if `error` fires, the module's status becomes `silent` and
@@ -112,12 +121,12 @@ as loading rather than as nothing happening.
 it latched to `true` in the wedged case while nothing played. The `start` event is the
 only trustworthy signal.
 
-*Rejected: treating the very first failure as fatal and never retrying.* D5's enable action
+*Rejected: treating the very first failure as fatal and never retrying.* D43's enable action
 deliberately clears the status back to untested and tries again, because the single most
 common cause of a first failure is a screen that has had no gesture yet — a condition the
 learner can fix.
 
-### D4: `isAvailable()` becomes a four-state status the UI can subscribe to
+### D42 — `isAvailable()` becomes a four-state status the UI can subscribe to
 
 | Status | Meaning | Listening exercise shows |
 |---|---|---|
@@ -143,12 +152,20 @@ re-render of the whole player for a button label. The store belongs where the ev
 *Rejected: a boolean `isAvailable()` plus a separate `hasFailed()`.* Two booleans encode
 four states badly and invite the impossible combination.
 
-### D5: "Turn on sound" is a real gesture, and the module remembers it was tried
+### D43 — "Turn on sound" is a real gesture, and the module remembers it was tried
 
 `speech.enable(text)` is called from the button's `onClick` — inside the gesture handler,
 which is what iOS Safari wants and what Chrome's sticky activation gets for free. It
-resets the status to `untested`, best-effort clears a wedged engine (`cancel()` then
-`resume()`), and speaks `text`. D3's watchdog then decides: `working`, or `silent` again.
+resets the status to `untested`, calls `resume()`, and speaks `text`. D41's watchdog then
+decides: `working`, or `silent` again.
+
+It deliberately does **not** call `cancel()` first. That was the original plan, and the
+measurements taken while planning this change refute it: `cancel()` followed by `resume()`
+did not revive a wedged engine. So the cancel buys nothing against the case it was aimed
+at, while being itself the cancel-an-unstarted-utterance pattern that wedges engines — it
+would risk the common case (a screen that has simply had no gesture, which speaking from
+inside the handler fixes on its own) to chase a case it cannot fix. `resume()` stays: it
+is a no-op unless Chrome has paused itself, which it sometimes does.
 
 The module keeps an `enableAttempted` flag, because "silent and never asked" and "silent
 and asked, still nothing" are different screens and the difference is device-scoped, not
@@ -156,7 +173,7 @@ block-scoped. Putting it in `ListenView`'s `useState` would re-offer the failed 
 every time the block re-mounts — after a reset, or after the teacher navigates away and
 back.
 
-### D6: The repeat control is restyled, not replaced
+### D44 — The repeat control is restyled, not replaced
 
 `.listenAgain` grows into the exercise's primary control with three appearances (ready,
 speaking, silent) in `blocks.module.css`. It stays tappable while speaking — replacing the
@@ -168,23 +185,137 @@ who may not read English yet *and* a teacher watching over Zoom who needs to kno
 glance whether the student's device has sound. The emoji does that work: 🔊 ready,
 🔈 speaking, 🔇 silent.
 
-### D7: Rejected at the product level — recorded audio, and deleting the exercise
+### D45 — Recorded audio was rejected here, then reversed; deleting the exercise stays rejected
 
-*Recorded audio files per item* (an `audio` field in lesson JSON, `HTMLAudioElement`
-playback) is the maximally reliable answer and was considered first. It loses on the
-project's own architecture rule: "Lessons are data (JSON), never code — a new lesson must
-require zero new code." Recorded audio makes a new lesson require a new *asset pipeline*,
-which is the same tax wearing a different hat, on a product whose selling point is that
-the teacher writes a JSON file. It also cannot cover the `sentence` block, which composes
-its lines from templates at runtime, so TTS would have to be fixed anyway. Kept on the
-table as a later upgrade if pronunciation quality, not reliability, turns out to be the
-complaint.
+*Recorded audio* was rejected on two grounds, and **one of them was simply false.** The
+claim was that clips "cannot cover the `sentence` block, which composes its lines from
+templates at runtime, so TTS would have to be fixed anyway." A template and the vocabulary
+it is applied to are both static lesson data, so every line the block can produce is
+enumerable without running anything. Measured across both lessons: 110 distinct lines,
+1470 characters — the whole app, not just `sentence`. The premise was wrong and the
+conclusion went with it. D52 records what replaced it.
+
+The second ground was real but weaker than it looked: clips make a new lesson require an
+asset step, against the rule that "a new lesson must require zero new code." D52 answers
+it by making clips an *upgrade* to a lesson rather than a precondition for one — a lesson
+speaks the moment its JSON exists, through the synthesiser this change repaired.
+
+What is left of the original objection is worth keeping: clips are not free. They are
+committed bytes, they go stale when a line is edited, and they need a machine that can
+synthesise them. D53 to D56 are about paying that honestly rather than pretending it is
+nothing.
 
 *Deleting the listening exercise* was the other option on the table. It loses because the
 exercise is not what is broken. The engine is, and it is broken for all six block types —
 deleting `listen` would hide the symptom while cards, matching, sentences, sorting and the
 physical-response game stayed mute, on an app whose speech spec opens with "Spoken English
 is what makes these exercises a language lesson rather than a picture game."
+
+### D52 — Two sources, clip first, synthesiser second
+
+`Speech` keeps the interface this change already gave it — `speak`, `enable`, `getState`,
+`subscribe`, `cancel`. Underneath, `speak(line)` looks the line up in a manifest: a hit
+plays a clip through an `HTMLAudioElement`, a miss goes to `speechSynthesis` exactly as it
+does today. Everything above — the phase machine, the four statuses, the watchdog, the
+honest control, the "Turn on sound" offer — is unchanged and shared by both sources.
+
+*Why this ordering rather than clips only:* it is what keeps "lessons are data". A lesson
+written this afternoon speaks this afternoon; running the generator is what makes it
+dependable, not what makes it work. It also means a line edited in JSON degrades to the
+device voice instead of going silent, which is the failure mode an author will actually
+hit.
+
+*Why the fallback is worth having at all, given clips are more reliable:* a clip can be
+missing for ordinary reasons — a new lesson, a typo fixed after the last run, a phrase
+someone reworded. Silence in those cases would be a worse bug than the one this change
+exists to fix, and it would be invisible to the author.
+
+The clip path also improves the honesty of D41's watchdog, which is why the spec was
+sharpened alongside it: `audio.play()` returns a promise that rejects with a named error
+when playback is not permitted, so a blocked clip is *reported* rather than inferred from
+1500 ms of nothing. The grace period stays for the synthesiser, which has no such signal.
+
+### D53 — Clips are generated by the author, not by CI and not by the browser
+
+`npm run audio` walks `lessons/*.json`, enumerates every speakable line, and synthesises
+the ones missing from `public/audio/`. It is run by whoever edited a lesson, and its
+output is committed — the same arrangement `add-app-icon` D28 chose for its PNGs.
+
+*Rejected: generate in CI.* The runner has no macOS voices, so it would need a cloud TTS
+key in repository secrets and would spend an API call on every push for output that almost
+never changes. It would also make the audio a build artefact that no one has ever heard
+before it ships.
+
+*Rejected: synthesise on the fly at runtime, through an API.* It puts a key in the client
+or a proxy in the Worker, spends a network round trip before a child hears a word, and
+breaks the README's "no network call once the page has loaded" far more thoroughly than
+static files do. For 1470 characters of fixed vocabulary it buys nothing.
+
+*Rejected: the unofficial Google Translate TTS endpoint.* Undocumented, CORS-blocked from
+a browser, token-gated, rate-limited by IP, and against its terms of service. Not viable
+at runtime and not defensible at generation time either.
+
+### D54 — macOS `say` and `afconvert`, with the voice as a parameter
+
+The generator shells out to two tools that ship with macOS:
+
+```
+say -v "$VOICE" -r 145 -o line.aiff "the line"
+afconvert line.aiff line.m4a -f m4af -d aac
+```
+
+Verified end to end on the author's machine: three clips in two seconds, valid mono AAC at
+22 kHz, 0.4–1.2 s each. Extrapolated over 110 lines that is **925 KB and about 70
+seconds**, once (measured over the full run, not extrapolated). No account, no API key, no cost, and the voice is the same `en-US
+Samantha` the Web Speech path already selected, so the two sources do not sound like two
+different apps.
+
+The voice is read from an environment variable with `Samantha` as the default, so
+switching to the Enhanced variant — or to a cloud TTS later — changes one call, not the
+pipeline. That matters for one reason worth writing down: Apple's system voices are
+licensed for use on Apple platforms, which is comfortable for an internal teaching tool and
+would want revisiting if this were published broadly.
+
+*Rejected: a cloud TTS now* (Google Cloud, OpenAI, ElevenLabs). Better voices, and 1470
+characters fits any free tier — but it needs an account, a key and a billing setup for a
+job the machine can already do offline. Left as the documented upgrade path instead.
+
+### D55 — Clips are static files under `public/`, never imported from code
+
+They live at `public/audio/<hash>.m4a`, where the hash is taken over the line's exact
+text. `public/` is copied into `dist/` verbatim, and `add-cloudflare-deploy` D46 serves
+`dist/` through an assets binding for exactly this reason: bundled bytes count against the
+Worker's size limit, served bytes do not. An `import` of a clip would quietly move 925 KB
+into the bundle; the manifest alone costs 5.9 KB, which is the point of separating them.
+
+Hashing rather than naming files after words means a line edited in JSON simply misses in
+the manifest and falls back to the synthesiser, instead of playing the old wording under
+the right-looking name. The manifest keeps the original text beside each hash so the
+directory stays debuggable.
+
+The hash covers **the voice as well as the line**. Hashing the text alone was the first
+plan and it is a trap: the generator skips lines that already have a clip, so installing a
+better voice and re-running would match every existing hash and regenerate nothing. The
+clips would stay in the old voice permanently, with no signal that the upgrade had done
+nothing — precisely the silent-wrong-state this change exists to remove. With the voice in
+the hash, changing it produces a new set and the old one falls out into the stale report.
+
+The manifest itself is generated into source and bundled, not fetched: 110 entries is a few
+kilobytes, and knowing *whether* a clip exists must not itself require a network call.
+
+### D56 — A lesson's clips are fetched when the lesson opens
+
+Opening a lesson requests its clips up front rather than at the moment each word is
+spoken. At roughly 200–400 KB per lesson this is a fraction of what the page already
+loads, and it keeps the README's promise honest: once the lesson is on screen, nothing
+else goes to the network.
+
+*Rejected: fetch each clip on demand.* Simpler, and slightly faster to first paint — but
+the first time each exercise type speaks, the child waits on the network, and on a poor
+connection that lands exactly on the word they were asked to identify.
+
+A fetch that fails is not an error the learner sees: the line falls back to the
+synthesiser, which is the same path a missing clip takes.
 
 ## Risks / Trade-offs
 
@@ -196,14 +327,53 @@ is what makes these exercises a language lesson rather than a picture game."
 
 - **iOS Safari may still refuse the auto-spoken word on entering the exercise**, because
   the `useEffect` that speaks it is not inside the gesture's call stack. → This is exactly
-  what D5 is for: the failure is detected, and the offered button speaks from inside a
+  what D43 is for: the failure is detected, and the offered button speaks from inside a
   handler. Worth an explicit check on a real iPhone before this is called done, since it is
   the one platform this design does not fully reason its way to.
 
 - **The wedge already inflicted on a user's browser is not repaired by this change.**
   Chrome's TTS controller survives page reloads; a browser poisoned by the current build
-  may need a restart before it speaks again. → Nothing in the app can fix that. It must be
-  said out loud when verifying, or the fix will look like it failed.
+  may need a restart before it speaks again. → Nothing in the app can fix that, and it must
+  be said out loud when verifying or the fix will look like it failed. Note this affects
+  only a browser that already ran the broken build — no learner reaches that state once
+  this ships. Clips sidestep it entirely, which is what makes the runtime checks in group 8
+  possible on a machine whose synthesiser is still stuck.
+
+- **Committed clips go stale silently.** Edit a line in a lesson JSON and its clip no
+  longer matches by hash, so the line quietly reverts to the device voice — correct
+  behaviour, but the author may not notice the downgrade. → A generator that reports what
+  is missing, and a test that fails when a lesson has lines with no clip, turn a silent
+  drift into a visible one. The test must warn rather than block, since a lesson is allowed
+  to ship without clips by design (D52).
+
+- **925 KB of binary in git, growing with every lesson.** → It is committed once per line
+  and never rewritten, the same trade `add-app-icon` D28 already made for its PNGs. At the
+  current rate a lesson costs roughly 300 KB; if the library grows past a few dozen
+  lessons this wants revisiting, and the manifest makes that measurable rather than a
+  guess.
+
+- **Two defects in this design were found only by running it in a browser**, and both were
+  invisible to tests written against a fake. Warming the cache with detached `Audio`
+  elements fetches nothing in Chrome, and reusing a warmed element to play from means
+  playing one that never finished loading. The fix — `fetch` to warm, a fresh element to
+  play — is now pinned by tests that assert warming constructs no media elements at all.
+  → The lesson generalises: a fake that answers instantly cannot model a source that
+  answers slowly or not at all, so the browser check in group 9 is not optional polish.
+
+- **Audio cannot be verified through browser automation.** Under the debugger attachment
+  this project's tooling uses, no media element ever leaves `readyState 0` — not the
+  clips, not a synthetic in-memory WAV — while the same bytes decode fine through
+  `decodeAudioData` and the same pages play normally in a hand-driven window. An
+  automated browser therefore reports silence identically for a correct implementation and
+  a broken one, and reading that as "the machine's audio is broken" is a mistake this
+  change made once already. → Verify in layers that automation *can* see (the bytes decode,
+  the server serves ranges, the right source is chosen, the fetches complete) and leave
+  exactly one question — does sound reach the speaker — to a person with a normal window.
+
+- **The generator only runs on macOS.** An author on Linux or Windows cannot produce clips,
+  though they can still write lessons that speak through the synthesiser. → Acceptable
+  while there is one author on a Mac; D54 keeps the synth step behind one call so a cloud
+  TTS can replace it without touching the rest.
 
 - **Every existing priming test is deleted, not adapted.** They assert the silent utterance
   and the `pointerdown` listener, both of which are the bug. → The replacement suite has to
@@ -222,12 +392,17 @@ is what makes these exercises a language lesson rather than a picture game."
 
 ## Migration Plan
 
-Not applicable — client-only behaviour with no persisted or synchronised state. The change
-ships in one build; rollback is reverting the commit. Nothing in a room, a lesson file, or
-the Worker is versioned by it.
+Client-only behaviour with no persisted or synchronised state: the change ships in one
+build and rollback is reverting the commit. Nothing in a room, a lesson file, or the Worker
+is versioned by it.
+
+The clips are the only ordering constraint, and it is a soft one. They can land in the same
+commit or a later one — until they exist every line falls back to the synthesiser, which is
+the same state the app is in the moment this change's first half ships. There is no
+migration to run and nothing to back-fill.
 
 ## Open Questions
 
-None that block implementation. The iOS Safari behaviour under D5 is a verification step,
+None that block implementation. The iOS Safari behaviour under D43 is a verification step,
 not an unknown that changes the design: whichever way it lands, the offered button is the
 mitigation.

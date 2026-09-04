@@ -1,5 +1,6 @@
 import { useEffect, type ReactNode } from 'react'
 import { blockViews, type BlockView } from '@/blocks'
+import { speakableLines } from '@/shared/blocks'
 import { blockStateOf, isLessonComplete } from '@/shared/reducer'
 import { seedFor } from '@/shared/rng'
 import type { BlockType, Lesson } from '@/shared/types'
@@ -37,10 +38,16 @@ export function LessonPlayer({
 }: LessonPlayerProps) {
   const { state, dispatch, progress } = store
 
+  // Nothing to arm: speech rides on the sticky user activation the tap that opened this
+  // lesson already gave (design D39). Leaving still stops whatever is mid-word.
+  //
+  // The lesson's recordings are fetched here, all at once, so that no word waits on the
+  // network in the middle of an exercise — which on a poor connection would land on
+  // exactly the word a child was asked to identify (design D56).
   useEffect(() => {
-    speech.prime()
+    speech.preload(speakableLines(lesson))
     return () => speech.cancel()
-  }, [])
+  }, [lesson])
 
   const block = lesson.blocks[state.slide]
   if (block === undefined) return null

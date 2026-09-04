@@ -292,6 +292,35 @@
   box-shadow: var(--shadow);
 }
 
+/*
+ * Speaking. The pulse is the whole point of the state: in this exercise the spoken word
+ * is the question, so a control that looks identical whether or not it worked leaves the
+ * learner with nothing to read the failure from (design D44).
+ */
+.listenSpeaking {
+  animation: listenPulse 900ms ease-in-out infinite;
+}
+
+@keyframes listenPulse {
+  50% {
+    transform: scale(1.04);
+    box-shadow: 0 2px 0 var(--line), 0 10px 28px rgb(76 95 215 / 35%);
+  }
+}
+
+/* The offer that carries the gesture — gold, because it is an invitation, not a verdict. */
+.listenEnable {
+  color: var(--ink);
+  background: var(--gold);
+}
+
+/* The verdict: this device has no sound. Stays tappable; a child taps it anyway. */
+.listenMute {
+  color: var(--ink-soft);
+  background: var(--line);
+  box-shadow: none;
+}
+
 .listenFallback {
   margin: 0;
   font-size: 1.8rem;

@@ -1,14 +1,43 @@
 {
-  // Local development only. Publishing — the assets binding, the custom domain and the
-  // deploy from CI — is `add-cloudflare-deploy` (design D18); `vite dev` proxies to this
-  // Worker rather than being served by it (design D17).
+  // One Worker serves both halves of the app (design D46): the built client through the
+  // assets binding, and the room through `main`. They are the same origin by
+  // construction, which is what lets the client address the server with nothing but a
+  // relative path — no CORS, no socket host to configure (D-2).
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "lesson-loop",
+  // The account's workers.dev subdomain is already `lesson-loop`, so a Worker of the same
+  // name would publish to lesson-loop.lesson-loop.workers.dev. `web` is the half that
+  // varies: web.lesson-loop.workers.dev.
+  "name": "web",
   "main": "worker/index.ts",
   "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./dist",
+    // `/l/animals`, `/r/AB12` and `/t/AB12` are client routes with no file behind them.
+    // A student's link is pasted into a messenger and opened cold, so an address that
+    // matches no file must return the app rather than a missing page.
+    "not_found_handling": "single-page-application",
+    // ...but that fallback would answer the room's own routes with the app's page, and a
+    // deployment where every page loads while no room can be opened is the failure mode
+    // design D47 exists for. These run before the assets layer sees them. Keep this list
+    // in step with WORKER_PATHS in worker/index.ts — `tests/worker-routes.test.ts` fails
+    // if it is not (design D48).
+    "run_worker_first": ["/api/*", "/ws"]
+  },
   "durable_objects": {
     "bindings": [{ "name": "ROOMS", "class_name": "Room" }]
   },
+  // Opening a room needs no account and no name, by design, and each request makes a
+  // Durable Object — so the endpoint is bounded rather than left open (design D49). Ten
+  // a minute is far beyond what teaching produces (a lesson opens one room; a retry or a
+  // change of mind makes it three) and far below what a loop wants. `period` may only be
+  // 10 or 60.
+  "ratelimits": [
+    {
+      "name": "ROOM_LIMIT",
+      "namespace_id": "1001",
+      "simple": { "limit": 10, "period": 60 }
+    }
+  ],
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room"] }],
   "observability": { "enabled": true }
 }

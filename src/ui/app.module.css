@@ -1,34 +1,74 @@
 /* ── Home ─────────────────────────────────────────────────────────────────── */
 
 .home {
+  min-height: 100%;
+}
+
+/*
+ * A brand band across the top, ruled off like the player's header, so the home screen
+ * and a running lesson have the same shape and nothing shifts when you leave one for
+ * the other. The rule is full width; what sits on it lines up with the cards below.
+ */
+.homeBar {
+  border-bottom: 1px solid var(--line);
+}
+
+.homeBarInner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   max-width: 46rem;
   margin: 0 auto;
-  padding: 2.5rem 1rem 4rem;
+  padding: 1rem;
+}
+
+.homeMark {
+  flex: none;
+  display: block;
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.homeWordmark {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.homeBody {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 2.25rem 1rem 4rem;
 }
 
 .homeTitle {
   margin: 0;
-  font-size: clamp(2rem, 8vw, 3rem);
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
   letter-spacing: -0.02em;
 }
 
 .homeSubtitle {
-  margin: 0.25rem 0 2rem;
+  margin: 0.35rem 0 1.5rem;
   color: var(--ink-soft);
 }
 
+/*
+ * `auto-fit` rather than `auto-fill`: with two lessons the row has two cards in it and
+ * they fill the width, instead of two small cards huddled against the left edge.
+ */
 .lessonGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.875rem;
 }
 
 .lessonCard {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: 1.75rem 1rem;
+  gap: 0.9rem;
+  min-height: var(--tap);
+  padding: 0.9rem 1rem;
+  text-align: left;
   background: var(--card);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
@@ -39,14 +79,37 @@
   transform: translateY(-2px);
 }
 
+.lessonCard:active {
+  transform: translateY(0);
+}
+
 .lessonEmoji {
-  font-size: 2.75rem;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  font-size: 1.9rem;
   line-height: 1;
+  background: var(--paper);
+  border-radius: var(--radius);
+}
+
+.lessonText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
 }
 
 .lessonName {
   font-size: 1.05rem;
   font-weight: 600;
+}
+
+.lessonMeta {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
 }
 
 .failures {

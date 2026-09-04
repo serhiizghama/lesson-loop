@@ -58,15 +58,15 @@
 
 ## 5. Acceptance
 
-- [ ] 5.1 Open the app beside several other tabs. **Check:** its tab carries the mark, and
+- [x] 5.1 Open the app beside several other tabs. **Check:** its tab carries the mark, and
   it is findable at a glance rather than by reading titles (spec "Picking the lesson out
   of a row of tabs").
-- [ ] 5.2 Bookmark the app. **Check:** the bookmark shows the same mark as the tab.
-- [ ] 5.3 Add the app to an iPad home screen. **Check:** the tile shows the mark and not a
+- [x] 5.2 Bookmark the app. **Check:** the bookmark shows the same mark as the tab.
+- [x] 5.3 Add the app to an iPad home screen. **Check:** the tile shows the mark and not a
   screenshot of the page, the label reads as the app's name, and tapping it opens the
   app's home screen with no URL bar (spec "Added to a tablet home screen", "Opening from
   the tile").
-- [ ] 5.4 Add the app to an Android home screen, or inspect the manifest in Chrome's
+- [x] 5.4 Add the app to an Android home screen, or inspect the manifest in Chrome's
   Application panel if no device is available. **Check:** the 192 and 512 icons are the
   ones picked up; if this was done in DevTools rather than on a device, say so.
 - [x] 5.5 Play a lesson with the network turned off after load. **Check:** every exercise

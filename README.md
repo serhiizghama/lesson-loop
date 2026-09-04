@@ -5,8 +5,16 @@ tap-based exercises — flip cards, matching, sentence building, sorting, listen
 physical-response games — built from a plain JSON vocabulary list.
 
 A lesson opened from the home screen runs entirely in the browser: no sign-up, no
-database, and no network call once the page has loaded. When the teacher wants the
-student to join in, she opens a **room** — and only then does anything leave the device.
+database, and nothing to talk to. Opening a lesson fetches its spoken words as static
+audio files from the same origin; after that it makes no network call at all. When the
+teacher wants the student to join in, she opens a **room** — and only then does anything
+leave the device.
+
+**Every word is spoken.** English lines are pre-recorded into small clips committed to
+this repository, so pronunciation does not depend on which voices a device happens to
+have. A line without a clip — a lesson added but not yet recorded — is spoken by the
+browser instead, so a new lesson works the moment its JSON exists. After editing a
+lesson, `npm run audio` records whatever is new.
 
 ## Rooms: two links, two halves of the same lesson
 
@@ -65,8 +73,7 @@ npm run dev        # http://localhost:5173, proxying /api and /ws to the Worker
 ```
 
 Then open a lesson, press **Invite student**, and paste the student link into a second
-browser window. Publishing this to the internet is a later change; two windows against
-`wrangler dev` is as far as it goes today.
+browser window.
 
 ```bash
 npm run typecheck  # tsc --noEmit, over the client and the Worker
@@ -74,10 +81,50 @@ npm test           # vitest
 npm run build      # production bundle in dist/
 ```
 
+## Publishing it
+
+One Cloudflare Worker serves both halves: the built client through its assets binding, and
+the room through the same code that runs under `wrangler dev`. That is why the client
+never has a server address configured anywhere — it is always the origin the page came
+from, so there is no CORS, no socket host to set, and no way for the two halves to be on
+different versions.
+
+**Normally you do not publish by hand.** Pushing to `main` runs the checks and, if they
+pass, publishes. A pull request runs the checks and publishes nothing: a red build cannot
+become the app a lesson is running on. This needs two repository secrets, which are set
+once in GitHub — `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
+
+The by-hand route, for the first deploy or when CI is not an option:
+
+```bash
+npx wrangler login   # once per machine
+npm run deploy       # builds, then wrangler deploy
+```
+
+`npx wrangler deploy --dry-run` reports the bundle and the bindings without publishing —
+worth running after touching `wrangler.jsonc`.
+
+Two things about `wrangler.jsonc` are load-bearing and easy to undo by accident:
+
+- `not_found_handling: "single-page-application"` is what makes a student's link work when
+  it is opened cold from a message. `/r/AB12` is not a file; without this it is a 404.
+- `run_worker_first` lists the paths the Worker must answer *before* that fallback sees
+  them. Leave a path out and the fallback returns the app's own page, with a `200`, to
+  something expecting JSON — every page still loads and no room can be opened.
+  `tests/worker-routes.test.ts` fails if the list and the Worker disagree, so add a route
+  to both.
+
+**A new lesson now needs a deploy.** The Worker still keeps no catalogue of lessons — a
+lesson travels to the room with the request that opens it — but `lessons/` is bundled into
+the client, and the client is what gets published. So a lesson reaches the teacher when it
+is pushed, not when the file is saved.
+
 ## Adding a lesson
 
 Drop a JSON file into `lessons/`. Nothing else — no code, no registration, no imports.
-It is picked up at build time, validated on load, and appears on the home screen.
+It is picked up at build time, validated on load, and appears on the home screen. Being
+picked up at build time is also why it reaches a published app on the next deploy rather
+than the moment it is saved — see **Publishing it** above.
 
 A lesson has a vocabulary list and an ordered list of exercise blocks:
 

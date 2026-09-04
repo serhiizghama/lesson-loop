@@ -233,7 +233,8 @@ Audio: `speechSynthesis`, `lang='en-US'`, `rate≈0.85` — same as in her origi
   a UI kit gets in the way). React is chosen because "state → render" is literally what a
   synchronised room is.
 - **Server:** a single Cloudflare Worker serving the static assets (assets binding) plus a
-  Durable Object. One domain, no CORS, one `npx wrangler deploy`.
+  Durable Object. One domain, no CORS, one `npx wrangler deploy` — and in practice not even
+  that, since pushing to `main` publishes once the checks pass (D-24).
 - **Cost:** the Workers free tier plus Durable Objects on the free plan.
   ⚠️ Verify the current limits at deploy time rather than trusting this document.
 
@@ -254,9 +255,20 @@ lesson-loop/
 ```
 
 The separate `engine/` never happened: block rendering lives in `src/blocks/` and the logic
-behind it in `src/shared/blocks/`. The Worker serving the static assets is the shape after
-`add-cloudflare-deploy`; until then development runs two processes, with Vite proxying the
-socket to `wrangler dev` (D-18).
+behind it in `src/shared/blocks/`. The Worker does now serve the static assets, so the
+deployed app is one Worker and one origin; development still runs two processes, with Vite
+proxying the socket to `wrangler dev`, because Vite is what gives the client hot reload.
+
+Two settings in `wrangler.jsonc` carry the deployed routing: unknown paths fall back to the
+app, so a student's link works when it is opened cold, and `run_worker_first` lists the
+paths the room must answer before that fallback sees them. A route in one list and not the
+other is a deployment where every page loads and no room can be opened, which is why a test
+holds the two together.
+
+One consequence worth stating plainly: the Worker still keeps no catalogue of lessons
+(D-20), but `lessons/` is bundled into the client and the client is deployed — so a new
+lesson reaches the teacher on the next deploy, not the moment the file is saved. Adding a
+lesson still needs no code and no server change.
 
 ---
 
@@ -269,9 +281,13 @@ collect feedback.
 
 Where it stands on 2026-09-04: `add-lesson-engine` is implemented and archived — the engine,
 the six block types and both of her lessons play end to end in one browser, offline.
-`add-synced-rooms` is implemented: two browsers hold one lesson together against
-`wrangler dev`, with the teacher panel, the answer keys and the lock. It stops short of
-publishing (D-18). `add-cloudflare-deploy` has not been started.
+`add-synced-rooms` is implemented and archived: two browsers hold one lesson together, with
+the teacher panel, the answer keys and the lock. `add-app-icon` is implemented and archived.
+`add-cloudflare-deploy` publishes the app: one Worker serves the client and the room on a
+`workers.dev` subdomain (D-23), pushed from CI (D-24), with room creation bounded (D-25).
+
+That leaves v0.1's acceptance, which is not a passing suite: run a real lesson with two
+people and collect feedback. The questions in §11 wait on it.
 
 **v0.2** — `hotspot`, `memory`, `scramble`; four to six new lessons; sounds and
 correct-answer animations; tablet polish; pre-generated mp3 instead of TTS.
@@ -327,8 +343,11 @@ technical decisions `Dn`, without the hyphen; the two sequences are separate.
 | D-15 | Room state is persisted to the room's Durable Object storage rather than held only in memory, so that a reloaded tab does not cost the lesson. Qualifies principle 2 | 2026-09-04 |
 | D-16 | The teacher's role is granted by a secret key in the link fragment, not by the route, so the student's link cannot be edited into the teacher's | 2026-09-04 |
 | D-17 | The teacher's answer key is computed from lesson data and belongs to the block contract, so a new block type cannot ship without one. No teacher notes are added to the lesson format in v0.1 | 2026-09-04 |
-| D-18 | `add-synced-rooms` ends at two browsers against `wrangler dev`; publishing, asset serving and CI deployment are `add-cloudflare-deploy` | 2026-09-04 |
+| D-18 | `add-synced-rooms` ends at two browsers against `wrangler dev`; publishing, asset serving and CI deployment are `add-cloudflare-deploy`. **Closed** by that change — see D-23, D-24, D-25 | 2026-09-04 |
 | D-19 | Room behaviour lives in `src/shared/room.ts` as pure code with the Durable Object a thin adapter, so convergence is a unit test rather than a two-browser check | 2026-09-04 |
 | D-20 | The room holds the lesson's data, not just its id: it is sent when the room is opened and when the lesson is switched. The Worker keeps no lesson catalogue, so principle 3 survives — a new lesson is still a file in `lessons/` and needs no deploy | 2026-09-04 |
 | D-21 | The teacher paces a shared lesson: moving between exercises and resetting one are hers alone, absent from the student's screen and refused by the room. The lock stays a separate, stronger rule about touching the exercise itself. An unsynced student therefore holds their exercise rather than walking on — qualifies principle 4 | 2026-09-04 |
 | D-22 | The app carries its own mark and a web manifest, so it can be kept on a home screen as a standalone window. It deliberately stops short of a service worker: the lesson already runs with the network gone, and a cache layer would only add a stale-content failure mode in front of a child | 2026-09-04 |
+| D-23 | The published address is a `workers.dev` subdomain, not a domain of our own. Nothing about a domain can be judged before a real lesson has been taught, and adding one later changes no code — every URL the client builds comes from `window.location` | 2026-09-04 |
+| D-24 | Publishing happens from CI on a push to `main`, only after the type check, tests and build have passed, so what is served is always a revision that exists in `main`. A hand-run deploy stays the break-glass route. The API token and the account id are repository secrets: the repository is public (D-1) | 2026-09-04 |
+| D-25 | Opening a room is rate limited per calling address, since it needs no account and each request makes a Durable Object. The bound sits far above any teaching pace and the check fails open: a mechanism guarding a quota may never be the reason a lesson cannot start (qualifies principle 4) | 2026-09-04 |
