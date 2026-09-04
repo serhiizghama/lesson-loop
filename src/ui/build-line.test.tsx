@@ -19,7 +19,13 @@ import type { LessonStore } from './useLesson'
 const lesson = testLesson()
 
 function store(state: LessonState = testState()): LessonStore {
-  return { state, dispatch: () => {}, progress: { done: 0, total: 6, percent: 0 } }
+  return {
+    state,
+    dispatch: () => {},
+    progress: { done: 0, total: 6, percent: 0 },
+    muted: false,
+    setMuted: () => {},
+  }
 }
 
 /** The signature to look for: `lesson-loop@`, wherever the version happens to land. */

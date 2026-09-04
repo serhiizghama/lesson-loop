@@ -34,6 +34,12 @@ export type RoomState = {
   lesson: Lesson
   state: LessonState
   locked: boolean
+  /**
+   * Whether the app has been told to stop speaking unasked (design D66). The teacher's,
+   * and the room's rather than a device's, because a live lesson has one voice and it is
+   * hers — a synthesised one repeating her on two screens talks over her.
+   */
+  muted: boolean
   /** Never leaves the room: a client is told how many peers there are, not who. */
   teacherKey: string
   participants: Participant[]
@@ -61,7 +67,9 @@ export class RoomCore {
 
   /** A room opens on the lesson and the progress the teacher already had (spec). */
   static open(lesson: Lesson, state: LessonState, teacherKey: string): RoomCore {
-    return new RoomCore({ lesson, state, locked: false, teacherKey, participants: [] })
+    return new RoomCore({
+      lesson, state, locked: false, muted: false, teacherKey, participants: [],
+    })
   }
 
   /** The whole room, for the adapter to persist. Callers must not mutate it. */
@@ -75,6 +83,10 @@ export class RoomCore {
 
   get locked(): boolean {
     return this.#room.locked
+  }
+
+  get muted(): boolean {
+    return this.#room.muted
   }
 
   get participants(): readonly Participant[] {
@@ -114,7 +126,13 @@ export class RoomCore {
 
   /** The snapshot a given socket is sent: the same state, addressed to its own role. */
   stateMessage(role: Role): ServerMessage {
-    return { t: 'state', state: this.#room.state, locked: this.#room.locked, role }
+    return {
+      t: 'state',
+      state: this.#room.state,
+      locked: this.#room.locked,
+      muted: this.#room.muted,
+      role,
+    }
   }
 
   peersMessage(): ServerMessage {
@@ -139,6 +157,14 @@ export class RoomCore {
         if (role !== 'teacher') return { kind: 'refused', reason: 'not-teacher' }
         if (this.#room.locked === message.value) return { kind: 'refused', reason: 'no-effect' }
         this.#room = { ...this.#room, locked: message.value }
+        return { kind: 'applied' }
+      case 'mute':
+        // A third rule about who may do what, enforced here for the same reason as the
+        // other two: a student who could quieten or unquieten the room would be deciding
+        // how the lesson is taught (design D66).
+        if (role !== 'teacher') return { kind: 'refused', reason: 'not-teacher' }
+        if (this.#room.muted === message.value) return { kind: 'refused', reason: 'no-effect' }
+        this.#room = { ...this.#room, muted: message.value }
         return { kind: 'applied' }
     }
   }
@@ -205,6 +231,8 @@ export function reconcile(local: LessonState, incoming: LessonState): LessonStat
 export type ClientView = {
   state: LessonState
   locked: boolean
+  /** Whether this screen has been told to stop speaking unasked (design D66). */
+  muted: boolean
   role: Role | null
   /**
    * Whether the next snapshot must be taken whole rather than reconciled by version.
@@ -216,7 +244,7 @@ export type ClientView = {
 }
 
 export function newClientView(state: LessonState): ClientView {
-  return { state, locked: false, role: null, adoptNext: true }
+  return { state, locked: false, muted: false, role: null, adoptNext: true }
 }
 
 /** A fresh socket: whatever the room says next is the truth (spec: "Coming back"). */
@@ -236,7 +264,16 @@ export function viewAct(view: ClientView, lesson: Lesson, action: Action): Clien
 export function viewReceive(view: ClientView, message: ServerMessage): ClientView {
   if (message.t === 'state') {
     const state = view.adoptNext ? message.state : reconcile(view.state, message.state)
-    return { state, locked: message.locked, role: message.role, adoptNext: false }
+    // Read as an explicit `true` rather than taken as given: a snapshot from a Worker
+    // built before this change carries no `muted` at all, and sound on is what that
+    // build behaves as (design D74).
+    return {
+      state,
+      locked: message.locked,
+      muted: message.muted === true,
+      role: message.role,
+      adoptNext: false,
+    }
   }
   if (message.t === 'refused') return { ...view, adoptNext: true }
   return view

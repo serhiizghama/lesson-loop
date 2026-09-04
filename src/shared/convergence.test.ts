@@ -46,6 +46,10 @@ class Client {
     return this.view.locked
   }
 
+  get muted(): boolean {
+    return this.view.muted
+  }
+
   /** The optimistic half of design D13: the tap lands here before it is ever sent. */
   act(action: Action): ClientMessage {
     this.view = viewAct(this.view, this.lesson, action)
@@ -210,7 +214,13 @@ describe('two clients and one room end up identical', () => {
     room.send(teacher, teacher.act({ t: 'nav', slide: 3 }))
 
     const ahead = student.state
-    student.receive({ t: 'state', state: { ...ahead, v: ahead.v - 1, slide: 0 }, locked: false, role: 'student' })
+    student.receive({
+      t: 'state',
+      state: { ...ahead, v: ahead.v - 1, slide: 0 },
+      locked: false,
+      muted: false,
+      role: 'student',
+    })
     expect(student.state).toBe(ahead)
     expect(student.state.slide).toBe(3)
   })
@@ -297,5 +307,39 @@ describe('two clients and one room end up identical', () => {
     expect(student.locked).toBe(true)
     expect(student.refusals).toBe(2)
     expectAgreement(room, teacher, student)
+  })
+
+  // Spec: the teacher's setting applies to both screens.
+  it("carries the teacher's sound setting to the student's screen", () => {
+    const { room, teacher, student } = table()
+    room.connect(teacher)
+    room.connect(student)
+    expect(student.muted).toBe(false)
+
+    room.send(teacher, { t: 'mute', value: true })
+    expect(teacher.muted).toBe(true)
+    expect(student.muted).toBe(true)
+
+    room.send(teacher, { t: 'mute', value: false })
+    expect(student.muted).toBe(false)
+    expectAgreement(room, teacher, student)
+  })
+
+  // Spec: "A student who joins after it was turned off" and "Surviving a reload" — both
+  // are the same thing to the room, a socket taking the setting from its first snapshot.
+  it('hands the setting to a screen that arrives after it was changed', () => {
+    const { room, teacher, student, lesson } = table()
+    room.connect(teacher)
+    room.send(teacher, { t: 'mute', value: true })
+
+    room.connect(student)
+    expect(student.muted).toBe(true)
+
+    // The teacher reloads: a new socket under the same key, starting from nothing.
+    room.disconnect(teacher)
+    const reloaded = new Client('t', KEY, lesson, testState())
+    expect(reloaded.muted).toBe(false)
+    room.connect(reloaded)
+    expect(reloaded.muted).toBe(true)
   })
 })

@@ -7,9 +7,10 @@ and that decision SHALL apply to both screens. It exists because the teacher is 
 of a live lesson: she models the words herself, and a synthesised voice repeating them on
 two devices talks over her.
 
-The control SHALL be reachable at all times while the teacher is teaching, including on a
-narrow window and whether or not she has dismissed her extra surface, and SHALL show which
-of the two states is in force. Sound SHALL start on.
+The control SHALL sit among the teacher's other lesson controls, alongside the one that
+locks the student, SHALL show which of the two states is in force, and SHALL remain usable
+on a window as narrow as the student's. Sound SHALL start on. There SHALL be exactly one
+such control on a screen, so the teacher is never offered two switches for one setting.
 
 The setting SHALL belong to the teacher alone. A student SHALL have no control for it and
 SHALL NOT be able to change it by any route the page or the connection allows. A
@@ -56,6 +57,11 @@ may tap, and locking the student SHALL NOT change whether the app speaks.
 - **THEN** the student can still tap the exercise as normal, and locking or unlocking them
   changes nothing about whether the app speaks
 
-#### Scenario: Reachable with the panel dismissed
-- **WHEN** the teacher dismisses her extra surface to see the exercise as the student has it
-- **THEN** she can still turn sound off and on
+#### Scenario: Where the teacher looks for it
+- **WHEN** the teacher's view is shown
+- **THEN** the control sits beside the one that locks the student, labelled with which
+  state the lesson is in, and it is the only such control on the screen
+
+#### Scenario: Usable on a narrow window
+- **WHEN** the teacher's view is shown in a 380-pixel-wide viewport
+- **THEN** the control is reachable and usable, and the page does not scroll sideways

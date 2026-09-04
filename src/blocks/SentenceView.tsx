@@ -51,7 +51,7 @@ export const SentenceView: BlockView<'sentence'> = ({ lesson, block, state, disp
         type="button"
         className={styles.speakButton}
         disabled={sentence === null}
-        onClick={() => sentence !== null && speech.speak(sentence)}
+        onClick={() => sentence !== null && speech.speak(sentence, 'demand')}
       >
         🔊 Listen
       </button>

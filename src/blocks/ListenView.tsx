@@ -32,6 +32,12 @@ export const ListenView: BlockView<'listen'> = ({ lesson, block, state, seed, di
   // A screen that has had no tap — a student's, turned by the teacher — is offered the
   // gesture rather than being handed the answer to read (design D43). Where there is no
   // speech API at all the offer would be a lie, so that case skips straight to the word.
+  //
+  // Both read the device's own verdict and neither reads the lesson's sound setting: a
+  // lesson told to be quiet has a working device and a control that speaks on being
+  // pressed, so revealing the word would turn listening into reading for no reason
+  // (design D69). Only the control's wording changes — "Listen again" in front of a child
+  // who has heard nothing is a broken-looking button.
   const offerSound = status === 'silent' && !enableAttempted
   const showWord = status === 'unsupported' || (status === 'silent' && enableAttempted)
 
@@ -53,9 +59,15 @@ export const ListenView: BlockView<'listen'> = ({ lesson, block, state, seed, di
             speaking ? styles.listenSpeaking : '',
             showWord ? styles.listenMute : '',
           ].join(' ')}
-          onClick={() => speech.speak(targetItem.en)}
+          onClick={() => speech.speak(targetItem.en, 'demand')}
         >
-          {showWord ? '🔇 No sound here' : speaking ? '🔈 Speaking…' : '🔊 Listen again'}
+          {showWord
+            ? '🔇 No sound here'
+            : speaking
+              ? '🔈 Speaking…'
+              : speech.quiet
+                ? '🔊 Listen'
+                : '🔊 Listen again'}
         </button>
       )}
 

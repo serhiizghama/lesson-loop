@@ -14,15 +14,21 @@ import type { LessonStore } from './useLesson'
  */
 const lesson = testLesson()
 
-function store(state: LessonState = testState()): LessonStore {
-  return { state, dispatch: () => {}, progress: { done: 0, total: 6, percent: 0 } }
+function store(state: LessonState = testState(), muted = false): LessonStore {
+  return {
+    state,
+    dispatch: () => {},
+    progress: { done: 0, total: 6, percent: 0 },
+    muted,
+    setMuted: () => {},
+  }
 }
 
-function studentMarkup(state?: LessonState, readOnly = false): string {
+function studentMarkup(state?: LessonState, readOnly = false, muted = false): string {
   return renderToStaticMarkup(
     <LessonPlayer
       lesson={lesson}
-      store={store(state)}
+      store={store(state, muted)}
       onExit={() => {}}
       canSteer={false}
       readOnly={readOnly}
@@ -31,25 +37,27 @@ function studentMarkup(state?: LessonState, readOnly = false): string {
 }
 
 /** A lesson opened from the home screen: no room, no role, every control (design D22). */
-function soloMarkup(state?: LessonState): string {
+function soloMarkup(state?: LessonState, muted = false): string {
   return renderToStaticMarkup(
-    <LessonPlayer lesson={lesson} store={store(state)} onExit={() => {}} />,
+    <LessonPlayer lesson={lesson} store={store(state, muted)} onExit={() => {}} />,
   )
 }
 
-function teacherMarkup(state: LessonState = testState(), locked = false): string {
+function teacherMarkup(state: LessonState = testState(), locked = false, muted = false): string {
   return renderToStaticMarkup(
     <LessonPlayer
       lesson={lesson}
-      store={store(state)}
+      store={store(state, muted)}
       onExit={() => {}}
       canSteer
+      soundControlInPanel
       aside={
         <TeacherPanel
           lesson={lesson}
           lessons={[lesson]}
           state={state}
           locked={locked}
+          muted={muted}
           connection={{ connected: true, failures: 0, unsynced: false }}
           peers={{ teacher: true, students: 1 }}
           studentLink="https://lessonloop.test/r/AB12"
@@ -58,10 +66,16 @@ function teacherMarkup(state: LessonState = testState(), locked = false): string
           onReset={() => {}}
           onSwitchLesson={() => {}}
           onSetLocked={() => {}}
+          onSetMuted={() => {}}
         />
       }
     />,
   )
+}
+
+/** Just the header, where the sound control lives. */
+function headerOf(markup: string): string {
+  return markup.slice(markup.indexOf('<header'), markup.indexOf('</header>'))
 }
 
 /** Just the footer, so the two views' lesson controls can be compared directly. */
@@ -179,5 +193,55 @@ describe("the teacher's screen carries what the student's does not", () => {
 
   it('says whether the student is there', () => {
     expect(teacherMarkup()).toContain('student here')
+  })
+})
+
+/**
+ * The sound control is the teacher's, and a student must not even see that it exists
+ * (design D72). The whole markup is read rather than the header alone where the point is
+ * "nothing anywhere", because "hidden with CSS" would satisfy a screenshot and not the
+ * requirement.
+ */
+describe('the sound control belongs to the screen that paces the lesson', () => {
+  const LABEL_ON = 'Sound is on'
+  const LABEL_OFF = 'Sound is off'
+
+  it("is in the teacher's panel, beside the lock, in both states", () => {
+    const on = teacherMarkup()
+    expect(on).toContain('Voice on')
+    expect(on).toContain('Student can tap')
+    expect(headerOf(on)).not.toContain('Voice')
+
+    expect(teacherMarkup(testState(), false, true)).toContain('Voice off')
+  })
+
+  // A lesson played alone has no panel, so the header carries it there.
+  it('is in the header of a lesson opened alone', () => {
+    expect(headerOf(soloMarkup())).toContain(LABEL_ON)
+    expect(headerOf(soloMarkup(testState(), true))).toContain(LABEL_OFF)
+  })
+
+  // Spec: "No control leaks onto the student's screen" — including when it is off, which
+  // is when a child would most want to press it.
+  it("is absent from the student's screen whether the sound is on or off", () => {
+    for (const markup of [studentMarkup(), studentMarkup(testState(), false, true)]) {
+      expect(markup).not.toContain(LABEL_ON)
+      expect(markup).not.toContain(LABEL_OFF)
+      expect(headerOf(markup)).not.toContain('🔇')
+    }
+  })
+
+  it('shows which state the lesson is in, not only what pressing it would do', () => {
+    expect(headerOf(soloMarkup())).toContain('aria-pressed="false"')
+    expect(headerOf(soloMarkup(testState(), true))).toContain('aria-pressed="true"')
+    // In the panel the two toggles sit together, so each must say its own state.
+    expect(teacherMarkup(testState(), false, true)).toContain('aria-pressed="true"')
+  })
+
+  // One setting gets one control: the panel's copy replaces the header's rather than
+  // joining it, so the teacher never has two switches for one thing.
+  it('is not duplicated in the header when the panel carries it', () => {
+    expect(headerOf(teacherMarkup())).not.toContain(LABEL_ON)
+    expect(headerOf(teacherMarkup(testState(), false, true))).not.toContain(LABEL_OFF)
   })
 })

@@ -31,7 +31,9 @@ covering the room rather than one device.
 
 - **One sound setting per lesson in play, and one control that changes it.** On by
   default, so nothing about a lesson opened today changes until the setting is touched.
-- **In a room the setting is the teacher's and it covers both screens.** It travels in
+- **In a room the setting is the teacher's and it covers both screens**, as a toggle
+  beside the one that locks the student — the two are siblings: one says whether the
+  student may act, the other whether the app may talk. It travels in
   the room's state beside the lock: a student has no such control and cannot change it by
   any route, a participant joining later inherits it, and it survives a reload and a
   change of lesson within the room. A lesson opened alone from the home screen has the
@@ -56,7 +58,7 @@ covering the room rather than one device.
   every one of them and give the teacher the switch instead); a per-exercise or per-block
   setting in the lesson format; a separate switch per device; muting the teacher's screen
   alone; anything about the star trail's chime and notes, which do not exist yet — when
-  `add-star-trail` ships they obey this same setting (design D64).
+  `add-star-trail` ships they obey this same setting (design D73).
 
 ## Capabilities
 
@@ -91,14 +93,15 @@ None. The setting belongs with the speech it governs and the teacher who owns it
   `worker/room.ts` (a stored room from before this change loads as unmuted),
   `src/ui/useLesson.ts` and `src/ui/useRoom.ts` (both stores expose `muted`/`setMuted`, so
   the player still cannot tell which one it holds — D13),
-  `src/ui/LessonPlayer.tsx` (the control where the screen steers; the policy wrapper),
+  `src/ui/LessonPlayer.tsx` (the policy wrapper; the control on a lesson played alone),
+  `src/ui/TeacherPanel.tsx` and `src/ui/RoomLesson.tsx` (the control beside the lock),
   `src/blocks/SentenceView.tsx` and `src/blocks/ListenView.tsx` (two call sites declare
   `demand`; the listening control's wording), `src/ui/app.module.css`.
 - **New:** `src/speech/policy.ts` — the wrapper that applies the setting to a `Speech`,
   with its own tests.
 - **Unchanged:** the lesson format and every lesson file, the reducer, the action set,
   `LessonState`, the answer keys, the routes, `TeacherPanel.tsx` (the control lives in the
-  player header, not the panel — D63), and `src/shared/blocks/speakable.ts` (the setting
+  player header, not the panel — D72), and `src/shared/blocks/speakable.ts` (the setting
   changes when a line is said, never which lines exist, so recordings are unaffected).
 - **Tests:** new tests for the policy wrapper; `src/shared/room.test.ts` for the
   teacher-only rule and the refusal a student gets; `src/shared/convergence.test.ts` for

@@ -18,6 +18,8 @@ export type RoomStore = LessonStore & {
   role: Role | null
   locked: boolean
   connection: Connection
+  /** Teacher-only, and the room's rather than this device's (design D66). */
+  setMuted: (value: boolean) => void
   peers: Peers
   /** Set when the room refused us outright; retrying would not help. */
   error: RoomErrorCode | null
@@ -95,6 +97,13 @@ export function useRoom(code: string, teacherKey: string | null): RoomStore {
     socketRef.current?.send({ t: 'lock', value })
   }, [])
 
+  // Not applied optimistically: unlike a tap, nothing is waiting on it within the hundred
+  // milliseconds the room takes to answer, and the room is where a student's attempt at it
+  // is refused.
+  const setMuted = useCallback((value: boolean) => {
+    socketRef.current?.send({ t: 'mute', value })
+  }, [])
+
   const switchLesson = useCallback((next: Lesson) => {
     socketRef.current?.send({ t: 'switch-lesson', lesson: next })
   }, [])
@@ -112,10 +121,12 @@ export function useRoom(code: string, teacherKey: string | null): RoomStore {
     lesson,
     role: view.role,
     locked: view.locked,
+    muted: view.muted,
     connection,
     peers,
     error,
     setLocked,
+    setMuted,
     switchLesson,
   }
 }

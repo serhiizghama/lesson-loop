@@ -10,6 +10,8 @@ export type TeacherPanelProps = {
   lessons: readonly Lesson[]
   state: LessonState
   locked: boolean
+  /** Whether the app has been told to stop speaking unasked, on both screens (D66). */
+  muted: boolean
   connection: Connection
   peers: Peers
   studentLink: string
@@ -18,6 +20,7 @@ export type TeacherPanelProps = {
   onReset: () => void
   onSwitchLesson: (lesson: Lesson) => void
   onSetLocked: (value: boolean) => void
+  onSetMuted: (value: boolean) => void
 }
 
 /**
@@ -26,7 +29,7 @@ export type TeacherPanelProps = {
  * surface does not crowd out the exercise").
  */
 export function TeacherPanel(props: TeacherPanelProps) {
-  const { lesson, state, locked, connection, peers } = props
+  const { lesson, state, locked, muted, connection, peers } = props
   const [open, setOpen] = useState(true)
   const [copied, setCopied] = useState(false)
   const [switching, setSwitching] = useState(false)
@@ -87,6 +90,17 @@ export function TeacherPanel(props: TeacherPanelProps) {
           onClick={() => props.onSetLocked(!locked)}
         >
           {locked ? '🔒 Student locked' : '🔓 Student can tap'}
+        </button>
+        {/* The lock's sibling and its opposite number: one says whether the student may
+            act, this says whether the app may talk. Both are the teacher's, both cover
+            both screens, and neither is the other (design D72). */}
+        <button
+          type="button"
+          className={muted ? styles.panelButtonOn : styles.panelButton}
+          aria-pressed={muted}
+          onClick={() => props.onSetMuted(!muted)}
+        >
+          {muted ? '🔇 Voice off' : '🔊 Voice on'}
         </button>
       </div>
 

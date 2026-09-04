@@ -55,9 +55,26 @@ export type SpeechState = {
   enableAttempted: boolean
 }
 
+/**
+ * Why a line is being said (design D67). `auto` is the app volunteering — a card turned
+ * over, a new word to identify — and is what a lesson told to be quiet stops saying.
+ * `demand` is the learner pressing something in order to hear it, which is never
+ * suppressed: it is the whole of how a quieted listening exercise stays answerable.
+ *
+ * Absent means `auto`, deliberately. A block type written later, by someone who has never
+ * read this, is quiet during a quiet lesson rather than being the one thing that shouts.
+ */
+export type SpeechIntent = 'auto' | 'demand'
+
 export type Speech = {
   /** Speaks English, replacing whatever is in flight. Silent if unavailable. */
-  speak(text: string): void
+  speak(text: string, intent?: SpeechIntent): void
+  /**
+   * Whether volunteered lines are being suppressed right now. False here — this module
+   * speaks whatever it is given; the setting is applied by `quietable` around it
+   * (design D67). A control that reads it words itself accordingly (design D69).
+   */
+  readonly quiet: boolean
   /**
    * Retries speech from inside a user gesture, which is what a screen that has had no
    * tap needs. Clears any earlier verdict so the watchdog decides again.
@@ -337,7 +354,11 @@ export function createSpeech(host: SpeechHost, clipPlayer?: ClipPlayer): Speech 
   }
 
   return {
-    speak: request,
+    // The intent is not read here: whether a line may be said is the policy's business,
+    // and this module's is saying it (design D67).
+    speak: (text) => request(text),
+
+    quiet: false,
 
     enable(text) {
       enableAttempted = true

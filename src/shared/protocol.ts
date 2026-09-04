@@ -26,6 +26,8 @@ export type ClientMessage =
   | { t: 'action'; action: Action }
   | { t: 'switch-lesson'; lesson: Lesson }
   | { t: 'lock'; value: boolean }
+  /** Teacher only: whether the app may speak unasked, on both screens (design D66). */
+  | { t: 'mute'; value: boolean }
 
 // ── Room → client ────────────────────────────────────────────────────────────
 
@@ -40,7 +42,7 @@ export type Peers = { teacher: boolean; students: number }
 
 export type ServerMessage =
   /** The whole state after every applied action, and on join (design D10). */
-  | { t: 'state'; state: LessonState; locked: boolean; role: Role }
+  | { t: 'state'; state: LessonState; locked: boolean; muted: boolean; role: Role }
   | { t: 'refused'; reason: RefusedReason }
   | { t: 'peers'; peers: Peers }
   | { t: 'error'; code: RoomErrorCode }
@@ -68,6 +70,7 @@ const clientMessageSchema = z.discriminatedUnion('t', [
   z.object({ t: z.literal('action'), action: actionSchema }),
   z.object({ t: z.literal('switch-lesson'), lesson: lessonSchema }),
   z.object({ t: z.literal('lock'), value: z.boolean() }),
+  z.object({ t: z.literal('mute'), value: z.boolean() }),
 ])
 
 /**

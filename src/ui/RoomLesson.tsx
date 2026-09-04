@@ -58,6 +58,7 @@ export function RoomLesson({ code, teacherKey, onExit }: {
       onExit={onExit}
       canSteer={teacher}
       readOnly={!teacher && room.locked}
+      soundControlInPanel={teacher}
       notice={<RoomNotice unsynced={room.connection.unsynced} lockedOut={!teacher && room.locked} />}
       aside={
         teacher ? (
@@ -66,6 +67,7 @@ export function RoomLesson({ code, teacherKey, onExit }: {
             lessons={lessons}
             state={room.state}
             locked={room.locked}
+            muted={room.muted}
             connection={room.connection}
             peers={room.peers}
             studentLink={studentLink}
@@ -74,6 +76,7 @@ export function RoomLesson({ code, teacherKey, onExit }: {
             onReset={() => block !== undefined && room.dispatch({ t: 'reset', block: block.id })}
             onSwitchLesson={(next: Lesson) => room.switchLesson(next)}
             onSetLocked={room.setLocked}
+            onSetMuted={room.setMuted}
           />
         ) : undefined
       }

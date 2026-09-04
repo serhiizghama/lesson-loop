@@ -166,10 +166,13 @@ Client → room:
   id: the room has no lesson catalogue, so `lessons/` stays content the client bundles and
   a new lesson never needs the Worker redeployed (D-20)
 - `{ t:'lock', value }` — teacher only
+- `{ t:'mute', value }` — teacher only. Whether the app may speak unasked, on both
+  screens at once: the teacher is the voice of a live lesson and a synthesised one
+  repeating her on two devices talks over her (D-27)
 
 Room → client:
-- `{ t:'state', state, locked, role }` — the whole state, on join and after every applied
-  action
+- `{ t:'state', state, locked, muted, role }` — the whole state, on join and after every
+  applied action
 - `{ t:'refused', reason }` — the action did not apply: a locked student, a stale tap
 - `{ t:'peers', peers }` — who is in the room
 - `{ t:'error', code }` — no such room, room expired, room full
@@ -353,3 +356,4 @@ technical decisions `Dn`, without the hyphen; the two sequences are separate.
 | D-24 | Publishing happens from CI on a push to `main`, only after the type check, tests and build have passed, so what is served is always a revision that exists in `main`. A hand-run deploy stays the break-glass route. The API token and the account id are repository secrets: the repository is public (D-1) | 2026-09-04 |
 | D-25 | Opening a room is rate limited per calling address, since it needs no account and each request makes a Durable Object. The bound sits far above any teaching pace and the check fails open: a mechanism guarding a quota may never be the reason a lesson cannot start (qualifies principle 4) | 2026-09-04 |
 | D-26 | The build says which build it is, on the home screen only. The number is derived when the app is built — `package.json`'s major and minor plus the commit count — rather than bumped by a script and tagged: a pipeline that commits a version writes a commit for every commit, and publishes a revision its author never wrote. A build with no history says `-unknown` rather than naming one it is not | 2026-09-04 |
+| D-27 | One sound setting per room, the teacher's, covering both screens and on by default. It suppresses what the app volunteers — every line an exercise says of its own accord — and never what the learner presses to hear, so a quieted listening exercise becomes press-to-hear rather than an unanswerable one. The teacher is the voice of a live lesson; the app is the second one only when she says so. Answers the open question `add-star-trail` left, and its chime and notes will obey the same switch | 2026-09-04 |

@@ -31,7 +31,10 @@ export class Room implements DurableObject {
     // is the likeliest thing to happen in a first real lesson (design D11).
     ctx.blockConcurrencyWhile(async () => {
       const stored = await ctx.storage.get<RoomState>(STORAGE_KEY)
-      if (stored !== undefined) this.#core = new RoomCore(stored)
+      // A room written before the sound setting existed has no `muted`, and sound on is
+      // what that build behaved as. Reading the stored shape is the adapter's job, not
+      // the core's (design D74).
+      if (stored !== undefined) this.#core = new RoomCore({ ...stored, muted: stored.muted ?? false })
     })
   }
 

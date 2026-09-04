@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { MAX_PARTICIPANTS, RoomCore, reconcile } from './room'
+import { MAX_PARTICIPANTS, RoomCore, newClientView, reconcile, viewReceive } from './room'
 import { newLessonState } from './reducer'
+import { parseClientMessage, type ServerMessage } from './protocol'
 import { testLesson, testState } from './__fixtures__/lesson'
 import type { Lesson, LessonState } from './types'
 
@@ -221,6 +222,109 @@ describe('RoomCore enforces the lock (design D14)', () => {
       reason: 'not-teacher',
     })
     expect(core.locked).toBe(false)
+  })
+})
+
+describe('RoomCore holds the room’s sound setting (design D66)', () => {
+  it('parses a mute frame and rejects one that carries no value', () => {
+    expect(parseClientMessage('{"t":"mute","value":true}')).toEqual({ t: 'mute', value: true })
+    expect(parseClientMessage('{"t":"mute"}')).toBeNull()
+    expect(parseClientMessage('{"t":"mute","value":"yes"}')).toBeNull()
+  })
+
+  it('opens with sound on', () => {
+    const core = room()
+    expect(core.muted).toBe(false)
+    core.join('t', KEY)
+    expect(core.stateMessage('teacher')).toEqual(expect.objectContaining({ muted: false }))
+  })
+
+  it("applies the teacher's mute and carries it out on the state message", () => {
+    const core = room()
+    core.join('t', KEY)
+    expect(core.handle('t', { t: 'mute', value: true })).toEqual({ kind: 'applied' })
+    expect(core.muted).toBe(true)
+    expect(core.stateMessage('student')).toEqual(expect.objectContaining({ muted: true }))
+  })
+
+  it('reports no effect when the setting already holds', () => {
+    const core = room()
+    core.join('t', KEY)
+    expect(core.handle('t', { t: 'mute', value: false })).toEqual({
+      kind: 'refused',
+      reason: 'no-effect',
+    })
+    core.handle('t', { t: 'mute', value: true })
+    expect(core.handle('t', { t: 'mute', value: true })).toEqual({
+      kind: 'refused',
+      reason: 'no-effect',
+    })
+  })
+
+  // Spec: "The setting is not the student's" — a student who could quieten the room would
+  // be deciding how the lesson is taught.
+  it('refuses the setting to a student and leaves it as it was', () => {
+    const core = room()
+    core.join('t', KEY)
+    core.join('s', null)
+    core.handle('t', { t: 'mute', value: true })
+
+    expect(core.handle('s', { t: 'mute', value: false })).toEqual({
+      kind: 'refused',
+      reason: 'not-teacher',
+    })
+    expect(core.muted).toBe(true)
+    expect(core.snapshot.muted).toBe(true)
+  })
+
+  // Spec: "Surviving a change of lesson".
+  it('keeps the setting when the room changes lesson', () => {
+    const core = room()
+    core.join('t', KEY)
+    core.handle('t', { t: 'mute', value: true })
+    core.handle('t', { t: 'switch-lesson', lesson: otherLesson() })
+
+    expect(core.lesson.id).toBe('other')
+    expect(core.snapshot.state.slide).toBe(0)
+    expect(core.muted).toBe(true)
+  })
+
+  // Spec: "The setting is not the lock" — one decides whether the app speaks, the other
+  // whether the student may touch the exercise.
+  it('is independent of the lock in both directions', () => {
+    const core = room()
+    core.join('t', KEY)
+    core.join('s', null)
+
+    core.handle('t', { t: 'mute', value: true })
+    expect(core.locked).toBe(false)
+    // The student still plays: quiet is not locked.
+    expect(core.handle('s', { t: 'action', action: { t: 'tap', block: 'vocab', target: 'dog' } })).toEqual({
+      kind: 'applied',
+    })
+
+    core.handle('t', { t: 'lock', value: true })
+    expect(core.muted).toBe(true)
+    core.handle('t', { t: 'lock', value: false })
+    expect(core.muted).toBe(true)
+  })
+})
+
+describe('a client view reads the room’s sound setting (design D74)', () => {
+  const snapshot = testState()
+
+  it('reads a snapshot that carries the setting', () => {
+    const view = viewReceive(newClientView(snapshot), {
+      t: 'state', state: snapshot, locked: false, muted: true, role: 'student',
+    })
+    expect(view.muted).toBe(true)
+  })
+
+  // A Worker built before this change sends no `muted` at all, and sound on is what that
+  // build behaves as.
+  it('reads a snapshot from an older room as sound on', () => {
+    const older = { t: 'state', state: snapshot, locked: false, role: 'student' } as ServerMessage
+    expect(viewReceive(newClientView(snapshot), older).muted).toBe(false)
   })
 })
 

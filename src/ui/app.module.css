@@ -38,7 +38,8 @@
 .homeBody {
   max-width: 46rem;
   margin: 0 auto;
-  padding: 2.25rem 1rem 4rem;
+  /* The foot of the page leaves room for the fixed build line below it. */
+  padding: 2.25rem 1rem 5rem;
 }
 
 .homeTitle {
@@ -257,6 +258,31 @@
 }
 
 /* ── Room ─────────────────────────────────────────────────────────────────── */
+
+/*
+ * The lesson's sound, on the screen that paces it (design D72). Icon-only and the same
+ * footprint as the back arrow, because at 380 px it shares the header with the title, the
+ * progress bar and — in a solo lesson — the invite button.
+ *
+ * The two states are told apart by more than the glyph: a muted lesson is a state the
+ * teacher has to be able to see she is in, or "the app stopped talking" becomes a bug
+ * report.
+ */
+.soundOn,
+.soundOff {
+  flex: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1.1rem;
+  border-radius: 50%;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.soundOff {
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
 
 .invite {
   flex: none;
@@ -543,7 +569,23 @@
  * between the teacher and a lesson card.
  */
 .buildLine {
-  margin: 3rem 0 0;
+  /*
+   * Pinned to the foot of the window rather than trailing the last lesson card: the
+   * lesson list grows, and a line that follows it would sit in a different place every
+   * time a lesson is added. Centred, because it belongs to the page rather than to the
+   * column the cards are in.
+   *
+   * `pointer-events: none` so it can never take a tap meant for a card that reaches the
+   * bottom of a short screen; `.homeBody` leaves room for it so it never covers one.
+   */
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  text-align: center;
+  pointer-events: none;
   font-size: 0.75rem;
   color: var(--ink-soft);
   opacity: 0.7;

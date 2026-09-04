@@ -46,7 +46,7 @@ See proposal.md — Why. What the design has to work with:
 
 ## Decisions
 
-### D57 — One setting, held where the lesson's state is held: in the room, or locally
+### D66 — One setting, held where the lesson's state is held: in the room, or locally
 
 `RoomState` gains `muted: boolean`, set by a new teacher-only `{ t: 'mute', value }` and
 carried out on every `state` message beside `locked`. `ClientView` gains it, `useRoom`
@@ -67,7 +67,7 @@ more panel, more state, and the teacher would have to remember which one she pre
 action, and a setting is not an action's outcome; it would also reset on every
 `switch-lesson`, which the spec says it must not.
 
-### D58 — The setting is applied by wrapping `Speech`, and a line declares its intent
+### D67 — The setting is applied by wrapping `Speech`, and a line declares its intent
 
 `speak` becomes `speak(text: string, intent?: SpeechIntent)` where
 `SpeechIntent = 'auto' | 'demand'`, defaulting to `'auto'`. `Speech` also gains a readonly
@@ -100,7 +100,7 @@ and a module-level mutable would have to be pushed into on every render anyway.
 *Rejected:* suppressing at the bottom, inside `request()` — `enable()` funnels through it,
 so the device-level offer would stop working exactly when it is needed.
 
-### D59 — Off means the app volunteers nothing; a control the learner presses always speaks
+### D68 — Off means the app volunteers nothing; a control the learner presses always speaks
 
 *Why:* "completely off, including the buttons" would leave the listening exercise with no
 question. The written word is the fallback for a device that cannot speak, and turning a
@@ -114,9 +114,9 @@ physical-response instruction from the setting, so they always speak — the phy
 instruction is the single line the teacher is most likely to be saying herself ("Touch your
 nose!"), so exempting it would silence everything except the one she most wants silenced.
 
-### D60 — With the sound off, the listening control invites a first play
+### D69 — With the sound off, the listening control invites a first play
 
-`ListenView` reads `speech.quiet` — the flag the wrapper carries (D58) — to choose its
+`ListenView` reads `speech.quiet` — the flag the wrapper carries (D67) — to choose its
 wording only: `🔊 Listen` (nothing has been said yet) instead of `🔊 Listen again`. The
 `showWord` fallback is left keyed on the device's own `status`, untouched by the setting.
 
@@ -139,7 +139,7 @@ speak. *Rejected:* auto-unmuting on reaching a listening exercise — the teache
 would then be overridden by the lesson, and she would find sound back on without having
 touched anything.
 
-### D61 — The wrapper's identity changes with the setting, which is what re-speaks a standing prompt
+### D70 — The wrapper's identity changes with the setting, which is what re-speaks a standing prompt
 
 `LessonPlayer` builds the wrapper with `useMemo(() => quietable(speech, muted), [muted])`,
 so its identity changes when and only when the setting changes. Four views list `speech` in
@@ -165,7 +165,7 @@ thing for a new block type to forget. *Trade-off recorded:* this behaviour rests
 dependency arrays, so it is pinned by tests (tasks 5.3, 6.4) rather than left to be
 rediscovered.
 
-### D62 — Sound starts on, and a room opens with it on
+### D71 — Sound starts on, and a room opens with it on
 
 `RoomCore.open` sets `muted: false`, `useLesson` starts `false`, and the invitation
 (`POST /api/rooms`) carries the lesson and its state as it does today — not the setting.
@@ -183,25 +183,36 @@ switch would conclude the app's sound is broken. *Rejected:* remembering it per 
 `localStorage` — MVP principle 2 keeps nothing at rest, and a remembered mute is a
 first-class support question ("why is it silent today?").
 
-### D63 — The control lives in the player's header, not in the teacher panel
+### D72 — The control is the lock's sibling in the teacher's panel; the header carries it only where there is no panel
 
-An icon-only toggle (`🔊` / `🔇`, `aria-pressed`, an accessible name) sits in
-`LessonPlayer`'s header, rendered where `canSteer` is true — which is the teacher in a room
-and the one person playing a lesson alone, and never a student (D22). `TeacherPanel` is not
-touched.
+`TeacherPanel` gains `muted` and `onSetMuted` and renders a labelled toggle beside the
+lock — `🔊 Voice on` / `🔇 Voice off`, `aria-pressed`, the same `panelButton` /
+`panelButtonOn` pair the lock uses. `LessonPlayer` takes `soundControlInPanel` and renders
+its own header toggle only when the screen steers and nothing else is carrying it, which
+in practice is the lesson opened alone. `RoomLesson` passes `soundControlInPanel={teacher}`.
 
-*Why:* one implementation covers both the room and the solo lesson, which the panel cannot
-because a solo lesson has no panel. The panel is also dismissible, and the spec requires
-this control to stay reachable when the teacher has dismissed it to see what the student
-sees. `canSteer` is already the app's word for "this screen paces the lesson", so the
-control appears and disappears with the rest of that set, and the "nothing on the student's
-screen" requirement holds by construction rather than by a second check.
+*Why:* the two are siblings and read as a pair — one says whether the student may act, the
+other whether the app may talk — and a teacher looking for "how do I stop it talking" looks
+where the other lesson controls are. Both belong to the teacher, both cover both screens,
+and neither is the other. A solo lesson has no panel at all, so the header is where its
+control has to live; gating on an explicit prop rather than on `aside === undefined` keeps
+that a stated arrangement instead of a coincidence of composition.
 
-*Rejected:* the teacher panel beside the lock — conceptually its sibling, but it would
-vanish with the panel and would need a second copy for solo. *Rejected:* the footer beside
-`↺ Reset` — the footer is about pacing the lesson; a setting is not a step.
+One setting gets exactly one control on any given screen: the panel's copy replaces the
+header's rather than joining it, so the teacher is never looking at two switches for one
+thing and wondering whether they disagree.
 
-### D64 — When `add-star-trail` lands, its chime and notes obey this same setting
+*Rejected:* the header alone — this is what was built first and tried in a real browser;
+the panel is where the teacher looks for a lesson control, and an unlabelled icon beside
+the progress bar reads as decoration next to `🔒 Student locked`. *Rejected:* both at once
+— two controls for one boolean on one screen. *Rejected:* the footer beside `↺ Reset` —
+the footer is about pacing the lesson; a setting is not a step.
+
+*Cost, accepted:* the panel is dismissible, so a teacher who has collapsed it to see what
+the student sees cannot change the sound until she opens it again. That is already true of
+the lock, and bringing the panel back is one tap.
+
+### D73 — When `add-star-trail` lands, its chime and notes obey this same setting
 
 Nothing in this change touches `src/sound/`, which does not exist. The wrapper is shaped so
 that the completion chime and the closing screen's notes are `'auto'` lines by the same
@@ -215,7 +226,7 @@ stops the two changes from shipping two switches.
 `sound` capability in `openspec/specs/` yet, and a requirement no shipped code satisfies is
 a spec that lies.
 
-### D65 — A room stored before this change loads as unmuted, in the adapter
+### D74 — A room stored before this change loads as unmuted, in the adapter
 
 `worker/room.ts` normalises what it reads from storage — `{ ...stored, muted: stored.muted
 ?? false }` — before handing it to `RoomCore`, and `viewReceive` reads `message.muted ===
@@ -231,7 +242,7 @@ value is its default does not need one.
 
 ## Risks / Trade-offs
 
-- **The re-speak on turning the sound back on rests on effect dependency arrays (D61).** A
+- **The re-speak on turning the sound back on rests on effect dependency arrays (D70).** A
   later refactor that memoises the `speech` prop harder, or drops it from a dependency
   list, would silently remove a specified behaviour. → Two tests pin it directly: the
   listening view speaks its target when the setting flips on, and does not when it flips
@@ -239,7 +250,7 @@ value is its default does not need one.
 - **A teacher who turns the sound off and forgets may report the app as broken.** → The
   control shows its state rather than only its action, and it is in the header on every
   screen that steers, so the state and its remedy are in the same place.
-- **A student on a quieted listening exercise may not realise they should press.** → D60's
+- **A student on a quieted listening exercise may not realise they should press.** → D69's
   wording change is exactly this: the control reads as an invitation to play, not as a
   repeat of something they missed.
 - **Both screens still speak when the sound is on, and the teacher hears the student's
@@ -258,7 +269,7 @@ value is its default does not need one.
 
 Deployed as one revision, client and Worker together. Nothing to migrate: no lesson file, no
 `LessonState` field, no route and no stored schema change beyond an optional boolean whose
-absence reads as its default (D65). A room opened before the change keeps working, with
+absence reads as its default (D74). A room opened before the change keeps working, with
 sound on, the moment a device running the new code joins it.
 
 Rollback is a revert. A room whose state was stored with `muted: true` and is then served by

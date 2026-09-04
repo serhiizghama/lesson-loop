@@ -29,6 +29,38 @@ further attempts.
 - **THEN** the mistake is shown, the selection is cleared, previously earned progress is
   intact, and the learner may try again immediately
 
+### Requirement: An exercise speaks unasked only while the lesson's sound is on
+
+Everywhere these exercises speak of their own accord — a revealed card, a tapped tile, a
+completed pair, an item picked to sort, a chosen word and scaffold level, the word being
+asked in a listening exercise, the instruction in a physical-response exercise — they SHALL
+do so only while the lesson's sound is on. Every control a learner presses in order to hear
+a line SHALL speak it whether the sound is on or off.
+
+No exercise SHALL become unanswerable, uncompletable or unclear because the sound is off:
+what an exercise scores, what counts as correct, and what it shows SHALL be exactly as they
+are with the sound on.
+
+#### Scenario: A card exercise with the sound off
+- **WHEN** the sound is off and the learner reveals a card
+- **THEN** the card reveals its written forms as usual, nothing is spoken, and revealing
+  every card still completes the exercise
+
+#### Scenario: A themed match with the sound off
+- **WHEN** the sound is off and the learner completes a pair in a block that declares a
+  spoken line
+- **THEN** the pair is locked in and shown as matched, and neither the tapped tile nor the
+  pair line is spoken
+
+#### Scenario: A physical-response exercise with the sound off
+- **WHEN** the sound is off and the learner advances through the instructions
+- **THEN** each instruction is shown as usual and none is spoken
+
+#### Scenario: A sentence exercise with the sound off
+- **WHEN** the sound is off and the learner picks a word and then a scaffold level
+- **THEN** the sentence is rendered as usual and is not spoken, and pressing the control
+  that speaks it does speak it
+
 ### Requirement: Card exercise
 
 A card exercise SHALL present the selected items as cards showing one face. Tapping a card
@@ -139,6 +171,13 @@ has been taken and sound still did not work. The written word is a last resort: 
 it turns a listening exercise into a reading one, so it is not shown while there is still
 a chance of hearing the word.
 
+Where the lesson's sound has been turned off, the word SHALL NOT be spoken on arriving at
+it, and the control SHALL invite a first play rather than a repeat, since there is nothing
+yet to repeat. Pressing it SHALL speak the word. The written English word SHALL NOT be
+revealed on account of the sound being off: it remains reserved for a device that cannot
+speak, and a learner whose lesson was told to be quiet can still hear the word by asking
+for it.
+
 #### Scenario: Hearing and answering
 - **WHEN** a word is spoken and the learner taps the picture it names
 - **THEN** the answer is accepted and the next word is spoken
@@ -177,6 +216,15 @@ a chance of hearing the word.
 - **WHEN** sound is unavailable at any point in the exercise
 - **THEN** every picture remains tappable, correct answers still advance, and the exercise
   can still be completed
+
+#### Scenario: Arriving at a word with the lesson quieted
+- **WHEN** the lesson's sound is off and the exercise moves to its next word
+- **THEN** nothing is spoken, the control invites a first play rather than a repeat, and
+  the written English word is not shown
+
+#### Scenario: Asking for the word in a quieted lesson
+- **WHEN** the lesson's sound is off and the learner presses the control
+- **THEN** the word is spoken, and the exercise is answered in the usual way
 
 ### Requirement: Physical-response exercise
 

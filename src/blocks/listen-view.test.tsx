@@ -24,10 +24,11 @@ const lesson = testLesson()
 const block = lesson.blocks.find((b) => b.type === 'listen') as BlockOf<'listen'>
 
 /** A speech module frozen in one state, so a render can be pinned to it. */
-function fakeSpeech(status: SpeechStatus, extra: Partial<SpeechState> = {}) {
+function fakeSpeech(status: SpeechStatus, extra: Partial<SpeechState> = {}, quiet = false) {
   const state: SpeechState = { status, speaking: false, enableAttempted: false, ...extra }
   const speech: Speech = {
     speak: vi.fn(),
+    quiet,
     enable: vi.fn(),
     getState: () => state,
     subscribe: () => () => {},
@@ -99,9 +100,50 @@ describe('the repeat control says what it is doing', () => {
 
   it('repeats the word when tapped', () => {
     const speech = fakeSpeech('working')
-    render(speech)
+    const state = render(speech)
+    // Cleared, because arriving at the word speaks it too: without this the assertion
+    // below would be satisfied by the mount and would prove nothing about the tap.
+    vi.mocked(speech.speak).mockClear()
+
     act(() => control().click())
-    expect(speech.speak).toHaveBeenCalledWith(expect.any(String))
+    expect(speech.speak).toHaveBeenCalledWith(state.order[state.index], 'demand')
+  })
+})
+
+/**
+ * A lesson the teacher has told to be quiet (design D69). The device speaks perfectly
+ * well here — what has changed is that the app no longer volunteers, so the word arrives
+ * when it is asked for and the control has to say so.
+ */
+describe('the repeat control while the lesson is quiet', () => {
+  it('invites a first play rather than a repeat', () => {
+    render(fakeSpeech('working', {}, true))
+    expect(control().textContent).toContain('Listen')
+    expect(control().textContent).not.toContain('Listen again')
+  })
+
+  it('offers a repeat again once the lesson is not quiet', () => {
+    render(fakeSpeech('working', {}, false))
+    expect(control().textContent).toContain('Listen again')
+  })
+
+  // Spec: "Arriving at a word with the lesson quieted" — the written word stays reserved
+  // for a device that cannot speak, not for a teacher who chose silence.
+  it('does not reveal the written word', () => {
+    const state = render(fakeSpeech('working', {}, true))
+    expect(container.textContent).not.toContain(state.order[state.index])
+    expect(control().textContent).not.toContain('No sound')
+  })
+
+  // Spec: "Asking for the word in a quieted lesson" — this is the intent that gets
+  // through the suppression, and it is the whole of why the exercise stays answerable.
+  it('speaks the word when pressed', () => {
+    const speech = fakeSpeech('working', {}, true)
+    const state = render(speech)
+    vi.mocked(speech.speak).mockClear()
+
+    act(() => control().click())
+    expect(speech.speak).toHaveBeenCalledWith(state.order[state.index], 'demand')
   })
 })
 
