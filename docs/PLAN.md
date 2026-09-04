@@ -245,6 +245,7 @@ lesson-loop/
 │  ├─ speech/        # speechSynthesis, with its priming gate
 │  ├─ net/           # socket client, reconnect, solo fallback
 │  └─ ui/            # shell, lesson player, teacher panel, routing
+├─ public/           # the app's mark and its web manifest, copied verbatim into dist/
 ├─ lessons/          # animals.json, body-parts.json, ...
 ├─ worker/           # index.ts + Room (Durable Object) — thin adapters over src/shared
 ├─ openspec/         # the specs, and the changes that produced them
@@ -330,3 +331,4 @@ technical decisions `Dn`, without the hyphen; the two sequences are separate.
 | D-19 | Room behaviour lives in `src/shared/room.ts` as pure code with the Durable Object a thin adapter, so convergence is a unit test rather than a two-browser check | 2026-09-04 |
 | D-20 | The room holds the lesson's data, not just its id: it is sent when the room is opened and when the lesson is switched. The Worker keeps no lesson catalogue, so principle 3 survives — a new lesson is still a file in `lessons/` and needs no deploy | 2026-09-04 |
 | D-21 | The teacher paces a shared lesson: moving between exercises and resetting one are hers alone, absent from the student's screen and refused by the room. The lock stays a separate, stronger rule about touching the exercise itself. An unsynced student therefore holds their exercise rather than walking on — qualifies principle 4 | 2026-09-04 |
+| D-22 | The app carries its own mark and a web manifest, so it can be kept on a home screen as a standalone window. It deliberately stops short of a service worker: the lesson already runs with the network gone, and a cache layer would only add a stale-content failure mode in front of a child | 2026-09-04 |

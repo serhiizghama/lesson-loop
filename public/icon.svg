@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="LessonLoop">
+  <!--
+    The LessonLoop mark (design D26): the lesson going round — a gold ring with a gap,
+    closed by an arrow head, on the app's ink field. Two shapes only, so that at 16
+    pixels a ring is still a ring and the arrow head still breaks its outline.
+
+    This file is the mark's source. `icon-180.png`, `icon-192.png` and `icon-512.png`
+    beside it are committed rasters of this same geometry (design D28), for the slots
+    that refuse a vector. Change the mark here and all three must be redrawn with it,
+    or the tab and the home-screen tile stop being the same picture.
+
+    Geometry: a 512 field, corner radius 112. The ring is centred at (256, 256) with
+    radius 138 and stroke 48, drawn clockwise from 352° round to 286°. The arrow head
+    is a triangle standing on that end of the arc: its base is radial and wider than
+    the stroke, its tip runs along the tangent.
+  -->
+  <rect width="512" height="512" rx="112" fill="#23213a"/>
+  <path d="M 392.66 236.79 A 138 138 0 1 1 294.04 123.35" fill="none" stroke="#f0ac2b" stroke-width="48"/>
+  <path d="M 316.09 46.44 L 401.70 154.22 L 271.99 200.25 Z" fill="#f0ac2b"/>
+</svg>

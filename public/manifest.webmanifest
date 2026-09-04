@@ -1,0 +1,30 @@
+{
+  "name": "LessonLoop",
+  "short_name": "LessonLoop",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fdf7ee",
+  "theme_color": "#fdf7ee",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    },
+    {
+      "src": "/icon-180.png",
+      "type": "image/png",
+      "sizes": "180x180"
+    },
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

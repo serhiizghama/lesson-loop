@@ -143,6 +143,30 @@ Validation runs on load and in CI, and names the exact place:
 blocks.6.buckets.2.key: no selected item has habitat = "ocean"
 ```
 
+## The icon
+
+The mark — a gold loop with an arrow head, on the app's ink field — is what the tab, the
+bookmark and a home-screen shortcut show. It lives in `public/`, which Vite serves as-is in
+development and copies into `dist/` at build:
+
+| File | Where it is used |
+|---|---|
+| `icon.svg` | the tab, and any browser that takes a vector icon |
+| `icon-180.png` | `apple-touch-icon` — an iOS or iPadOS home screen |
+| `icon-192.png`, `icon-512.png` | the manifest — an Android tile and its splash |
+| `manifest.webmanifest` | the shortcut's name, icons and colours |
+
+**`icon.svg` is the source; the three PNGs are committed rasters of it.** To change the
+mark, edit `icon.svg` — it carries the geometry in a comment — then export it at 180, 192
+and 512 pixels square with whatever rasteriser you have to hand (Figma, Inkscape,
+`rsvg-convert`) and overwrite the PNGs. Nothing in the build does this for you: a
+rasteriser is a native dependency bought for four files that change about once a year.
+
+`npm test` checks the wiring — that every icon `index.html` and the manifest declare
+exists, that each PNG really is the size it is declared at, and that none of them points at
+another origin. It cannot see whether the PNGs still *look* like the SVG, so redraw all
+three together.
+
 ## How it is built
 
 - `src/shared/` — the lesson format, its validation, the pure state reducer, and the room
