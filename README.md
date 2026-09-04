@@ -119,6 +119,24 @@ lesson travels to the room with the request that opens it — but `lessons/` is 
 the client, and the client is what gets published. So a lesson reaches the teacher when it
 is pushed, not when the file is saved.
 
+### Which build am I looking at?
+
+The home screen carries one quiet line at the bottom: `lesson-loop@0.1.16 · 2026-09-04 18:29`.
+It is there so that "it stopped working" can be answered — a tab left open since the
+morning shows an older version than a freshly opened one, and that is usually the whole
+story.
+
+**Nothing bumps the version.** `package.json` keeps the major and minor (`0.1.0`), and the
+build appends how many commits the history carries, so `0.1.16` is the sixteenth commit.
+No script edits a file, no job commits back to the repository, and no tag is created — the
+number is derived when `npm run build` runs and baked into the bundle. To raise the minor,
+edit `package.json`; the rest counts itself.
+
+If you ever see `0.1.0-unknown`, the build could not read the git history — a tarball of
+the source, a machine without git, or a shallow clone. The app works normally; it is just
+telling you it cannot name itself rather than showing a number that would be a lie. In CI
+that would mean the checkout lost its history, since the deploy job asks for all of it.
+
 ## Adding a lesson
 
 Drop a JSON file into `lessons/`. Nothing else — no code, no registration, no imports.

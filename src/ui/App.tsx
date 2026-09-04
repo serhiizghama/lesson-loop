@@ -3,6 +3,7 @@ import type { Lesson } from '@/shared/types'
 import { RoomLesson } from './RoomLesson'
 import { SoloLesson } from './SoloLesson'
 import { homePath, lessonPath, useRoute } from './router'
+import { buildLine } from '@/version'
 import styles from './app.module.css'
 
 export function App() {
@@ -88,6 +89,14 @@ function Home({ onOpen }: { onOpen: (lessonId: string) => void }) {
             ))}
           </section>
         )}
+
+        {/*
+          Which build this is (design D61). It sits here and on no other screen: an
+          exercise and the student's view are specified to carry the lesson and nothing
+          else, and a seven-year-old has no use for a version. The teacher does, the
+          moment anyone asks her what she is looking at.
+        */}
+        <p className={styles.buildLine}>{buildLine(__APP_VERSION__, __BUILT_AT__)}</p>
       </main>
     </div>
   )

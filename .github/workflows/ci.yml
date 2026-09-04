@@ -9,10 +9,10 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
       - run: npm ci
       # Covers the client and the Worker: `worker/` is a separate TypeScript program,
@@ -29,15 +29,21 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      # The whole history, because the version the app shows is how many commits are
+      # behind it (design D57). A default checkout fetches one commit, and the build would
+      # then publish `-unknown` — the honest fallback, and the wrong answer here.
+      - uses: actions/checkout@v7
         with:
-          node-version: 22
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
           cache: npm
       - run: npm ci
       - run: npm run build
       # The token and the account id are repository secrets: this repository is public,
-      # and neither belongs in it (design D50).
+      # and neither belongs in it (design D50). Nothing here writes back to the repository
+      # and nothing is tagged — the version is derived, not recorded (D-26).
       - run: npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
