@@ -1,0 +1,12 @@
+{
+  // The Worker runtime is not a browser: its globals collide with the DOM library the
+  // client is built against, so it gets its own program. `npm run typecheck` runs both.
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2022"],
+    "types": ["@cloudflare/workers-types"],
+    "baseUrl": "..",
+    "paths": { "@/*": ["src/*"] }
+  },
+  "include": [".", "../src/shared"]
+}

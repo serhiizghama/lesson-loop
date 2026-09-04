@@ -1,0 +1,37 @@
+schema: spec-driven
+
+context: |
+  LessonLoop — a web app for one-on-one online English lessons. The teacher and the
+  student open the same synchronised page of interactive exercises from two different
+  links; every tap either of them makes is reflected on the other screen. The teacher's
+  view additionally carries answer keys, prompt phrases and lesson controls that the
+  student never sees. Video and audio stay in Zoom — this app is the second window.
+
+  Client: an English teacher in the Philippines. Her students are Japanese children
+  (vocabulary carries a Japanese gloss plus romaji); adult learners come later.
+
+  Full product context, lesson data format, room protocol and roadmap: docs/PLAN.md.
+
+  Tech stack: TypeScript everywhere. Vite + React for the client, hand-written CSS
+  (no UI kit). A single Cloudflare Worker serves the static assets and hosts a Durable
+  Object per room. Vitest for unit tests.
+
+  Architecture rules that must not be violated without an explicit decision:
+  - Lessons are data (JSON), never code. A new lesson must require zero new code.
+  - Themed exercises are the same block type applied to different vocabulary tags.
+  - One reducer, two execution sites: applyAction() runs optimistically on the client
+    and authoritatively inside the Durable Object. It lives in shared code.
+  - Solo mode is mandatory: with the socket down the app stays fully usable, unsynced.
+  - Tap-to-select, never drag-and-drop.
+  - No accounts, no database, no persistence in the MVP.
+
+  Conventions: documentation and code comments in English; conventional commit messages;
+  no AI attribution in commits.
+
+rules:
+  proposal:
+    - State the teaching problem being solved, not just the technical change.
+  design:
+    - Record rejected alternatives and why they lost.
+  tasks:
+    - Each task must be independently verifiable, with the check written out.

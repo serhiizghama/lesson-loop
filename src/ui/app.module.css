@@ -1,0 +1,475 @@
+/* ── Home ─────────────────────────────────────────────────────────────────── */
+
+.home {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 2.5rem 1rem 4rem;
+}
+
+.homeTitle {
+  margin: 0;
+  font-size: clamp(2rem, 8vw, 3rem);
+  letter-spacing: -0.02em;
+}
+
+.homeSubtitle {
+  margin: 0.25rem 0 2rem;
+  color: var(--ink-soft);
+}
+
+.lessonGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: 1rem;
+}
+
+.lessonCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.75rem 1rem;
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  transition: transform 120ms ease;
+}
+
+.lessonCard:hover {
+  transform: translateY(-2px);
+}
+
+.lessonEmoji {
+  font-size: 2.75rem;
+  line-height: 1;
+}
+
+.lessonName {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.failures {
+  margin-top: 3rem;
+  padding: 1rem 1.25rem;
+  color: var(--wrong);
+  background: var(--wrong-soft);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+}
+
+/* ── Player ───────────────────────────────────────────────────────────────── */
+
+.player {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+
+.back {
+  flex: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1.3rem;
+  border-radius: 50%;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.headerTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.headerEmoji {
+  font-size: 1.2rem;
+}
+
+.progress {
+  position: relative;
+  flex: 1;
+  min-width: 4.5rem;
+  height: 1.5rem;
+  background: var(--card);
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--correct));
+  transition: width 260ms ease;
+}
+
+.progressText {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.stage {
+  flex: 1;
+  width: 100%;
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 1.25rem 0.75rem 1.5rem;
+}
+
+.blockTitle {
+  margin: 0 0 0.25rem;
+  font-size: clamp(1.3rem, 5vw, 1.7rem);
+}
+
+.blockHint {
+  margin: 0 0 1.25rem;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.nav {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  padding-bottom: max(0.6rem, env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid var(--line);
+}
+
+.navButton {
+  width: var(--tap);
+  height: var(--tap);
+  font-size: 1.4rem;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.resetButton {
+  height: var(--tap);
+  padding: 0 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.navCount {
+  flex: 1;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.navDone {
+  color: var(--correct);
+  font-weight: 700;
+}
+
+/* ── Room ─────────────────────────────────────────────────────────────────── */
+
+.invite {
+  flex: none;
+  height: 2.5rem;
+  padding: 0 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  color: var(--accent);
+  box-shadow: var(--shadow);
+}
+
+.noticeWarn,
+.noticeTurn {
+  margin: 0;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.noticeWarn {
+  color: var(--wrong);
+  background: var(--wrong-soft);
+}
+
+.noticeTurn {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.roomGate {
+  display: grid;
+  place-content: center;
+  gap: 1rem;
+  justify-items: center;
+  min-height: 100%;
+  padding: 2rem 1.25rem;
+  text-align: center;
+}
+
+.roomGateText {
+  margin: 0;
+  max-width: 26rem;
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+}
+
+/*
+ * The exercise and the teacher's panel share the page rather than stack on top of one
+ * another. Below 900px the panel goes under the exercise, in normal flow — so nothing
+ * ever covers the exercise and the page never scrolls sideways, down to 380px and below.
+ */
+.split {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 0 0.75rem;
+}
+
+.split > .stage {
+  padding-inline: 0;
+}
+
+@media (min-width: 900px) {
+  .split {
+    flex-direction: row;
+    align-items: flex-start;
+    max-width: 72rem;
+  }
+
+  .split > .stage {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+/* ── Teacher panel ────────────────────────────────────────────────────────── */
+
+.panel {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 1rem;
+  padding: 0.85rem;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+@media (min-width: 900px) {
+  .panel {
+    position: sticky;
+    top: 4.5rem;
+    width: 21rem;
+  }
+}
+
+.panelShow {
+  align-self: flex-start;
+  margin-bottom: 1rem;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.panelHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.panelTitle {
+  flex: 1;
+  min-width: 4rem;
+  font-weight: 700;
+}
+
+.panelHide {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  color: var(--ink-soft);
+}
+
+.dotOn,
+.dotOff {
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.dotOn {
+  color: var(--correct);
+}
+
+.dotOff {
+  color: var(--ink-soft);
+}
+
+.panelControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.panelButton,
+.panelButtonOn {
+  padding: 0.55rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.panelButtonOn {
+  color: var(--card);
+  background: var(--accent);
+  box-shadow: none;
+}
+
+.panelLink {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.panelLink label {
+  width: 100%;
+  font-weight: 700;
+}
+
+.panelLink input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0.6rem;
+  font: inherit;
+  color: var(--ink);
+  background: var(--paper);
+  border: none;
+  border-radius: var(--radius);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.panelSwitch {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: flex-start;
+}
+
+.panelLessons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.panelLesson {
+  padding: 0.5rem 0.7rem;
+  font-size: 0.85rem;
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+/* ── Answer key ───────────────────────────────────────────────────────────── */
+
+.answerKey {
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--line);
+}
+
+.answerKeyTitle {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+
+.answerKeyRows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row_open,
+.row_current,
+.row_done {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.3rem 0.45rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+
+.row_current {
+  background: var(--accent-soft);
+  font-weight: 700;
+}
+
+.row_done {
+  color: var(--ink-soft);
+  opacity: 0.55;
+}
+
+.rowLabel {
+  flex: none;
+  min-width: 2.5rem;
+}
+
+.rowValue {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

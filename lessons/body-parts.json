@@ -1,0 +1,52 @@
+{
+  "id": "body-parts",
+  "title": "My Body",
+  "emoji": "🧍",
+  "audience": "kids",
+  "l1": "ja",
+  "items": [
+    { "id": "eyes", "en": "eyes", "emoji": "👁️", "plural": true, "l1": { "word": "目", "romaji": "me" }, "example": "They are eyes." },
+    { "id": "ears", "en": "ears", "emoji": "👂", "plural": true, "l1": { "word": "耳", "romaji": "mimi" }, "example": "They are ears." },
+    { "id": "nose", "en": "nose", "emoji": "👃", "l1": { "word": "鼻", "romaji": "hana" }, "example": "It is a nose." },
+    { "id": "mouth", "en": "mouth", "emoji": "👄", "l1": { "word": "口", "romaji": "kuchi" }, "example": "It is a mouth." },
+    { "id": "teeth", "en": "teeth", "emoji": "🦷", "plural": true, "l1": { "word": "歯", "romaji": "ha" }, "example": "They are teeth." },
+    { "id": "hair", "en": "hair", "emoji": "💇", "article": "none", "l1": { "word": "髪", "romaji": "kami" }, "example": "It is hair." },
+    { "id": "hand", "en": "hand", "emoji": "✋", "l1": { "word": "手", "romaji": "te" }, "example": "It is a hand." },
+    { "id": "foot", "en": "foot", "emoji": "🦶", "l1": { "word": "足", "romaji": "ashi" }, "example": "It is a foot." },
+    { "id": "leg", "en": "leg", "emoji": "🦵", "l1": { "word": "脚", "romaji": "ashi" }, "example": "It is a leg." },
+    { "id": "arm", "en": "arm", "emoji": "💪", "l1": { "word": "腕", "romaji": "ude" }, "example": "It is an arm." }
+  ],
+  "blocks": [
+    {
+      "id": "vocab", "type": "cards", "title": "🧠 What Is It?",
+      "hint": "Tap a card to hear it and see the Japanese word.",
+      "items": { "select": "all" }, "front": "emoji", "back": ["en", "l1"]
+    },
+    {
+      "id": "pairs", "type": "match", "title": "🎯 Matching Game",
+      "hint": "Tap the picture, then tap the matching word.",
+      "items": { "select": "all" }, "left": "emoji", "right": "en", "count": 6
+    },
+    {
+      "id": "say", "type": "sentence", "title": "💬 Say It Bigger!",
+      "hint": "Choose a body part. Then grow your sentence, one step at a time.",
+      "items": { "select": "all" },
+      "levels": [
+        { "label": "One word", "template": "{en}" },
+        { "label": "It is a…", "template": "{it} {be} {article} {en}." },
+        { "label": "This is my…", "template": "{this} {be} my {en}." }
+      ]
+    },
+    {
+      "id": "hear", "type": "listen", "title": "👂 Which One Is It?",
+      "hint": "Listen, then tap the body part you heard.",
+      "items": { "select": "all" }, "choices": 4
+    },
+    {
+      "id": "touch", "type": "tpr", "title": "🎮 Touch Your…!",
+      "hint": "Listen, then touch the real body part on yourself!",
+      "items": { "select": "all" }, "prompt": "Touch your {en}!"
+    },
+    { "id": "done", "type": "finish", "title": "🎉 Great job!", "message": "Great job learning body parts!" }
+  ]
+}
