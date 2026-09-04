@@ -246,7 +246,8 @@ lesson-loop/
 ├─ src/
 │  ├─ blocks/        # one React view per exercise type
 │  ├─ shared/        # types, validation, reducer, block logic, room core, protocol
-│  ├─ speech/        # speechSynthesis, with its priming gate
+│  ├─ speech/        # recorded clips, falling back to speechSynthesis
+│  ├─ sound/         # the chime and the closing notes, synthesised with Web Audio
 │  ├─ net/           # socket client, reconnect, solo fallback
 │  └─ ui/            # shell, lesson player, teacher panel, routing
 ├─ public/           # the app's mark and its web manifest, copied verbatim into dist/
@@ -294,6 +295,15 @@ people and collect feedback. The questions in §11 wait on it.
 
 **v0.2** — `hotspot`, `memory`, `scramble`; four to six new lessons; sounds and
 correct-answer animations; tablet polish; pre-generated mp3 instead of TTS.
+
+Of that list, `fix-silent-speech` delivered the pre-generated recordings, and
+`add-star-trail` delivers **sounds and correct-answer animations**: the header's percentage
+becomes one star per exercise; completing the one on screen earns its star with a flying
+star, a synthesised chime and a confetti burst, on both screens at once and without a word
+said; the control that moves the lesson on draws attention while the exercise is finished;
+and the closing screen shows the stars actually earned, arriving one per note, instead of a
+painted five. Everything it makes audible obeys the teacher's sound switch (D-27). What
+remains of v0.2 is the three new block types, the new lessons and tablet polish.
 
 **v0.3** — a teacher account and a lesson editor. This is where a real backend, auth and
 storage appear. Deliberately kept out of the MVP.
@@ -356,4 +366,5 @@ technical decisions `Dn`, without the hyphen; the two sequences are separate.
 | D-24 | Publishing happens from CI on a push to `main`, only after the type check, tests and build have passed, so what is served is always a revision that exists in `main`. A hand-run deploy stays the break-glass route. The API token and the account id are repository secrets: the repository is public (D-1) | 2026-09-04 |
 | D-25 | Opening a room is rate limited per calling address, since it needs no account and each request makes a Durable Object. The bound sits far above any teaching pace and the check fails open: a mechanism guarding a quota may never be the reason a lesson cannot start (qualifies principle 4) | 2026-09-04 |
 | D-26 | The build says which build it is, on the home screen only. The number is derived when the app is built — `package.json`'s major and minor plus the commit count — rather than bumped by a script and tagged: a pipeline that commits a version writes a commit for every commit, and publishes a revision its author never wrote. A build with no history says `-unknown` rather than naming one it is not | 2026-09-04 |
-| D-27 | One sound setting per room, the teacher's, covering both screens and on by default. It suppresses what the app volunteers — every line an exercise says of its own accord — and never what the learner presses to hear, so a quieted listening exercise becomes press-to-hear rather than an unanswerable one. The teacher is the voice of a live lesson; the app is the second one only when she says so. Answers the open question `add-star-trail` left, and its chime and notes will obey the same switch | 2026-09-04 |
+| D-27 | One sound setting per room, the teacher's, covering both screens and on by default. It suppresses what the app volunteers — every line an exercise says of its own accord — and never what the learner presses to hear, so a quieted listening exercise becomes press-to-hear rather than an unanswerable one. The teacher is the voice of a live lesson; the app is the second one only when she says so. Answers the open question `add-star-trail` left; its chime, its notes and its spoken praise obey this switch (D-28) | 2026-09-04 |
+| D-28 | A star is earned by **completing** an exercise, never by accuracy: a wrong answer stays a shake and another try, and nothing counts mistakes. A star mirrors the lesson state exactly and remembers nothing, so a reset returns it to open and completing again earns it again — the simplest rule, chosen over "once earned, always earned", which would have needed new state on the wire. The closing screen shows the stars actually earned rather than a fixed five, because a child notices that stars nobody can fail to get are not worth having. The celebration is a sound and a picture and never a word: no phrase is spoken for a completed exercise or for a finished lesson. Recorded praise in the lesson's own voice was built first and then removed — the teacher is the voice of a live lesson, and an app congratulating the child a beat after she was about to is talking across her. The closing screen also stands the header's marks down and shows its message as its own heading, so the stars and the sentence each appear once | 2026-09-04 |

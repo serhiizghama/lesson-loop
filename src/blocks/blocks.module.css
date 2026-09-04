@@ -390,12 +390,6 @@
   text-align: center;
 }
 
-.stars {
-  margin: 0;
-  font-size: 2rem;
-  letter-spacing: 0.15em;
-}
-
 .finishMessage {
   margin: 0;
   font-size: clamp(1.3rem, 6vw, 1.8rem);

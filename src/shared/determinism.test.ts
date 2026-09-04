@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { testLesson, testState } from './__fixtures__/lesson'
-import { applyAction, blockStateOf, blockById, lessonProgress } from './reducer'
+import { applyAction, blockStateOf, blockById, lessonProgress, lessonTrail } from './reducer'
 import type { Action, CardsState, LessonState, MatchState } from './types'
 
 /**
@@ -45,6 +45,23 @@ describe('determinism', () => {
     const student = replay(testState(9001))
     expect(teacher).toEqual(student)
     expect(lessonProgress(lesson, teacher)).toEqual(lessonProgress(lesson, student))
+  })
+
+  it('shows the teacher and the student one trail, slot for slot', () => {
+    const teacher = replay(testState(9001))
+    const student = replay(testState(9001))
+    const left = lessonTrail(lesson, teacher)
+    const right = lessonTrail(lesson, student)
+
+    // Field by field rather than a single deep compare, so a slot that agreed on `done`
+    // but not on `current` could not hide inside a passing test.
+    expect(left).toHaveLength(right.length)
+    for (const [i, slot] of left.entries()) {
+      expect(slot.blockId).toBe(right[i]!.blockId)
+      expect(slot.done).toBe(right[i]!.done)
+      expect(slot.current).toBe(right[i]!.current)
+    }
+    expect(left.some((slot) => slot.done)).toBe(true) // the script really does earn one
   })
 
   it('lays the cards out differently under a different seed', () => {

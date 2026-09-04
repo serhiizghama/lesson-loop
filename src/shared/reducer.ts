@@ -88,6 +88,46 @@ export function lessonProgress(lesson: Lesson, state: LessonState): Progress {
   return { done, total, percent: total === 0 ? 0 : Math.round((done / total) * 100) }
 }
 
+export type TrailSlot = { blockId: string; done: boolean; current: boolean }
+
+/**
+ * One mark per scored exercise, in lesson order — what the header draws instead of a
+ * percentage, and what the closing screen counts its stars from (design D75).
+ *
+ * Derived beside `lessonProgress` and stored nowhere, so the rule the client asked for
+ * falls out for free: a star is the block's completion state and nothing else, and a
+ * reset — which makes the block incomplete — returns its slot to open without anything
+ * having to remember that it was once earned.
+ *
+ * The closing slide is not scored, so it yields no slot. That is why nothing is `current`
+ * while it is on screen, rather than the last exercise staying lit behind it.
+ */
+export function lessonTrail(lesson: Lesson, state: LessonState): TrailSlot[] {
+  const onScreen = lesson.blocks[state.slide]
+  return lesson.blocks
+    .filter((block) => logicFor(block).scored)
+    .map((block) => ({
+      blockId: block.id,
+      done: isBlockComplete(lesson, state, block),
+      current: block.id === onScreen?.id,
+    }))
+}
+
+/**
+ * Whether the exercise on screen is finished and there is somewhere left to go
+ * (design D83) — what makes the controls that move the lesson on draw attention.
+ *
+ * Derived, so it cannot be wrong. A flag set by the celebration would be silent in exactly
+ * the cases that matter most: a teacher returning to an exercise completed earlier, or
+ * joining a room whose current exercise is already done. It also switches itself off on
+ * the closing screen, where there is no next slide to want.
+ */
+export function isNextDue(lesson: Lesson, state: LessonState): boolean {
+  if (state.slide >= lesson.blocks.length - 1) return false
+  const block = lesson.blocks[state.slide]
+  return block !== undefined && isBlockComplete(lesson, state, block)
+}
+
 export function isLessonComplete(lesson: Lesson, state: LessonState): boolean {
   const { done, total } = lessonProgress(lesson, state)
   return total > 0 && done === total

@@ -24,7 +24,7 @@ lesson exactly as it stands, progress included. That gives two links to one less
 | Link | Who it is for | What it shows |
 |---|---|---|
 | `/t/<code>#<key>` | the teacher | the exercise **plus** the answer key, the lesson controls that pace the session, the student's link, a lock on student input, and whether the student is connected |
-| `/r/<code>` | the student | the exercise, its instruction, where in the lesson they are and how much is done — and nothing else |
+| `/r/<code>` | the student | the exercise, its instruction, where in the lesson they are and the stars they have earned — and nothing else |
 
 Every tap inside the exercise moves both screens, whoever made it: flipping a card,
 making a pair, placing an item, choosing a scaffold level. A tap is applied locally at
@@ -33,8 +33,26 @@ once and settled by the room, so it never waits for the network.
 **The teacher paces the lesson.** Moving between exercises, resetting one and changing
 lesson are hers alone — the student's screen has no controls for them, and the room
 refuses them from a student even if something else sends one. The student sees where
-they are (`3 / 9` and the progress bar) without steering. A lesson opened from the home
+they are (`3 / 9` and the star trail) without steering. A lesson opened from the home
 screen is solo and keeps every control, since there is no teacher to wait for.
+
+**Finishing an exercise is worth something.** The header carries one mark per exercise,
+and completing the one on screen earns its star there and then: a star flies from the
+exercise to its mark, a chime sounds, and confetti bursts over it. It lasts about a second
+and a half, the exercise stays playable, and the lesson does not move on by itself — the
+teacher's next control simply starts asking to be pressed. Both screens play it, from the
+state they share, without a message passing between them.
+
+It says nothing. The celebration is a sound and a picture, never a word: the teacher is
+the voice of a live lesson, and an app saying "well done" a beat after the child finishes
+is talking across the person who was about to say it.
+
+A star is earned by **completing** an exercise, never by getting it right first time: a
+wrong answer is a shake and another try, and nothing counts mistakes. A star is the
+exercise's state and nothing more, so a reset returns it to open. The closing screen shows
+one star per exercise, gold only where it was earned — which is the point: stars nobody
+can fail to get are not worth having. It is the one screen where the header's marks stand
+down, since the same stars are already there, large enough to count.
 
 The teacher's half is granted by the key in the link's `#fragment`, not by the route —
 `/r/AB12` cannot be turned into `/t/AB12` by guessing. A student joining mid-lesson lands
@@ -238,7 +256,9 @@ three together.
   core. No React, no DOM: it runs unchanged in the browser and inside the Cloudflare
   Worker, and a test enforces that.
 - `src/blocks/` — one React view per exercise type.
-- `src/ui/` — the shell: routing, lesson picker, progress, navigation, teacher panel.
+- `src/ui/` — the shell: routing, lesson picker, the star trail, navigation, teacher panel.
+- `src/sound/` — the chime and the closing screen's notes, synthesised on the device with
+  the Web Audio API: no audio file, no network, and silent when the lesson is quiet.
 - `src/net/` — the socket to a room, its reconnection, and opening a room.
 - `worker/` — the Worker and the `Room` Durable Object: thin adapters over `src/shared`.
 - `lessons/` — the content.

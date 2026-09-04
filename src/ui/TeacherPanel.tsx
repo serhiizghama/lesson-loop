@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { answerKeyFor } from '@/shared/reducer'
+import { answerKeyFor, isNextDue } from '@/shared/reducer'
 import type { Lesson, LessonState } from '@/shared/types'
 import type { Peers } from '@/shared/protocol'
 import type { Connection } from '@/net/socket'
@@ -38,6 +38,12 @@ export function TeacherPanel(props: TeacherPanelProps) {
   const key = block === undefined ? null : answerKeyFor(lesson, state, block)
   const atStart = state.slide === 0
   const atEnd = state.slide === lesson.blocks.length - 1
+  /**
+   * Derived here rather than passed in, from the same function the footer arrow uses
+   * (design D83): the panel already holds the lesson and the state, and two controls that
+   * mean the same thing must not be able to disagree about when they mean it.
+   */
+  const nextDue = isNextDue(lesson, state)
 
   if (!open) {
     return (
@@ -77,7 +83,14 @@ export function TeacherPanel(props: TeacherPanelProps) {
         <button type="button" className={styles.panelButton} disabled={atStart} onClick={props.onPrevious}>
           ← Previous
         </button>
-        <button type="button" className={styles.panelButton} disabled={atEnd} onClick={props.onNext}>
+        {/* It does not move the lesson on by itself — it says that it is time (spec: "The
+            teacher sees it is time"). She is the one talking to the child. */}
+        <button
+          type="button"
+          className={nextDue ? `${styles.panelButton} ${styles.panelButtonDue}` : styles.panelButton}
+          disabled={atEnd}
+          onClick={props.onNext}
+        >
           Next →
         </button>
         <button type="button" className={styles.panelButton} onClick={props.onReset}>
