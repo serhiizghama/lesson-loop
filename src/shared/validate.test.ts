@@ -178,6 +178,28 @@ describe('cross-reference validation', () => {
   })
 })
 
+describe('spoken templates', () => {
+  it('accepts a template every selected item can fill', () => {
+    const lesson = broken((l) => {
+      ;(l.blocks[0] as { speak?: string }).speak = 'The {en} says {tag:sound}!'
+    })
+    expect(validateLesson(lesson).ok).toBe(true)
+  })
+
+  it('rejects a template reading a tag an item lacks, naming both', () => {
+    const lesson = broken((l) => {
+      l.items[2]!.tags = { habitat: 'jungle' }
+      ;(l.blocks[0] as { speak?: string }).speak = 'The {en} says {tag:sound}!'
+    })
+    const result = validateLesson(lesson)
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    const message = result.errors.join('\n')
+    expect(message).toContain('blocks.0.speak:')
+    expect(message).toContain('"lion"')
+  })
+})
+
 describe('resolveItems', () => {
   const lesson = base()
 

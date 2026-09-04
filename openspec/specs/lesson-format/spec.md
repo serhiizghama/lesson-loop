@@ -52,6 +52,12 @@ generic block types. The format SHALL NOT require a dedicated block type per the
 - **THEN** a matching block over the sound tag and a sorting block over the habitat tag
   are both expressible without introducing any new block type
 
+#### Scenario: A themed block declares what it says aloud
+- **WHEN** a block declares the line it speaks as a template reading a tag, such as
+  `{article} {en} says {tag:sound}!`
+- **THEN** the line is filled per item from the same vocabulary list, with no code written
+  for that theme, and validation rejects the lesson if a selected item lacks the tag
+
 ### Requirement: Blocks select their items by explicit reference
 
 A block SHALL select the items it uses in one of three ways: an explicit list of item

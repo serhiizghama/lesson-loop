@@ -32,12 +32,19 @@ further attempts.
 ### Requirement: Card exercise
 
 A card exercise SHALL present the selected items as cards showing one face. Tapping a card
-SHALL reveal its other faces and speak the English word. The exercise SHALL be complete
-when every card has been revealed at least once.
+SHALL reveal its other faces and speak. What is spoken SHALL be the line the block declares
+for its items, or the English word where the block declares none, so that a card teaching a
+tag is heard as that tag and not as the word. The exercise SHALL be complete when every
+card has been revealed at least once.
 
 #### Scenario: Revealing a card
 - **WHEN** the learner taps a card showing a picture
 - **THEN** the card reveals its written forms and the English word is spoken
+
+#### Scenario: A card that teaches a tag
+- **WHEN** the learner taps a card in a block declaring a spoken line that reads a tag,
+  such as the sound an animal makes
+- **THEN** that line is spoken, sound and all, rather than the English word on its own
 
 #### Scenario: Completing the set
 - **WHEN** the last unrevealed card is revealed
@@ -49,6 +56,11 @@ A matching exercise SHALL present two columns of the same items, each column sho
 different face, each independently shuffled. The learner SHALL tap one side and then the
 other. A correct pair SHALL be locked in and removed from play; an incorrect pair SHALL be
 rejected and the selection cleared. The exercise SHALL be complete when all pairs are made.
+
+Tapping a tile SHALL speak what that tile shows, naming a picture by its English word and
+leaving a first-language gloss unspoken. A block MAY declare a line spoken when a pair is
+completed; where it does, that line SHALL be spoken in place of the tapped tile's own text,
+so the pair is heard whole and the answer is not given away before it is made.
 
 #### Scenario: A correct pair
 - **WHEN** the learner taps a picture and then the word naming it
@@ -62,6 +74,14 @@ rejected and the selection cleared. The exercise SHALL be complete when all pair
 #### Scenario: Selecting twice on the same side
 - **WHEN** the learner taps a picture and then taps a different picture
 - **THEN** the selection moves to the second picture rather than attempting a pair
+
+#### Scenario: Hearing the side that carries the theme
+- **WHEN** the learner taps a tile showing a tag, such as the sound an animal makes
+- **THEN** that sound is spoken rather than nothing
+
+#### Scenario: A completed pair in a themed match
+- **WHEN** the learner completes a pair in a block that declares a spoken line
+- **THEN** that line is spoken once, naming both halves of the pair
 
 ### Requirement: Sentence-building exercise
 

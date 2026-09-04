@@ -68,8 +68,8 @@ Every block takes `id`, `title`, an optional `hint`, and an `items` selector —
 
 | `type` | What the learner does | Extra fields |
 |---|---|---|
-| `cards` | Taps a card to reveal it and hear the word | `front`, `back` (faces) |
-| `match` | Taps one side, then the other, to make a pair | `left`, `right` (faces), `count` |
+| `cards` | Taps a card to reveal it and hear the word | `front`, `back` (faces), `speak` |
+| `match` | Taps one side, then the other, to make a pair | `left`, `right` (faces), `count`, `speak` |
 | `sentence` | Picks a word, then grows it into a sentence | `levels` (label + template) |
 | `sort` | Taps an item, then the bucket it belongs in | `by` (tag), `buckets` |
 | `listen` | Hears a word and taps the right picture | `choices` |
@@ -78,6 +78,8 @@ Every block takes `id`, `title`, an optional `hint`, and an `items` selector —
 
 A **face** is one way of showing an item: `emoji`, `en`, `l1`, `example`, or `tag:<name>`.
 A **template** fills `{en}`, `{article}`, `{it}`, `{be}`, `{this}`, `{l1}` and `{tag:<name>}`.
+`speak` is a template too: the line a block says out loud about one item. Without it a
+card speaks the English word and a pair says nothing beyond the tile that was tapped.
 
 A themed exercise is never a new block type — it is an existing one reading a different
 tag. "Which sound does it make" is `match` over `tag:sound`; "where does it live" is `sort`

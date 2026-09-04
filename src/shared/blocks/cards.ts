@@ -1,7 +1,13 @@
-import type { CardsState } from '../types'
+import type { BlockOf, CardsState, Item } from '../types'
 import { shuffleWithSeed } from '../rng'
+import { renderTemplate } from '../text'
 import { resolveItems } from '../validate'
 import type { BlockLogic } from './contract'
+
+/** What a card says when it is tapped: the block's template, or the English word. */
+export function cardsSpeech(block: BlockOf<'cards'>, item: Item): string {
+  return renderTemplate(block.speak ?? '{en}', item)
+}
 
 export const cardsLogic: BlockLogic<'cards'> = {
   scored: true,

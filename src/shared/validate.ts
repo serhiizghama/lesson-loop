@@ -39,6 +39,7 @@ const blockSchema = z.discriminatedUnion('type', [
     items: itemRefSchema,
     front: faceSchema,
     back: z.array(faceSchema).min(1),
+    speak: z.string().min(1).optional(),
   }),
   z.object({
     ...blockBase,
@@ -47,6 +48,7 @@ const blockSchema = z.discriminatedUnion('type', [
     left: faceSchema,
     right: faceSchema,
     count: z.number().int().min(2).optional(),
+    speak: z.string().min(1).optional(),
   }),
   z.object({
     ...blockBase,
@@ -145,9 +147,22 @@ function crossCheck(lesson: Lesson): string[] {
       }
     }
 
+    const requireTemplateTags = (template: string, field: string) => {
+      for (const tag of tagsUsedByTemplate(template)) {
+        const without = items.filter((it) => it.tags?.[tag] === undefined)
+        if (without.length > 0) {
+          errors.push(
+            `${at}.${field}: tag "${tag}" is missing on ` +
+              without.map((it) => `"${it.id}"`).join(', '),
+          )
+        }
+      }
+    }
+
     switch (block.type) {
       case 'cards':
         requireFace(block.front, 'front')
+        if (block.speak !== undefined) requireTemplateTags(block.speak, 'speak')
         break
       case 'match': {
         requireFace(block.left, 'left')
@@ -157,19 +172,12 @@ function crossCheck(lesson: Lesson): string[] {
             `${at}.count: block "${block.id}" asks for ${block.count} pairs but selects ${items.length} items`,
           )
         }
+        if (block.speak !== undefined) requireTemplateTags(block.speak, 'speak')
         break
       }
       case 'sentence': {
         for (const [li, level] of block.levels.entries()) {
-          for (const tag of tagsUsedByTemplate(level.template)) {
-            const without = items.filter((it) => it.tags?.[tag] === undefined)
-            if (without.length > 0) {
-              errors.push(
-                `${at}.levels.${li}.template: tag "${tag}" is missing on ` +
-                  without.map((it) => `"${it.id}"`).join(', '),
-              )
-            }
-          }
+          requireTemplateTags(level.template, `levels.${li}.template`)
         }
         break
       }
@@ -204,15 +212,7 @@ function crossCheck(lesson: Lesson): string[] {
         break
       }
       case 'tpr': {
-        for (const tag of tagsUsedByTemplate(block.prompt)) {
-          const without = items.filter((it) => it.tags?.[tag] === undefined)
-          if (without.length > 0) {
-            errors.push(
-              `${at}.prompt: tag "${tag}" is missing on ` +
-                without.map((it) => `"${it.id}"`).join(', '),
-            )
-          }
-        }
+        requireTemplateTags(block.prompt, 'prompt')
         break
       }
     }

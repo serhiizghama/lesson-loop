@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { testLesson, testState } from '../__fixtures__/lesson'
 import { applyAction, blockById, blockStateOf, isBlockComplete } from '../reducer'
-import { listenChoices, listenTarget, tprCurrent } from './index'
+import { cardsSpeech, listenChoices, listenTarget, matchPairSpeech, tprCurrent } from './index'
 import { seedFor } from '../rng'
 import type {
   Action, BlockOf, CardsState, LessonState, ListenState, MatchState, SentenceState, SortState, TprState,
@@ -235,5 +235,39 @@ describe('tpr', () => {
     const stale = applyAction(lesson, advanced, { t: 'tap', block: 'move', target: initial.order[0]! })
     expect(stale).toBe(advanced)
     expect(stateOf<TprState>(advanced, 'move').index).toBe(1)
+  })
+})
+
+describe('what a block says about an item', () => {
+  const dog = lesson.items.find((i) => i.id === 'dog')!
+  const elephant = lesson.items.find((i) => i.id === 'elephant')!
+
+  const soundCards: BlockOf<'cards'> = {
+    id: 'sounds', type: 'cards', title: 'Sounds', items: { select: 'tag', tag: 'sound' },
+    front: 'emoji', back: ['tag:sound'], speak: '{article} {en} says {tag:sound}!',
+  }
+  const soundMatch: BlockOf<'match'> = {
+    id: 'soundmatch', type: 'match', title: 'Sound match', items: { select: 'tag', tag: 'sound' },
+    left: 'emoji', right: 'tag:sound', speak: 'The {en} says {tag:sound}!',
+  }
+
+  it('speaks the English word when a card declares nothing', () => {
+    expect(cardsSpeech(block('vocab') as BlockOf<'cards'>, dog)).toBe('dog')
+  })
+
+  it('speaks the sound rather than the animal when the card is about the sound', () => {
+    expect(cardsSpeech(soundCards, dog)).toBe('a dog says Woof!')
+  })
+
+  it('keeps the declared grammar inside the spoken line', () => {
+    expect(cardsSpeech(soundCards, elephant)).toBe('an elephant says Toot!')
+  })
+
+  it('says nothing on a pair the block has no sentence for', () => {
+    expect(matchPairSpeech(block('pairs') as BlockOf<'match'>, dog)).toBeNull()
+  })
+
+  it('announces a finished pair with both of its halves', () => {
+    expect(matchPairSpeech(soundMatch, dog)).toBe('The dog says Woof!')
   })
 })

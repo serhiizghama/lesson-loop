@@ -44,9 +44,22 @@ export type Bucket = { key: string; label: string; emoji: string }
 
 type BlockBase = { id: string; title: string; hint?: string }
 
+/**
+ * `speak` is what a block says aloud about one item, as a template: "A {en} says
+ * {tag:sound}!". Without it a block speaks the plain English word, which is right for
+ * vocabulary and wrong for a themed exercise whose whole point is the tag.
+ */
 export type Block =
-  | (BlockBase & { type: 'cards'; items: ItemRef; front: Face; back: Face[] })
-  | (BlockBase & { type: 'match'; items: ItemRef; left: Face; right: Face; count?: number })
+  | (BlockBase & { type: 'cards'; items: ItemRef; front: Face; back: Face[]; speak?: string })
+  | (BlockBase & {
+      type: 'match'
+      items: ItemRef
+      left: Face
+      right: Face
+      count?: number
+      /** Spoken when a pair is completed — the teaching moment, not on every tap. */
+      speak?: string
+    })
   | (BlockBase & { type: 'sentence'; items: ItemRef; levels: SentenceLevel[] })
   | (BlockBase & { type: 'sort'; items: ItemRef; by: string; buckets: Bucket[] })
   | (BlockBase & { type: 'listen'; items: ItemRef; choices?: number })

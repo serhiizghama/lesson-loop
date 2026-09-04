@@ -1,7 +1,17 @@
-import type { MatchState } from '../types'
+import type { BlockOf, Item, MatchState } from '../types'
 import { seedFor, shuffleWithSeed } from '../rng'
+import { renderTemplate } from '../text'
 import { resolveItems } from '../validate'
 import type { BlockLogic } from './contract'
+
+/**
+ * What a completed pair says, or null when the block declares nothing. Saying it on the
+ * pair rather than on the tap is deliberate: a sentence naming both halves would give the
+ * answer away while the learner is still choosing.
+ */
+export function matchPairSpeech(block: BlockOf<'match'>, item: Item): string | null {
+  return block.speak === undefined ? null : renderTemplate(block.speak, item)
+}
 
 export const matchLogic: BlockLogic<'match'> = {
   scored: true,

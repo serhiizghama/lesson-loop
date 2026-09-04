@@ -21,6 +21,17 @@ export function faceValue(item: Item, face: Face): string | null {
   return item.tags?.[tag] ?? null
 }
 
+/**
+ * What a face says out loud, or null when it must stay silent. A picture is named by
+ * its English word; the first-language gloss is never read, because the voice is an
+ * English one and would mangle it.
+ */
+export function faceSpeech(item: Item, face: Face): string | null {
+  if (face === 'emoji') return item.en
+  if (face === 'l1') return null
+  return faceValue(item, face)
+}
+
 const TAG_PLACEHOLDER = /\{tag:([A-Za-z0-9_-]+)\}/g
 
 /**

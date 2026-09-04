@@ -25,7 +25,8 @@
     {
       "id": "sounds", "type": "cards", "title": "🔊 Now Let's Learn Their Sounds!",
       "hint": "Tap each animal to hear the sound it makes.",
-      "items": { "select": "tag", "tag": "sound" }, "front": "emoji", "back": ["en", "tag:sound"]
+      "items": { "select": "tag", "tag": "sound" }, "front": "emoji", "back": ["en", "tag:sound"],
+      "speak": "{article} {en} says {tag:sound}!"
     },
     {
       "id": "pairs", "type": "match", "title": "🎯 Matching Game",
@@ -50,7 +51,8 @@
     {
       "id": "soundmatch", "type": "match", "title": "🎯 Sound Match",
       "hint": "Tap an animal, then tap the sound it makes.",
-      "items": { "select": "tag", "tag": "sound" }, "left": "emoji", "right": "tag:sound", "count": 5
+      "items": { "select": "tag", "tag": "sound" }, "left": "emoji", "right": "tag:sound", "count": 5,
+      "speak": "The {en} says {tag:sound}!"
     },
     {
       "id": "homes", "type": "sort", "title": "🏡 Where Do They Live?",

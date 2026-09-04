@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { articleFor, faceValue, renderTemplate, tagsUsedByTemplate } from './text'
+import { articleFor, faceSpeech, faceValue, renderTemplate, tagsUsedByTemplate } from './text'
 import type { Item } from './types'
 
 const dog: Item = { id: 'dog', en: 'dog', emoji: '🐶', l1: { word: '犬' }, tags: { move: 'Run!' } }
@@ -78,5 +78,23 @@ describe('uncountable nouns', () => {
   it('takes no article and stays singular', () => {
     expect(renderTemplate(IT_IS, hair)).toBe('It is hair.')
     expect(articleFor(hair)).toBe('')
+  })
+})
+
+describe('what a face says out loud', () => {
+  it('names a picture by its English word', () => {
+    expect(faceSpeech(dog, 'emoji')).toBe('dog')
+  })
+
+  it('reads a tag, which is the point of a themed exercise', () => {
+    expect(faceSpeech(dog, 'tag:move')).toBe('Run!')
+  })
+
+  it('never reads the first-language gloss, which an English voice would mangle', () => {
+    expect(faceSpeech(dog, 'l1')).toBeNull()
+  })
+
+  it('stays silent on a face the item cannot show', () => {
+    expect(faceSpeech(elephant, 'tag:move')).toBeNull()
   })
 })

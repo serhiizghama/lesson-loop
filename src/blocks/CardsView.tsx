@@ -1,3 +1,4 @@
+import { cardsSpeech } from '@/shared/blocks'
 import { faceValue } from '@/shared/text'
 import { resolveItems } from '@/shared/validate'
 import type { BlockView } from './types'
@@ -19,7 +20,7 @@ export const CardsView: BlockView<'cards'> = ({ lesson, block, state, dispatch, 
             className={`${styles.card} ${revealed ? styles.cardRevealed : ''}`}
             onClick={() => {
               dispatch({ t: 'tap', block: block.id, target: id })
-              speech.speak(item.en)
+              speech.speak(cardsSpeech(block, item))
             }}
           >
             <span className={styles.cardFront}>{faceValue(item, block.front)}</span>
