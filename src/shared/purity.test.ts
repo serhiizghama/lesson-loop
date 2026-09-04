@@ -39,6 +39,14 @@ describe('src/shared stays runnable in a Worker', () => {
     expect(files.length).toBeGreaterThan(5)
   })
 
+  // The glob is recursive and extension-based, so it is easy to believe it covers a new
+  // file when it does not. The room core is the one that would hurt most to miss.
+  it('covers the room core and the protocol', () => {
+    const covered = files.map((f) => f.slice(SHARED.length + 1))
+    expect(covered).toContain('room.ts')
+    expect(covered).toContain('protocol.ts')
+  })
+
   it.each(files)('%s imports no UI framework', (file) => {
     const code = stripComments(readFileSync(file, 'utf8'))
     for (const pattern of FORBIDDEN_IMPORTS) {

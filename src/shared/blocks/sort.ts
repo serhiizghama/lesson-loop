@@ -44,6 +44,27 @@ export const sortLogic: BlockLogic<'sort'> = {
     return { ...state, selected: null, wrong: { item: state.selected, bucket: action.target } }
   },
 
+  /** The bucket each item belongs in (spec: which bucket each item belongs in). */
+  answerKey(lesson, block, state) {
+    const labels = new Map(block.buckets.map((b) => [b.key, `${b.emoji} ${b.label}`]))
+    return {
+      title: `Sorted by ${block.by}`,
+      rows: state.order.flatMap((id) => {
+        const item = itemById(lesson, id)
+        if (item === undefined) return []
+        const key = item.tags?.[block.by]
+        return [{
+          id,
+          label: `${item.emoji} ${item.en}`,
+          value: (key === undefined ? undefined : labels.get(key)) ?? '—',
+          mark: state.placed[id] !== undefined
+            ? ('done' as const)
+            : state.selected === id ? ('current' as const) : ('open' as const),
+        }]
+      }),
+    }
+  },
+
   isComplete(_lesson, _block, state: SortState) {
     return state.order.length > 0 && Object.keys(state.placed).length === state.order.length
   },

@@ -12,6 +12,11 @@ export const finishLogic: BlockLogic<'finish'> = {
     return { seen: true }
   },
 
+  /** A slide, not an exercise. */
+  answerKey() {
+    return null
+  },
+
   isComplete() {
     return true
   },

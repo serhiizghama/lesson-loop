@@ -32,6 +32,27 @@ export const listenLogic: BlockLogic<'listen'> = {
     return { ...state, index: state.index + 1, answered: [...state.answered, target], wrong: null }
   },
 
+  /** Which picture the word being spoken names (spec: the key for a listening exercise). */
+  answerKey(lesson, block, state) {
+    const items = new Map(resolveItems(lesson, block.items).map((i) => [i.id, i]))
+    const target = listenTarget(state)
+    return {
+      title: 'Words in order',
+      rows: state.order.flatMap((id) => {
+        const item = items.get(id)
+        if (item === undefined) return []
+        return [{
+          id,
+          label: item.en,
+          value: item.emoji,
+          mark: state.answered.includes(id)
+            ? ('done' as const)
+            : id === target ? ('current' as const) : ('open' as const),
+        }]
+      }),
+    }
+  },
+
   isComplete(_lesson, _block, state: ListenState) {
     return state.order.length > 0 && state.answered.length === state.order.length
   },

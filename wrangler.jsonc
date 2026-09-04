@@ -1,0 +1,14 @@
+{
+  // Local development only. Publishing — the assets binding, the custom domain and the
+  // deploy from CI — is `add-cloudflare-deploy` (design D18); `vite dev` proxies to this
+  // Worker rather than being served by it (design D17).
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "lesson-loop",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-09-01",
+  "durable_objects": {
+    "bindings": [{ "name": "ROOMS", "class_name": "Room" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room"] }],
+  "observability": { "enabled": true }
+}

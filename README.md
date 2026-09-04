@@ -4,22 +4,72 @@ Interactive English lessons for one-on-one online teaching. A lesson is a sequen
 tap-based exercises — flip cards, matching, sentence building, sorting, listening, and
 physical-response games — built from a plain JSON vocabulary list.
 
-Everything runs in the browser. No sign-up, no database, no network calls once the page
-has loaded.
+A lesson opened from the home screen runs entirely in the browser: no sign-up, no
+database, and no network call once the page has loaded. When the teacher wants the
+student to join in, she opens a **room** — and only then does anything leave the device.
 
-> **Where this is going.** The next change puts the teacher and the student on the same
-> synchronised page from two different links, with answer keys and lesson controls on the
-> teacher's side only. See `docs/PLAN.md`.
+## Rooms: two links, two halves of the same lesson
+
+Mid-lesson the teacher presses **Invite student** and the app opens a room carrying the
+lesson exactly as it stands, progress included. That gives two links to one lesson:
+
+| Link | Who it is for | What it shows |
+|---|---|---|
+| `/t/<code>#<key>` | the teacher | the exercise **plus** the answer key, the lesson controls that pace the session, the student's link, a lock on student input, and whether the student is connected |
+| `/r/<code>` | the student | the exercise, its instruction, where in the lesson they are and how much is done — and nothing else |
+
+Every tap inside the exercise moves both screens, whoever made it: flipping a card,
+making a pair, placing an item, choosing a scaffold level. A tap is applied locally at
+once and settled by the room, so it never waits for the network.
+
+**The teacher paces the lesson.** Moving between exercises, resetting one and changing
+lesson are hers alone — the student's screen has no controls for them, and the room
+refuses them from a student even if something else sends one. The student sees where
+they are (`3 / 9` and the progress bar) without steering. A lesson opened from the home
+screen is solo and keeps every control, since there is no teacher to wait for.
+
+The teacher's half is granted by the key in the link's `#fragment`, not by the route —
+`/r/AB12` cannot be turned into `/t/AB12` by guessing. A student joining mid-lesson lands
+on whatever is on screen, already in progress. The room outlives any one lesson: the
+teacher can change lesson in place and the student follows on the same link.
+
+**Losing the connection does not lose the lesson.** The app says it is working without
+sync, keeps the exercise on screen fully playable, reconnects on its own, and brings the
+screens back into agreement. Because the teacher paces the lesson, she carries on through
+her own copy while the student holds the exercise they are on until the room is back. A
+lesson opened from the home screen never opens a socket at all.
+
+Rooms are anonymous and short-lived: a four-character code, at most four participants, no
+account and no name to enter, and the room is discarded after three hours of inactivity.
 
 ## Running it
+
+A lesson on its own needs one process:
 
 ```bash
 npm install
 npm run dev        # http://localhost:5173
 ```
 
+A room needs two: the Worker that hosts it, and the client that talks to it. In one
+terminal:
+
 ```bash
-npm run typecheck  # tsc --noEmit
+npm run dev:worker # wrangler dev, on http://localhost:8787
+```
+
+and in another:
+
+```bash
+npm run dev        # http://localhost:5173, proxying /api and /ws to the Worker
+```
+
+Then open a lesson, press **Invite student**, and paste the student link into a second
+browser window. Publishing this to the internet is a later change; two windows against
+`wrangler dev` is as far as it goes today.
+
+```bash
+npm run typecheck  # tsc --noEmit, over the client and the Worker
 npm test           # vitest
 npm run build      # production bundle in dist/
 ```
@@ -95,13 +145,21 @@ blocks.6.buckets.2.key: no selected item has habitat = "ocean"
 
 ## How it is built
 
-- `src/shared/` — the lesson format, its validation, and the pure state reducer. No React,
-  no DOM: it is written to run unchanged inside a Cloudflare Worker in the next change, and
-  a test enforces that.
+- `src/shared/` — the lesson format, its validation, the pure state reducer, and the room
+  core. No React, no DOM: it runs unchanged in the browser and inside the Cloudflare
+  Worker, and a test enforces that.
 - `src/blocks/` — one React view per exercise type.
-- `src/ui/` — the shell: lesson picker, progress, navigation.
+- `src/ui/` — the shell: routing, lesson picker, progress, navigation, teacher panel.
+- `src/net/` — the socket to a room, its reconnection, and opening a room.
+- `worker/` — the Worker and the `Room` Durable Object: thin adapters over `src/shared`.
 - `lessons/` — the content.
 
 Every tap is an action; `applyAction(lesson, state, action)` is pure and deterministic, and
 shuffled orders come from a seed held in the state rather than from `Math.random` at render
-time. That is what will let two people on two devices see the same screen.
+time. That one function runs in two places — optimistically in each browser and
+authoritatively inside the room — which is what lets two people on two devices see the
+same screen. The room broadcasts its whole state after every action rather than a patch,
+and a device adopts any snapshot at least as new as its own.
+
+A new lesson still needs no code anywhere: the lesson travels to the room with the request
+that opens it, so the Worker has no catalogue to keep in step with `lessons/`.

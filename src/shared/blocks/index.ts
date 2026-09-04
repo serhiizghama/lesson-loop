@@ -22,7 +22,7 @@ export const blockLogic: { [T in BlockType]: BlockLogic<T> } = {
   finish: finishLogic,
 }
 
-export type { BlockLogic } from './contract'
+export type { AnswerKey, AnswerKeyRow, BlockLogic } from './contract'
 export { cardsSpeech } from './cards'
 export { matchPairSpeech } from './match'
 export { listenChoices, listenTarget, DEFAULT_CHOICES } from './listen'

@@ -1,17 +1,38 @@
-import { useState } from 'react'
-import { lessonFailures, lessons } from '@/lessons'
-import { LessonPlayer } from './LessonPlayer'
+import { lessonFailures, lessonById, lessons } from '@/lessons'
+import { RoomLesson } from './RoomLesson'
+import { SoloLesson } from './SoloLesson'
+import { homePath, lessonPath, useRoute } from './router'
 import styles from './app.module.css'
 
 export function App() {
-  const [openLessonId, setOpenLessonId] = useState<string | null>(null)
-  const open = lessons.find((l) => l.id === openLessonId) ?? null
+  const { route, go } = useRoute()
+  const home = () => go(homePath)
 
-  if (open !== null) {
+  if (route.name === 'lesson') {
+    const lesson = lessonById(route.lessonId)
+    if (lesson === undefined) return <Missing what="lesson" onHome={home} />
     // Keying on the lesson gives each one a fresh state, seed included.
-    return <LessonPlayer key={open.id} lesson={open} onExit={() => setOpenLessonId(null)} />
+    return (
+      <SoloLesson
+        key={lesson.id}
+        lesson={lesson}
+        onExit={home}
+        onInvited={(path) => go(path, true)}
+      />
+    )
   }
 
+  if (route.name === 'teacher' || route.name === 'student') {
+    const key = route.name === 'teacher' && route.key !== '' ? route.key : null
+    return <RoomLesson key={route.code} code={route.code} teacherKey={key} onExit={home} />
+  }
+
+  if (route.name === 'unknown') return <Missing what="page" onHome={home} />
+
+  return <Home onOpen={(id) => go(lessonPath(id))} />
+}
+
+function Home({ onOpen }: { onOpen: (lessonId: string) => void }) {
   return (
     <div className={styles.home}>
       <h1 className={styles.homeTitle}>
@@ -25,7 +46,7 @@ export function App() {
             key={lesson.id}
             type="button"
             className={styles.lessonCard}
-            onClick={() => setOpenLessonId(lesson.id)}
+            onClick={() => onOpen(lesson.id)}
           >
             <span className={styles.lessonEmoji}>{lesson.emoji}</span>
             <span className={styles.lessonName}>{lesson.title}</span>
@@ -48,6 +69,18 @@ export function App() {
           ))}
         </section>
       )}
+    </div>
+  )
+}
+
+/** Never a blank screen: say what happened and offer the lesson list (spec). */
+function Missing({ what, onHome }: { what: string; onHome: () => void }) {
+  return (
+    <div className={styles.roomGate}>
+      <p className={styles.roomGateText}>There is no such {what}.</p>
+      <button type="button" className={styles.panelButton} onClick={onHome}>
+        Back to the lessons
+      </button>
     </div>
   )
 }

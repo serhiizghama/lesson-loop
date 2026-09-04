@@ -35,6 +35,11 @@ export const tprLogic: BlockLogic<'tpr'> = {
     return { ...state, index: state.index + 1 }
   },
 
+  /** Nothing to be right about: the learner answers with their body, off screen. */
+  answerKey() {
+    return null
+  },
+
   isComplete(_lesson, _block, state: TprState) {
     return state.started && state.index >= state.order.length
   },

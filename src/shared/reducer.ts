@@ -1,4 +1,5 @@
 import { blockLogic } from './blocks'
+import type { AnswerKey } from './blocks/contract'
 import { seedFor } from './rng'
 import type { Action, Block, BlockState, Lesson, LessonState } from './types'
 
@@ -45,14 +46,15 @@ export function applyAction(lesson: Lesson, state: LessonState, action: Action):
 
 /** Draws the seed — the only impure moment in the model (design D3). */
 export function createLessonState(lessonId: string): LessonState {
-  return {
-    v: 0,
-    lessonId,
-    slide: 0,
-    seed: (Math.random() * 0x100000000) >>> 0,
-    blocks: {},
-    resets: {},
-  }
+  return newLessonState(lessonId, (Math.random() * 0x100000000) >>> 0)
+}
+
+/**
+ * A lesson at its beginning on a seed someone else drew. The room uses this when it
+ * switches lesson, so that everything it does stays pure and reproducible (design D9).
+ */
+export function newLessonState(lessonId: string, seed: number): LessonState {
+  return { v: 0, lessonId, slide: 0, seed: seed >>> 0, blocks: {}, resets: {} }
 }
 
 export function blockById(lesson: Lesson, id: string): Block | undefined {
@@ -91,6 +93,15 @@ export function isLessonComplete(lesson: Lesson, state: LessonState): boolean {
   return total > 0 && done === total
 }
 
+/**
+ * The answer to a block as it stands, or null when it scores nothing (design D15).
+ * Dispatching here rather than in the teacher's panel is what makes a block type
+ * without a key a compile error instead of a silent gap in the lesson.
+ */
+export function answerKeyFor(lesson: Lesson, state: LessonState, block: Block): AnswerKey | null {
+  return logicFor(block).answerKey(lesson, block, blockStateOf(lesson, state, block))
+}
+
 function generationOf(state: LessonState, blockId: string): number {
   return state.resets[blockId] ?? 0
 }
@@ -104,6 +115,7 @@ type ErasedLogic = {
   init(lesson: Lesson, block: Block, seed: number): BlockState
   reduce(lesson: Lesson, block: Block, state: BlockState, action: Action): BlockState
   isComplete(lesson: Lesson, block: Block, state: BlockState): boolean
+  answerKey(lesson: Lesson, block: Block, state: BlockState): AnswerKey | null
 }
 
 function logicFor(block: Block): ErasedLogic {

@@ -1,6 +1,6 @@
 import type { BlockOf, Item, MatchState } from '../types'
 import { seedFor, shuffleWithSeed } from '../rng'
-import { renderTemplate } from '../text'
+import { faceValue, renderTemplate } from '../text'
 import { resolveItems } from '../validate'
 import type { BlockLogic } from './contract'
 
@@ -46,6 +46,25 @@ export const matchLogic: BlockLogic<'match'> = {
       return { ...state, paired: [...state.paired, a], selected: null, wrong: null }
     }
     return { ...state, selected: null, wrong: { a, b } }
+  },
+
+  /** Which item on the left belongs with which on the right (spec: the key for a matching exercise). */
+  answerKey(lesson, block, state) {
+    const items = new Map(resolveItems(lesson, block.items).map((i) => [i.id, i]))
+    return {
+      title: 'Pairs',
+      rows: state.orderA.flatMap((id) => {
+        const item = items.get(id)
+        if (item === undefined) return []
+        const held = state.selected !== null && state.selected.id === id
+        return [{
+          id,
+          label: faceValue(item, block.left) ?? item.en,
+          value: faceValue(item, block.right) ?? item.en,
+          mark: state.paired.includes(id) ? ('done' as const) : held ? ('current' as const) : ('open' as const),
+        }]
+      }),
+    }
   },
 
   isComplete(_lesson, _block, state: MatchState) {

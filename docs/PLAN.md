@@ -5,10 +5,10 @@ designed
 
 The product context below still holds; the technical sketches written before any code
 existed do not, and are superseded rather than kept in parallel. The authorities now are:
-`README.md` for how a lesson is written, `openspec/specs/` for the contracts the shipped
-engine satisfies, and `openspec/changes/add-synced-rooms/` for the room — whose delta specs
-become `openspec/specs/synced-rooms` and `openspec/specs/teacher-view` when that change is
-archived.
+`README.md` for how a lesson is written, and `openspec/specs/` for the contracts the
+shipped code satisfies — including `synced-rooms` and `teacher-view`, which the archived
+`add-synced-rooms` change produced. The reasoning behind a decision lives in that change's
+`design.md`, under `openspec/changes/archive/`.
 
 ---
 
@@ -16,8 +16,9 @@ archived.
 
 A web app for **one-on-one online English lessons** where the teacher and the student
 look at **one synchronised page** of interactive exercises. The teacher opens a lesson,
-gets a link, sends it to the student — from then on both tap the same screen and each
-sees what the other does.
+invites the student from inside it, and sends the link she is given — from then on both
+tap the same screen and each sees what the other does. Opening a lesson does not create a
+room; asking for one does (D-13).
 
 **Client:** an English teacher based in the Philippines. Her students are, judging by the
 source material, **Japanese children** (her cards carry `jp` + `romaji`), but the tool
@@ -45,7 +46,11 @@ or Baamboozle.
    whole lesson the moment the teacher reloads her tab.
 3. **Lessons are data, not code.** A new lesson is a JSON file in the repo.
 4. **Solo mode is mandatory.** If the socket never opens or drops, the app keeps working
-   fully — just unsynced. The teacher must never hit a blank screen mid-lesson.
+   — just unsynced. The teacher must never hit a blank screen mid-lesson, and no exercise
+   ever stops working for want of a connection. Qualified by D-21: because the teacher
+   paces a shared lesson, an unsynced student holds the exercise they are on rather than
+   walking through the rest alone. A lesson opened from the home screen is unqualified —
+   it plays start to finish with no network at all.
 5. **Tap, not drag.** Works with mouse, finger and stylus alike; syncs as "id X is
    selected" rather than as a stream of coordinates.
 6. **Zero cost.** The Cloudflare free tier covers both the static site and the sockets.
@@ -155,8 +160,11 @@ change, so a reloaded tab rejoins the lesson instead of restarting it (D-15).
 Client → room:
 - `{ t:'hello', room, key? }` — a key, where present, claims the teacher's role
 - `{ t:'action', action }` — any tap, navigation and resetting an exercise included, since
-  those are already actions in the shared reducer
-- `{ t:'switch-lesson', lessonId }` — teacher only
+  those are already actions in the shared reducer. Taps inside the exercise are accepted
+  from either participant; `nav` and `reset` only from the teacher (D-21)
+- `{ t:'switch-lesson', lesson }` — teacher only. The lesson travels whole rather than by
+  id: the room has no lesson catalogue, so `lessons/` stays content the client bundles and
+  a new lesson never needs the Worker redeployed (D-20)
 - `{ t:'lock', value }` — teacher only
 
 Room → client:
@@ -179,8 +187,10 @@ is needed.
 
 ### Rooms
 
+- Created by `POST /api/rooms`, carrying the lesson and the `LessonState` the teacher
+  already has open, so the invitation keeps whatever progress has been made (D-13).
 - Code: 4 characters from an alphabet without `0/O/1/I/5/S`; the DO is addressed via
-  `idFromName(code)`. Creating a room also mints a random teacher key, carried in the link
+  `idFromName(code)`, and a code already in play is refused and retried. Creating a room also mints a random teacher key, carried in the link
   fragment so it stays out of request lines, server logs and `Referer` headers.
 - Lifetime: a DO `alarm()` drops the state after 3 hours of inactivity.
 - Cap of 4 participants (room to grow into small groups later).
@@ -201,10 +211,13 @@ and immediately sees the correct screen.
 - **Home** — a grid of lesson tiles (emoji); picking one opens the lesson locally, with no
   network at all. A room is created only when the teacher asks to invite a student, from
   inside the lesson, carrying whatever progress has already been made (D-13).
-- **Lesson, student view** — the exercise only, large tap targets, nothing else.
-- **Lesson, teacher view** — the same plus a bottom bar: ← / →, "Reset block", "Lock
-  student input", a "student connected" indicator, the answer key and prompt phrases for
-  the current block.
+- **Lesson, student view** — the exercise, large tap targets, and where in the lesson
+  they are: `3 / 9` and the progress bar. No ← / →, no "Reset": the teacher paces the
+  lesson (D-21).
+- **Lesson, teacher view** — the same plus the panel: ← / →, "Reset this exercise",
+  "Change lesson", "Lock student input", a "student connected" indicator and the answer
+  key for the current block. Pacing is hers alone, and the room refuses it from a student
+  rather than merely hiding the buttons.
 
 Responsiveness: the student is most likely on a tablet or in a window next to a video
 call, so the layout is designed from the narrow window up (roughly 380–900 px wide)
@@ -255,8 +268,9 @@ collect feedback.
 
 Where it stands on 2026-09-04: `add-lesson-engine` is implemented and archived — the engine,
 the six block types and both of her lessons play end to end in one browser, offline.
-`add-synced-rooms` is planned in full and not yet implemented. `add-cloudflare-deploy` has
-not been started.
+`add-synced-rooms` is implemented: two browsers hold one lesson together against
+`wrangler dev`, with the teacher panel, the answer keys and the lock. It stops short of
+publishing (D-18). `add-cloudflare-deploy` has not been started.
 
 **v0.2** — `hotspot`, `memory`, `scramble`; four to six new lessons; sounds and
 correct-answer animations; tablet polish; pre-generated mp3 instead of TTS.
@@ -314,3 +328,5 @@ technical decisions `Dn`, without the hyphen; the two sequences are separate.
 | D-17 | The teacher's answer key is computed from lesson data and belongs to the block contract, so a new block type cannot ship without one. No teacher notes are added to the lesson format in v0.1 | 2026-09-04 |
 | D-18 | `add-synced-rooms` ends at two browsers against `wrangler dev`; publishing, asset serving and CI deployment are `add-cloudflare-deploy` | 2026-09-04 |
 | D-19 | Room behaviour lives in `src/shared/room.ts` as pure code with the Durable Object a thin adapter, so convergence is a unit test rather than a two-browser check | 2026-09-04 |
+| D-20 | The room holds the lesson's data, not just its id: it is sent when the room is opened and when the lesson is switched. The Worker keeps no lesson catalogue, so principle 3 survives — a new lesson is still a file in `lessons/` and needs no deploy | 2026-09-04 |
+| D-21 | The teacher paces a shared lesson: moving between exercises and resetting one are hers alone, absent from the student's screen and refused by the room. The lock stays a separate, stronger rule about touching the exercise itself. An unsynced student therefore holds their exercise rather than walking on — qualifies principle 4 | 2026-09-04 |
