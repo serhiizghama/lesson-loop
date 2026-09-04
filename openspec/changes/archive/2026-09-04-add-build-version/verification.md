@@ -36,25 +36,32 @@ collect. "No tests" is not "a test failed" — that probe proved nothing and was
 | the line reads as intended (3.1, 3.2) | served `dist/` locally and looked at the home screen | `lesson-loop@0.1.16 · 2026-09-04 18:32`, small and muted, below the lesson cards, after everything else on the page. An eye judgement, not test coverage |
 | the actions the pipeline uses exist (4.1) | queried the tags of `actions/checkout` and `actions/setup-node` | `v7` exists for both. This was checked because the versions had been raised to `v7` in the working tree and I wrongly suspected they were invented; they are not |
 
-## NOT performed — the whole of acceptance
+## Acceptance — run after archiving, on commit `4a36af1`
 
-None of the following was possible: the change was never committed, so it was never
-published, so there was nothing deployed to check it against. They are listed as untested
-and must not be read as passing.
+The change was archived before it was published, so this section was written as "not
+performed". It was then committed, published by CI, and the checks below were run against
+the deployed app. This paragraph is the honest record of that order: the archive was
+closed first, the evidence came second.
 
-| Check | Why not |
+| Check | Result |
 |---|---|
-| 4.2, the pipeline writes nothing back | needs a published push to inspect afterwards |
-| 6.1, the published app shows a real number and not `-unknown` | **this is the check that proves `fetch-depth: 0` works.** Until it runs, whether CI produces a real version or `0.1.0-unknown` is unknown — the fallback is honest, which is exactly what would make a broken checkout look fine |
-| 6.2, a new revision shows a different version | needs two publishes |
-| 6.3, a tab left open across a publish shows the older version | needs two publishes |
-| 6.4, no build line inside a lesson or on the student's screen, on the published app | covered by unit tests against rendered markup, never against the deployed app |
-| 6.5, nothing is fetched to know the version | the value is a literal in the bundle, which is what `define` does and what the build output shows — but no request log was taken on the published app to confirm it |
+| 6.1 the published app shows a real number, not `-unknown` | **passed.** `web.lesson-loop.workers.dev` serves `0.1.17` with the stamp `2026-09-04 11:42`. This is what proves `fetch-depth: 0` reached the build — the fallback is honest, so a broken checkout would have looked fine |
+| 6.4 no build line inside a lesson or on the student's screen | **passed.** Read from the live DOM: `/l/animals` and `/r/WQJQ` both contain no `lesson-loop@`, and the student's view carries no teacher controls |
+| 6.5 nothing is fetched to know the version | **passed.** Loading the home screen made seven requests — the page, its script and stylesheet, the manifest and the icon — and none for a version. It is a literal in the bundle |
+| 4.2 the pipeline writes nothing back | **passed.** After the published push, `main` carries only the commit that was pushed: no `chore: v0.1.x` appeared and no tag was created |
 
-## What this leaves
+### Still not run
 
-The main specs now carry two requirements saying the published app names its build. The
-published app does not, and will not until this work is committed and a deploy runs. That
-gap is the direct consequence of archiving first, and it closes the moment the change is
-pushed — after which 6.1 in particular is worth running, since it is the only thing that
-distinguishes a working `fetch-depth` from a silently unknown version.
+| Check | Why |
+|---|---|
+| 6.2 a new revision shows a different version | needs two *versioned* publishes. Only one exists — the publish before it had no version line at all, which is a difference but not the check as written |
+| 6.3 a tab open across a publish shows the older version | same reason; it needs a second publish to compare against |
+
+## One thing worth knowing
+
+The build stamp is written in the timezone of whatever machine built it. A local build
+showed `18:32`; the CI build of the same work shows `11:42`, because the runner is on UTC.
+So the time the teacher reads is UTC, not her own. Nothing is wrong — the version, which
+is what identifies the build, is exact either way — but the time beside it is not the time
+where she is. Noted rather than fixed: the change is closed, and this is a decision about
+what the line should say, not a defect in what it does.

@@ -49,7 +49,7 @@
   from it (design D57, Risks). **Check:** `.github/workflows/ci.yml` fetches enough history
   for `git rev-list --count HEAD`, and the change is a checkout option only — no job
   writes to the repository and no tag is created (design D-26).
-- [ ] 4.2 Confirm the pipeline still writes nothing back. **Check:** `git log` after a
+- [x] 4.2 Confirm the pipeline still writes nothing back. **Check:** `git log` after a
   published push contains only the commit that was pushed — no `chore: v0.1.x` commit
   appears, and `git tag` lists nothing new.
 
@@ -67,7 +67,7 @@
 
 ## 6. Acceptance
 
-- [ ] 6.1 Open the published app after this change is deployed. **Check:** the home screen
+- [x] 6.1 Open the published app after this change is deployed. **Check:** the home screen
   shows `lesson-loop@0.1.<n>` with a real number and a build time — **not** `-unknown`,
   which would mean the checkout does not carry the history (task 4.1).
 - [ ] 6.2 Publish again and compare. **Check:** the version shown differs from the previous
@@ -75,10 +75,10 @@
 - [ ] 6.3 Leave a tab open across a publish. **Check:** the old tab and a freshly opened one
   show different versions, so a stale tab can be recognised (spec "A tab left open since an
   earlier build").
-- [ ] 6.4 Open a lesson and a student link on the published app. **Check:** no build
+- [x] 6.4 Open a lesson and a student link on the published app. **Check:** no build
   information appears on either, and the exercise is unchanged (spec "Inside a lesson",
   "The student's screen").
-- [ ] 6.5 Confirm nothing is fetched for it. **Check:** with request logging cleared after
+- [x] 6.5 Confirm nothing is fetched for it. **Check:** with request logging cleared after
   load, opening the home screen and reading the version produces no network request (spec
   "Nothing is fetched to know the version").
 - [x] 6.6 Report which checks were automated and which were performed by hand, in the
