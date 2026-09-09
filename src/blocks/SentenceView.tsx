@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { renderTemplate } from '@/shared/text'
 import { resolveItems } from '@/shared/validate'
+import { Picture } from './Picture'
 import type { BlockView } from './types'
 import styles from './blocks.module.css'
 
@@ -26,7 +27,7 @@ export const SentenceView: BlockView<'sentence'> = ({ lesson, block, state, disp
             className={`${styles.pickerChip} ${state.item === item.id ? styles.pickerChipOn : ''}`}
             onClick={() => dispatch({ t: 'tap', block: block.id, target: item.id })}
           >
-            {item.emoji}
+            <Picture lesson={lesson} item={item} />
           </button>
         ))}
       </div>

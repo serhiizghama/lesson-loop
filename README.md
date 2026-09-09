@@ -16,6 +16,14 @@ have. A line without a clip — a lesson added but not yet recorded — is spoke
 browser instead, so a new lesson works the moment its JSON exists. After editing a
 lesson, `npm run audio` records whatever is new.
 
+**Every word is drawn.** Vocabulary is shown as a picture rather than an emoji: one flat
+illustration per item, 512×512 and about 35 KB, committed under `public/pics`. An item
+with no picture falls back to its emoji, so a lesson plays the moment its JSON exists and
+is illustrated afterwards — `npm run pictures` draws whatever is missing. Two lessons opt
+out on purpose: colours are exact SVG swatches rather than drawings, because "red" has to
+be red, and numbers keep their keycap emoji, because a drawn four that reads as a nine is
+a wrong answer rather than a style problem.
+
 ## Rooms: two links, two halves of the same lesson
 
 Mid-lesson the teacher presses **Invite student** and the app opens a room carrying the
@@ -97,6 +105,8 @@ browser window.
 npm run typecheck  # tsc --noEmit, over the client and the Worker
 npm test           # vitest
 npm run build      # production bundle in dist/
+npm run audio      # record the clips a new lesson needs (macOS)
+npm run pictures   # draw the pictures a new lesson needs (macOS + gemini-img)
 ```
 
 ## Publishing it

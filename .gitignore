@@ -7,3 +7,6 @@ dist/
 # teacher-provided source material, kept locally
 docs/reference/
 .omc/
+
+# generator originals for public/pics — 2 MB each, only the 512px copies ship
+.pics-src/

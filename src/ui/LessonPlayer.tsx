@@ -2,6 +2,7 @@ import {
   useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode,
 } from 'react'
 import { blockViews, type BlockView } from '@/blocks'
+import { preloadPictures } from '@/blocks/Picture'
 import { speakableLines } from '@/shared/blocks'
 import { blockStateOf, isLessonComplete, isNextDue, lessonTrail } from '@/shared/reducer'
 import { seedFor } from '@/shared/rng'
@@ -85,13 +86,14 @@ export function LessonPlayer({
   // Nothing to arm: speech rides on the sticky user activation the tap that opened this
   // lesson already gave (design D39). Leaving still stops whatever is mid-word.
   //
-  // The lesson's recordings are fetched here, all at once, so that no word waits on the
-  // network in the middle of an exercise — which on a poor connection would land on
+  // The lesson's recordings and its pictures are fetched here, all at once, so that
+  // nothing waits on the network in the middle of an exercise — which on a poor connection would land on
   // exactly the word a child was asked to identify (design D56). They are fetched whether
   // or not the lesson is quiet: sound can come back at any moment, and the word it comes
   // back for is the one that would then wait.
   useEffect(() => {
     speech.preload(speakableLines(lesson))
+    preloadPictures(lesson)
     return () => speech.cancel()
   }, [lesson])
 

@@ -395,3 +395,51 @@
   font-size: clamp(1.3rem, 6vw, 1.8rem);
   font-weight: 700;
 }
+
+/* ── Pictures ─────────────────────────────────────────────────────────────── */
+
+/*
+ * A picture stands where an emoji stood, so it is sized in `em` and every slot keeps
+ * controlling it through the font-size it already set. The factors below are per slot
+ * because an emoji glyph fills its box and a drawing does not: the same number that fits
+ * a 8.5rem card would burst a tile the height of one tap target.
+ */
+.picture,
+.pictureVector {
+  display: block;
+  width: 1.5em;
+  height: 1.5em;
+  object-fit: contain;
+}
+
+/*
+ * Drawings arrive on opaque white. Multiplied, that white takes the colour of whatever is
+ * under it, so a tile turning blue on selection or green on a pair does not leave the
+ * picture sitting in a white square. Flat colours over a pale background come through
+ * unchanged; the navy outline is already darker than anything it lands on.
+ *
+ * Swatches are excluded — they are transparent already, and multiplying the white one
+ * would erase it (design D99).
+ */
+.picture {
+  mix-blend-mode: multiply;
+}
+
+.cardFront .picture,
+.cardFront .pictureVector {
+  width: 2.1em;
+  height: 2.1em;
+}
+
+.tprEmoji .picture,
+.tprEmoji .pictureVector {
+  width: 1.6em;
+  height: 1.6em;
+}
+
+/* Inside a bucket a picture is a receipt, not the exercise: it stays glyph-sized. */
+.bucketItems .picture,
+.bucketItems .pictureVector {
+  width: 1em;
+  height: 1em;
+}

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { matchPairSpeech } from '@/shared/blocks'
 import { faceSpeech, faceValue } from '@/shared/text'
 import { resolveItems } from '@/shared/validate'
+import { Picture } from './Picture'
 import type { Face, MatchState, Side } from '@/shared/types'
 import type { BlockView } from './types'
 import styles from './blocks.module.css'
@@ -52,7 +53,7 @@ export const MatchView: BlockView<'match'> = ({ lesson, block, state, dispatch, 
               if (line !== null) speech.speak(line)
             }}
           >
-            {faceValue(item, face)}
+            {face === 'emoji' ? <Picture lesson={lesson} item={item} /> : faceValue(item, face)}
             {paired && <span className={styles.tick}>✓</span>}
           </button>
         )

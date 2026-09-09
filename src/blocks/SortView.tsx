@@ -1,4 +1,5 @@
 import { resolveItems } from '@/shared/validate'
+import { Picture } from './Picture'
 import type { BlockView } from './types'
 import styles from './blocks.module.css'
 
@@ -28,7 +29,7 @@ export const SortView: BlockView<'sort'> = ({ lesson, block, state, dispatch, sp
                 speech.speak(item.en)
               }}
             >
-              {item.emoji}
+              <Picture lesson={lesson} item={item} />
             </button>
           )
         })}
@@ -50,9 +51,14 @@ export const SortView: BlockView<'sort'> = ({ lesson, block, state, dispatch, sp
                 {bucket.emoji} {bucket.label}
               </span>
               <span className={styles.bucketItems}>
-                {inside.map((id) => (
-                  <span key={id}>{items.get(id)?.emoji}</span>
-                ))}
+                {inside.map((id) => {
+                  const placed = items.get(id)
+                  return placed === undefined ? null : (
+                    <span key={id}>
+                      <Picture lesson={lesson} item={placed} />
+                    </span>
+                  )
+                })}
               </span>
             </button>
           )

@@ -1,6 +1,7 @@
 import { useEffect, useSyncExternalStore } from 'react'
 import { listenChoices, listenTarget } from '@/shared/blocks'
 import { resolveItems } from '@/shared/validate'
+import { Picture } from './Picture'
 import type { BlockView } from './types'
 import styles from './blocks.module.css'
 
@@ -87,7 +88,7 @@ export const ListenView: BlockView<'listen'> = ({ lesson, block, state, seed, di
             ].join(' ')}
             onClick={() => dispatch({ t: 'tap', block: block.id, target: item.id })}
           >
-            {item.emoji}
+            <Picture lesson={lesson} item={item} />
           </button>
         ))}
       </div>

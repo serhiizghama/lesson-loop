@@ -1,6 +1,7 @@
 import { cardsSpeech } from '@/shared/blocks'
 import { faceValue } from '@/shared/text'
 import { resolveItems } from '@/shared/validate'
+import { Picture } from './Picture'
 import type { BlockView } from './types'
 import styles from './blocks.module.css'
 
@@ -23,7 +24,13 @@ export const CardsView: BlockView<'cards'> = ({ lesson, block, state, dispatch, 
               speech.speak(cardsSpeech(block, item))
             }}
           >
-            <span className={styles.cardFront}>{faceValue(item, block.front)}</span>
+            <span className={styles.cardFront}>
+              {block.front === 'emoji' ? (
+                <Picture lesson={lesson} item={item} />
+              ) : (
+                faceValue(item, block.front)
+              )}
+            </span>
             {revealed && (
               <span className={styles.cardBack}>
                 {block.back.map((face) => {

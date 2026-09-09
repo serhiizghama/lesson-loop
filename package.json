@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit && tsc --noEmit -p worker",
     "dev:worker": "wrangler dev",
     "deploy": "npm run build && wrangler deploy",
-    "audio": "vite-node scripts/audio.ts"
+    "audio": "vite-node scripts/audio.ts",
+    "pictures": "vite-node scripts/pictures.ts"
   },
   "dependencies": {
     "react": "^19.1.0",
