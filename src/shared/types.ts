@@ -42,6 +42,17 @@ export type SentenceLevel = {
 
 export type Bucket = { key: string; label: string; emoji: string }
 
+/**
+ * One of the two things a description asks about an item: the question as the learner
+ * reads it, and the face its answer is drawn from.
+ */
+export type DescribeQuestion = {
+  /** What is asked, e.g. "What colour is it?". */
+  label: string
+  /** The face the answer is read from; its distinct values across the block are the choices. */
+  face: Face
+}
+
 type BlockBase = { id: string; title: string; hint?: string }
 
 /**
@@ -64,6 +75,41 @@ export type Block =
   | (BlockBase & { type: 'sort'; items: ItemRef; by: string; buckets: Bucket[] })
   | (BlockBase & { type: 'listen'; items: ItemRef; choices?: number })
   | (BlockBase & { type: 'tpr'; items: ItemRef; prompt: string })
+  /**
+   * The model phrases a learner hears and repeats. The one place literal text enters a
+   * lesson (design D119): "Is it a square? — Yes, it is." is a fact about English, not a
+   * fact about a square, so there is no item to render it from.
+   */
+  | (BlockBase & { type: 'phrases'; lines: string[] })
+  /**
+   * Something is shown and the learner taps the item it names. `ask` and `show` are what
+   * make one type cover both of the teacher's guessing exercises (design D116): asking by
+   * a tag and offering pictures is a riddle, asking by the picture and offering words is
+   * naming what you see.
+   */
+  | (BlockBase & {
+      type: 'quiz'
+      items: ItemRef
+      /** The face the prompt is drawn from. */
+      ask: Face
+      /** The face the choices are shown by; never the same as `ask`. */
+      show: Face
+      count?: number
+      /** Spoken when a prompt is answered; the plain English word without it. */
+      speak?: string
+    })
+  /**
+   * Two questions about one item, answered together. Exactly two, because `pick` carries
+   * exactly two sides and because the exercise exists to put two facts in one breath
+   * (design D115).
+   */
+  | (BlockBase & {
+      type: 'describe'
+      items: ItemRef
+      questions: [DescribeQuestion, DescribeQuestion]
+      /** The sentence both answers add up to, shown when the item is finished. */
+      sentence: string
+    })
   | (BlockBase & { type: 'finish'; message: string })
 
 export type BlockType = Block['type']
@@ -113,6 +159,25 @@ export type ListenState = {
   wrong: string | null
 }
 export type TprState = { order: string[]; index: number; started: boolean }
+export type PhrasesState = {
+  /** Indices, as strings, of the phrases already heard. Declared order, never shuffled. */
+  played: string[]
+}
+export type QuizState = {
+  order: string[]
+  /** Index into `order` of the item being asked about. */
+  index: number
+  answered: string[]
+  wrong: string | null
+}
+export type DescribeState = {
+  order: string[]
+  index: number
+  /** Which of the two questions about the current item have been answered. */
+  given: { a: boolean; b: boolean }
+  /** The question last answered wrongly, cleared by the next action. */
+  wrong: Side | null
+}
 export type FinishState = { seen: boolean }
 
 export type BlockStateMap = {
@@ -122,6 +187,9 @@ export type BlockStateMap = {
   sort: SortState
   listen: ListenState
   tpr: TprState
+  phrases: PhrasesState
+  quiz: QuizState
+  describe: DescribeState
   finish: FinishState
 }
 
@@ -145,9 +213,15 @@ export type LessonState = {
 export type Action =
   | { t: 'nav'; slide: number }
   | { t: 'reset'; block: string }
-  /** cards: flip · listen: answer · tpr: advance past `target` · sentence: choose item */
+  /**
+   * cards: flip · listen: answer · tpr: advance past `target` · sentence: choose item ·
+   * phrases: play the phrase at index `target` · quiz: answer with item `target`
+   */
   | { t: 'tap'; block: string; target: string }
-  /** match: side a/b of the pair · sort: 'a' an item, 'b' a bucket key */
+  /**
+   * match: side a/b of the pair · sort: 'a' an item, 'b' a bucket key ·
+   * describe: 'a' the first question, 'b' the second, `target` the value chosen
+   */
   | { t: 'pick'; block: string; side: Side; target: string }
   | { t: 'level'; block: string; level: number }
 

@@ -3,7 +3,10 @@ import { join } from 'node:path'
 import { validateLesson, resolveItems } from '../../src/shared/validate'
 import { applyAction, blockStateOf } from '../../src/shared/reducer'
 import type { Action, Block, Lesson, LessonState } from '../../src/shared/types'
-import type { CardsState, ListenState, MatchState, SortState, TprState } from '../../src/shared/types'
+import type {
+  CardsState, DescribeState, ListenState, MatchState, QuizState, SortState, TprState,
+} from '../../src/shared/types'
+import { faceValue } from '../../src/shared/text'
 
 const dir = join(process.cwd(), 'lessons')
 
@@ -61,6 +64,30 @@ export function complete(lesson: Lesson, state: LessonState, block: Block): Less
         const tpr = current<TprState>()
         const target = tpr.started ? tpr.order[tpr.index] : tpr.order[0]
         if (target !== undefined) act({ t: 'tap', block: block.id, target })
+      }
+      break
+    }
+    case 'phrases':
+      for (let i = 0; i < block.lines.length; i++) act({ t: 'tap', block: block.id, target: String(i) })
+      break
+    case 'quiz':
+      for (let i = 0; i < current<QuizState>().order.length; i++) {
+        const quiz = current<QuizState>()
+        const target = quiz.order[quiz.index]
+        if (target !== undefined) act({ t: 'tap', block: block.id, target })
+      }
+      break
+    case 'describe': {
+      const items = new Map(resolveItems(lesson, block.items).map((i) => [i.id, i]))
+      for (let i = 0; i < current<DescribeState>().order.length; i++) {
+        const describe = current<DescribeState>()
+        const item = items.get(describe.order[describe.index] ?? '')
+        if (item === undefined) continue
+        const [first, second] = block.questions
+        const a = faceValue(item, first.face)
+        const b = faceValue(item, second.face)
+        if (a !== null) act({ t: 'pick', block: block.id, side: 'a', target: a })
+        if (b !== null) act({ t: 'pick', block: block.id, side: 'b', target: b })
       }
       break
     }

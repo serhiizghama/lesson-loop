@@ -450,3 +450,137 @@
   width: 1em;
   height: 1em;
 }
+
+/* ── Phrases ──────────────────────────────────────────────────────────────── */
+
+.phraseList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  width: 100%;
+}
+
+.phraseRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.phraseText {
+  flex: 1;
+  font-size: clamp(1rem, 3.5vw, 1.25rem);
+  font-weight: 600;
+  text-align: left;
+}
+
+.phraseButton {
+  flex: none;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  font-size: 1.4rem;
+  background: var(--accent-soft);
+  border-radius: var(--radius);
+}
+
+.phraseHeard {
+  background: var(--correct-soft);
+}
+
+/* ── Quiz ─────────────────────────────────────────────────────────────────── */
+
+.quiz {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.quizPrompt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 7rem;
+  padding: 1rem 1.25rem;
+  font-size: 4.5rem;
+  line-height: 1;
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.quizAsk {
+  font-size: clamp(1.3rem, 5vw, 1.9rem);
+  font-weight: 700;
+  text-align: center;
+}
+
+.quizDone {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.quizChoices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.quizChoices .tilePicture {
+  min-height: 6rem;
+  font-size: 2.8rem;
+}
+
+/* ── Describe ─────────────────────────────────────────────────────────────── */
+
+.describe {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.describeSentence {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-size: clamp(1.1rem, 4.5vw, 1.6rem);
+  font-weight: 700;
+  background: var(--correct-soft);
+  border-radius: var(--radius-lg);
+}
+
+.describeSubject {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 5rem;
+  line-height: 1;
+}
+
+.describeQuestion {
+  width: 100%;
+}
+
+.describeLabel {
+  margin: 0 0 0.4rem;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.describeChoices {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}

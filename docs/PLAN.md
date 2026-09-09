@@ -124,10 +124,22 @@ we do not write exceptions.
 `listen` is new relative to her material and the cheapest gain in value: it trains
 listening rather than recognition, and it keeps a child on their toes.
 
+**v0.2 — three more, added for her Shapes material:**
+
+| Type | Mechanic | Synchronised state |
+|---|---|---|
+| `phrases` | tap 🔊 on a model sentence → hear it, say it | `{ played: string[] }` |
+| `quiz` | something is shown → tap the item it names | `{ index, answered, wrong }` |
+| `describe` | one item, two questions → both answered, one sentence | `{ index, given: {a,b}, wrong }` |
+
+`quiz` takes the backlog's name and drops the timer that entry imagined: a race punishes
+the child who is thinking, which the engine has promised not to do. `ask` and `show` are
+what let one type be both of her guessing exercises — a riddle asked by a tag with pictures
+to choose from, and the same thing reversed, a picture to name.
+
 **Backlog (v0.2+):** `hotspot` (label a diagram), `scramble` (build a sentence from
 shuffled words), `spell` (assemble a word from letters / missing letter), `memory`
-(pairs, alternating turns, teacher-vs-student score — ideal for two players), `quiz`
-(timed race), `reading` (a passage with line-by-line highlighting, "my turn / your turn",
+(pairs, alternating turns, teacher-vs-student score — ideal for two players), `reading` (a passage with line-by-line highlighting, "my turn / your turn",
 plus comprehension questions), `gapfill` (grammar for adults), `wheel` (a wheel of
 conversation topics), `bingo`.
 
@@ -294,12 +306,12 @@ lesson still needs no code and no server change.
 ## 9. Roadmap
 
 **v0.1 — what she will actually try in a lesson**
-The engine, six block types, both of her lessons as JSON, rooms and links, the teacher
+The engine, its first six block types, both of her lessons as JSON, rooms and links, the teacher
 panel, deployed to `*.workers.dev`. Acceptance: run a real lesson with two people and
 collect feedback.
 
 Where it stands on 2026-09-04: `add-lesson-engine` is implemented and archived — the engine,
-the six block types and both of her lessons play end to end in one browser, offline.
+those six block types and both of her lessons play end to end in one browser, offline.
 `add-synced-rooms` is implemented and archived: two browsers hold one lesson together, with
 the teacher panel, the answer keys and the lock. `add-app-icon` is implemented and archived.
 `add-cloudflare-deploy` publishes the app: one Worker serves the client and the room on a
@@ -317,8 +329,20 @@ becomes one star per exercise; completing the one on screen earns its star with 
 star, a synthesised chime and a confetti burst, on both screens at once and without a word
 said; the control that moves the lesson on draws attention while the exercise is finished;
 and the closing screen shows the stars actually earned, arriving one per note, instead of a
-painted five. Everything it makes audible obeys the teacher's sound switch (D-27). What
-remains of v0.2 is the three new block types, the new lessons and tablet polish.
+painted five. Everything it makes audible obeys the teacher's sound switch (D-27).
+
+`add-shapes-and-shorter-lessons` delivers **the new lessons** and three of the block types.
+The teacher sent back two of her own HTML lessons, and read together they said two
+different things. The first was our Animals lesson cut in half — the same ten animals and
+the same seven exercises, five words to a lesson — which is a finding about teaching and
+not about software: **a lesson is five words** (D-36). Animals is now `animals-1` and
+`animals-2`. The second was a new topic, Shapes, most of whose exercises the engine could
+not play: `phrases`, `quiz` and `describe` are what it needed, and the eight shapes are
+drawn as exact SVG rather than borrowed from an emoji font that has no oval (D-38). Two of
+her exercises are deliberately absent (D-39).
+
+What remains of v0.2 is `hotspot`, `memory` and `scramble`, re-cutting the remaining four
+lessons to five words each, and tablet polish.
 
 **v0.3** — a teacher account and a lesson editor. This is where a real backend, auth and
 storage appear. Deliberately kept out of the MVP.
@@ -390,3 +414,7 @@ technical decisions `Dn`, without the hyphen; the two sequences are separate.
 | D-33 | Whether the student may draw is a **third teacher-owned switch**, beside the lock and the sound setting and independent of both: an exercise can be held while the child is still invited to circle her answer, and the pen can be taken away while the exercise stays hers to play. Enforced by the room rather than by hiding the toolbar, for the reason the other two are — the child the rule is aimed at is the likeliest person to reload the page. Taking the pen stops new marks and leaves every mark she has already made on both screens | 2026-09-09 |
 | D-34 | Drawing belongs to a **room** and is offered nowhere else: a lesson opened from the home screen has no pencil, because a mark made there has nobody to reach. A room that has lost its socket still draws — that is a room with a bad connection, not a lesson played alone | 2026-09-09 |
 | D-35 | The exercise is laid out at one **fixed reference width and scaled** to fit rather than reflowed, and given a fixed height as well. Reflowing put five cards in a row on a laptop and two on a phone, so the same fraction of the stage named different content on the two screens and a circle around the apple would have arrived around the milk. The height is fixed for a different reason: a mark is made around and beside the content as often as on it, and a board cropped to the last row of cards has nowhere to put an arrow. Above the reference width nothing changes at all, so the teacher's laptop renders exactly as before; below it the arrangement stays the laptop's and shrinks | 2026-09-09 |
+| D-36 | **A lesson is five words, not ten.** The teacher's own re-cut of Animals — the same content behind two tabs, "learn 5 new animal words" over each — is the finding: a child who has met ten animals in forty minutes has been shown ten, not taught ten. A topic longer than five words becomes several lesson files rather than one long lesson or one lesson with parts. Files are already what the app loads, routes to, opens a room on and scores; a `parts` field would put a presentational grouping into the format, the player, the star trail and the room protocol. The cost is a home screen of ungrouped cards, and grouping them is deferred until the real number of lessons is known | 2026-09-09 |
+| D-37 | **A later part carries the whole vocabulary and teaches only its own half.** What is capped is what a lesson introduces, not what it contains. This is not bookkeeping: all five wild animals live in the jungle, so "Where do they live?" over part two alone is one bucket and no question at all. Sorting, listening and matching are revision by nature — they need a spread — so they belong to the part that has one. Re-tagging the animals to fit the exercise was rejected: the fact is the thing being taught | 2026-09-09 |
+| D-38 | **Shapes are written as exact SVG, not taken from the emoji font**, extending D-30 from hues to geometry. The font has no oval — the teacher's own page labels a green circle "oval" — and the geometric character for a rectangle renders as an outline, a filled box or nothing at all depending on the device. A shapes lesson that shows a circle for "oval" teaches the opposite of what it says. Colours come from the palette the colour lesson already uses, so a child meets the same red twice | 2026-09-09 |
+| D-39 | **Two of her exercises are deferred, by name.** *Repeat After Me* has the teacher award a star for a spoken attempt: nothing in the product scores a person rather than a tap, and adding that changes what a room is. *Draw the shape* is a prompted, self-marked drawing, which is a block built on the ink (D-32) rather than a use of it. Naming them in the spec is deliberate — they are absent rather than approximated, and nothing in the format half-implements either | 2026-09-09 |

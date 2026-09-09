@@ -3,6 +3,8 @@ import { renderTemplate, faceSpeech } from '../text'
 import { resolveItems } from '../validate'
 import { cardsSpeech } from './cards'
 import { matchPairSpeech } from './match'
+import { quizSpeech } from './quiz'
+import { describeSentence } from './describe'
 
 /**
  * Every line a lesson can ever speak, derived from its data alone (spec: every line a
@@ -53,6 +55,18 @@ function linesOf(lesson: Lesson, block: Block): Array<string | null> {
     case 'listen':
     case 'sort':
       return resolveItems(lesson, block.items).map((item) => item.en)
+
+    case 'phrases':
+      // PhrasesView speaks the phrase whose control was pressed, and nothing else.
+      return block.lines
+
+    case 'quiz':
+      // QuizView speaks the answer once the prompt is answered, never the prompt itself.
+      return resolveItems(lesson, block.items).map((item) => quizSpeech(block, item))
+
+    case 'describe':
+      // DescribeView speaks the combined sentence, and only once both answers are in.
+      return resolveItems(lesson, block.items).map((item) => describeSentence(block, item))
 
     case 'finish':
       // Nothing is spoken on the closing slide.

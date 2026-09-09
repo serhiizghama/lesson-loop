@@ -217,6 +217,9 @@ Every block takes `id`, `title`, an optional `hint`, and an `items` selector —
 | `sort` | Taps an item, then the bucket it belongs in | `by` (tag), `buckets` |
 | `listen` | Hears a word and taps the right picture | `choices` |
 | `tpr` | Follows a spoken instruction with their body | `prompt` (template) |
+| `phrases` | Taps 🔊 on a model sentence, then says it | `lines` (literal sentences) |
+| `quiz` | Sees something and taps the item it names | `ask`, `show` (faces), `count`, `speak` |
+| `describe` | Answers two questions about one item | `questions` (two: label + face), `sentence` |
 | `finish` | The closing screen | `message` |
 
 A **face** is one way of showing an item: `emoji`, `en`, `l1`, `example`, or `tag:<name>`.
@@ -226,7 +229,19 @@ card speaks the English word and a pair says nothing beyond the tile that was ta
 
 A themed exercise is never a new block type — it is an existing one reading a different
 tag. "Which sound does it make" is `match` over `tag:sound`; "where does it live" is `sort`
-by `habitat`; "move like this animal" is `tpr` with the prompt `{tag:move}`.
+by `habitat`; "move like this animal" is `tpr` with the prompt `{tag:move}`. `quiz` is the
+same idea for guessing: `ask: "tag:thing"` with `show: "emoji"` is a riddle — *"a plate 🍽️"*
+→ tap the circle — and `ask: "emoji"` with `show: "en"` is the same exercise the other way
+round, naming the shape you can see.
+
+`phrases` is the one block whose content is literal text rather than vocabulary. The model
+sentences a child says *around* the words — "Is it a square?", "Yes, it is." — are facts
+about English, not about any one item, so there is nothing to render them from.
+
+**A lesson introduces at most five new words.** A topic longer than that becomes several
+lesson files — `animals-1.json`, `animals-2.json` — rather than one long lesson; a later
+part carries the whole vocabulary so it can revise, and only the words no earlier part
+carried count as new. `tests/lesson-length.test.ts` enforces it.
 
 ### If a lesson is wrong
 

@@ -57,14 +57,21 @@ const STYLE =
  * attached, which holds line weight and palette together far better than repeating
  * adjectives does. Delete it and the whole set redraws — that is the intent.
  */
-const ANCHOR = 'animals/dog'
+const ANCHOR = 'animals-1/dog'
 
 type Recipe = {
   /** The subject, as the model is asked for it. */
   subject: string
 }
 
-/** Ordered only in that the anchor is drawn first; everything else is drawn against it. */
+/**
+ * Ordered only in that the anchor is drawn first; everything else is drawn against it.
+ *
+ * Keyed by *topic*, not by lesson: a topic too long for one sitting is split across
+ * several lesson files (design D112), and the same dog is the same dog in both halves of
+ * Animals. `recipeFor` falls back from the lesson to its topic, so splitting a topic
+ * costs no entries here and adds no duplicates to maintain.
+ */
 const SUBJECTS: Record<string, Recipe> = {
   // ── animals ───────────────────────────────────────────────────────────────
   'animals/dog': { subject: 'a happy dog, whole body, sitting, seen from the front' },
@@ -147,6 +154,52 @@ const COLOURS: Record<string, string> = {
 /** The outline the drawings use, so a swatch sits in the same set as a drawn animal. */
 const INK = '#1f2a52'
 
+/** Two lobes and a point. Written out because a heart is not a formula. */
+const HEART =
+  'M256 446C86 340 46 232 106 156 160 88 232 106 256 168 280 106 352 88 406 156 466 232 426 340 256 446Z'
+
+/**
+ * Shapes, written not drawn, for the same reason the colours are (design D96, D120): the
+ * one thing a shapes lesson teaches is the geometry, and a diffusion model draws an
+ * approximate rectangle. An approximate rectangle is a wrong answer.
+ *
+ * They are written here rather than taken from the emoji font because the font is wrong:
+ * the only round emoji is a circle, so an oval has to be borrowed from it — the teacher's
+ * own page labels a green circle "oval" — and the geometric characters for a rectangle
+ * render as an outline, a filled box or nothing at all depending on the device.
+ *
+ * Colours are the palette's own, so that a shape and the colour lesson agree on what
+ * "red" is: a child meets the same red twice.
+ */
+const SHAPES: Record<string, { fill: string; body: string }> = {
+  circle: { fill: COLOURS['red'] ?? '', body: '<circle cx="256" cy="256" r="196"/>' },
+  square: { fill: COLOURS['blue'] ?? '', body: '<rect x="70" y="70" width="372" height="372" rx="12"/>' },
+  triangle: { fill: COLOURS['yellow'] ?? '', body: '<path d="M256 74 446 420 66 420Z"/>' },
+  rectangle: { fill: COLOURS['green'] ?? '', body: '<rect x="46" y="136" width="420" height="240" rx="12"/>' },
+  star: { fill: COLOURS['yellow'] ?? '', body: `<path d="${starPath()}"/>` },
+  heart: { fill: COLOURS['red'] ?? '', body: `<path d="${HEART}"/>` },
+  oval: { fill: COLOURS['green'] ?? '', body: '<ellipse cx="256" cy="256" rx="206" ry="136"/>' },
+  diamond: { fill: COLOURS['blue'] ?? '', body: '<path d="M256 58 442 256 256 454 70 256Z"/>' },
+}
+
+/**
+ * A five-pointed star, computed rather than typed: ten points whose coordinates have to
+ * agree to look like a star at all, and a typo in one of them reads as a wrong answer.
+ */
+function starPath(): string {
+  const cx = 256
+  const cy = 256
+  const round = (n: number) => Math.round(n * 10) / 10
+  const points: string[] = []
+  for (let i = 0; i < 10; i += 1) {
+    const r = i % 2 === 0 ? 200 : 82
+    const angle = (i / 10) * 2 * Math.PI - Math.PI / 2
+    points.push(`${round(cx + r * Math.cos(angle))} ${round(cy + r * Math.sin(angle))}`)
+  }
+  return `M${points.join(' ')}Z`
+}
+
+
 /**
  * Numbers keep 1️⃣…🔟 and get no picture at all.
  *
@@ -161,6 +214,20 @@ const NUMBERS_STAY_EMOJI = 'numbers'
 function die(message: string): never {
   console.error(`\n  ✗ ${message}\n`)
   process.exit(1)
+}
+
+/**
+ * The topic a lesson belongs to: `animals-2` is Animals, `colours` is Colours. A trailing
+ * part number is the only thing stripped, so a lesson whose id genuinely ends in a digit
+ * has to avoid the hyphen — which every id here does.
+ */
+function topicOf(lessonId: string): string {
+  return lessonId.replace(/-\d+$/, '')
+}
+
+/** The recipe for an item, by its lesson first and then by its topic. */
+function recipeFor(lessonId: string, itemId: string): Recipe | undefined {
+  return SUBJECTS[`${lessonId}/${itemId}`] ?? SUBJECTS[`${topicOf(lessonId)}/${itemId}`]
 }
 
 function lessons(): Array<{ file: string; lesson: Lesson }> {
@@ -290,6 +357,33 @@ function swatch(fill: string): string {
   )
 }
 
+/**
+ * The SVG for an item that is written rather than drawn, or null for one that is drawn.
+ *
+ * Two lessons qualify and they qualify for the same reason: the exact hue and the exact
+ * geometry are the content, so they are declared here and not asked of a model.
+ */
+function written(lessonId: string, itemId: string): string | null {
+  if (topicOf(lessonId) === 'colours') {
+    const fill = COLOURS[itemId]
+    return fill === undefined ? null : swatch(fill)
+  }
+  if (topicOf(lessonId) === 'shapes') {
+    const shape = SHAPES[itemId]
+    return shape === undefined ? null : outline(shape.fill, shape.body)
+  }
+  return null
+}
+
+/** A shape on the same ground as a swatch: its own fill, the drawings' ink around it. */
+function outline(fill: string, body: string): string {
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">` +
+    `<g fill="${fill}" stroke="${INK}" stroke-width="22" stroke-linejoin="round">${body}</g>` +
+    `</svg>\n`
+  )
+}
+
 function main(): void {
   console.log()
   const wanted = new Map<string, string>()
@@ -298,30 +392,36 @@ function main(): void {
     let drawn = 0
     for (const item of lesson.items) {
       const key = `${lesson.id}/${item.id}`
-      if (lesson.id === NUMBERS_STAY_EMOJI) continue
-      if (lesson.id === 'colours') {
+      if (topicOf(lesson.id) === NUMBERS_STAY_EMOJI) continue
+      if (written(lesson.id, item.id) !== null) {
         wanted.set(key, `${key}.svg`)
         drawn += 1
         continue
       }
-      if (SUBJECTS[key] === undefined) {
-        die(`lessons/${file} has item "${item.id}" with no recipe.\n` + `    Add "${key}" to SUBJECTS in ${MANIFEST.replace('src/blocks/pictures.ts', 'scripts/pictures.ts')}.`)
+      if (recipeFor(lesson.id, item.id) === undefined) {
+        die(`lessons/${file} has item "${item.id}" with no recipe.\n` + `    Add "${topicOf(lesson.id)}/${item.id}" to SUBJECTS in ${MANIFEST.replace('src/blocks/pictures.ts', 'scripts/pictures.ts')}.`)
       }
       wanted.set(key, `${key}.jpg`)
       drawn += 1
     }
-    const note = lesson.id === NUMBERS_STAY_EMOJI ? 'keycap emoji, by decision' : `${drawn} pictures`
+    const note = topicOf(lesson.id) === NUMBERS_STAY_EMOJI ? 'keycap emoji, by decision' : `${drawn} pictures`
     console.log(`  ${file.padEnd(20)} ${String(lesson.items.length).padStart(4)} items   ${note}`)
   }
   console.log()
 
-  // Colours first: they cost nothing and a failed drawing run should not leave the cheap
-  // half of the set unwritten.
-  mkdirSync(join(PICS, 'colours'), { recursive: true })
-  for (const [id, fill] of Object.entries(COLOURS)) {
-    writeFileSync(join(PICS, 'colours', `${id}.svg`), swatch(fill))
+  // The written pictures first: they cost nothing and a failed drawing run should not
+  // leave the cheap half of the set unwritten.
+  let scribed = 0
+  for (const [key, file] of wanted) {
+    if (!file.endsWith('.svg')) continue
+    const parts = key.split('/')
+    const svg = written(parts[0] ?? '', parts[1] ?? '')
+    if (svg === null) continue
+    mkdirSync(join(PICS, parts[0] ?? ''), { recursive: true })
+    writeFileSync(join(PICS, file), svg)
+    scribed += 1
   }
-  console.log(`  ${Object.keys(COLOURS).length} colour swatches written\n`)
+  console.log(`  ${scribed} pictures written rather than drawn\n`)
 
   const missing = [...wanted]
     .filter(([, file]) => file.endsWith('.jpg'))
@@ -335,7 +435,8 @@ function main(): void {
     console.log(`  Drawing ${missing.length} picture(s) — about a minute each…\n`)
     let done = 0
     for (const [key, file] of missing) {
-      const recipe = SUBJECTS[key]
+      const parts = key.split('/')
+      const recipe = recipeFor(parts[0] ?? '', parts[1] ?? '')
       if (recipe === undefined) continue
       draw(key, recipe, join(PICS, file))
       done += 1

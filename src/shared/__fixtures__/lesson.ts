@@ -50,6 +50,19 @@ export function testLesson(): Lesson {
       },
       { id: 'ears', type: 'listen', title: 'Listen', items: { select: 'all' }, choices: 3 },
       { id: 'move', type: 'tpr', title: 'Move like me', items: { select: 'all' }, prompt: '{tag:move}' },
+      { id: 'talk', type: 'phrases', title: 'Say it with me', lines: ['What is it?', 'It is a dog.'] },
+      {
+        id: 'guess', type: 'quiz', title: 'Which one?', items: { select: 'all' },
+        ask: 'tag:sound', show: 'emoji', count: 3,
+      },
+      {
+        id: 'tell', type: 'describe', title: 'Tell me about it', items: { select: 'all' },
+        questions: [
+          { label: 'What is it?', face: 'en' },
+          { label: 'Where does it live?', face: 'tag:habitat' },
+        ],
+        sentence: 'The {en} lives on the {tag:habitat}.',
+      },
       { id: 'done', type: 'finish', title: 'Great job!', message: 'You did it!' },
     ],
   }

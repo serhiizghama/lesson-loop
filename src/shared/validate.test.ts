@@ -222,3 +222,93 @@ describe('resolveItems', () => {
     expect(picked.map((i) => i.id)).toEqual(['lion', 'dog'])
   })
 })
+
+describe('the three exercises added for Shapes', () => {
+  /** `base()` has dog and cat on the farm and the lion in the jungle — two of everything. */
+  function withBlock(block: unknown): unknown {
+    const lesson = structuredClone(base()) as unknown as { blocks: unknown[] }
+    lesson.blocks.push(block)
+    return lesson
+  }
+
+  function errorsOf(block: unknown): string {
+    const result = validateLesson(withBlock(block))
+    expect(result.ok).toBe(false)
+    return result.ok ? '' : result.errors.join('\n')
+  }
+
+  const phrases = { id: 'talk', type: 'phrases', title: 'Say it', lines: ['What is it?'] }
+  const quiz = {
+    id: 'guess', type: 'quiz', title: 'Which one?', items: { select: 'all' },
+    ask: 'tag:sound', show: 'emoji', count: 3,
+  }
+  const describe_ = {
+    id: 'tell', type: 'describe', title: 'Tell me', items: { select: 'all' },
+    questions: [
+      { label: 'What is it?', face: 'en' },
+      { label: 'Where does it live?', face: 'tag:habitat' },
+    ],
+    sentence: 'The {en} lives on the {tag:habitat}.',
+  }
+
+  it('accepts all three when they are well formed', () => {
+    expect(validateLesson(withBlock(phrases)).ok).toBe(true)
+    expect(validateLesson(withBlock(quiz)).ok).toBe(true)
+    expect(validateLesson(withBlock(describe_)).ok).toBe(true)
+  })
+
+  it('rejects a phrase list with no phrases in it', () => {
+    expect(errorsOf({ ...phrases, lines: [] })).toContain('lines')
+  })
+
+  it('rejects an empty phrase', () => {
+    expect(errorsOf({ ...phrases, lines: ['What is it?', ''] })).toContain('lines.1')
+  })
+
+  it('rejects a quiz asking by a tag an item does not carry', () => {
+    const message = errorsOf({ ...quiz, ask: 'tag:move' })
+    expect(message).toContain('blocks.1.ask:')
+    expect(message).toContain('"dog"')
+  })
+
+  it('rejects a quiz that asks and shows by the same face', () => {
+    const message = errorsOf({ ...quiz, ask: 'emoji', show: 'emoji' })
+    expect(message).toContain('prints the answer in the question')
+  })
+
+  it('rejects a quiz offering more choices than it has items', () => {
+    expect(errorsOf({ ...quiz, count: 9 })).toContain('offers 9 choices but selects 3 items')
+  })
+
+  it('rejects a description asking about a face every item answers the same way', () => {
+    const lesson = structuredClone(base())
+    for (const item of lesson.items) item.tags = { ...item.tags, habitat: 'farm' }
+    const result = validateLesson({ ...lesson, blocks: [...lesson.blocks, describe_] })
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.errors.join('\n')).toContain('a question with one answer is not a question')
+  })
+
+  it('rejects a description asking the same thing twice', () => {
+    const twice = {
+      ...describe_,
+      questions: [
+        { label: 'What is it?', face: 'en' },
+        { label: 'Again?', face: 'en' },
+      ],
+      sentence: '{en}',
+    }
+    expect(errorsOf(twice)).toContain('asks the same thing twice')
+  })
+
+  it('rejects a description with other than two questions', () => {
+    expect(errorsOf({ ...describe_, questions: [describe_.questions[0]] })).toContain('questions')
+    expect(
+      errorsOf({ ...describe_, questions: [...describe_.questions, { label: 'And?', face: 'emoji' }] }),
+    ).toContain('questions')
+  })
+
+  it('rejects a sentence naming a tag an item does not carry', () => {
+    expect(errorsOf({ ...describe_, sentence: 'The {en} says {tag:move}.' })).toContain('"dog"')
+  })
+})

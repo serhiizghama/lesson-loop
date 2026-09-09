@@ -16,13 +16,13 @@ const lessons = readdirSync(join(process.cwd(), 'lessons'))
   .filter((f) => f.endsWith('.json'))
   .map((f) => JSON.parse(readFileSync(join(process.cwd(), 'lessons', f), 'utf8')) as Lesson)
 
-const animals = lessons.find((l) => l.id === 'animals') as Lesson
+const animals = lessons.find((l) => l.id === 'animals-1') as Lesson
 const colours = lessons.find((l) => l.id === 'colours') as Lesson
 const item = (lesson: Lesson, id: string): Item => lesson.items.find((i) => i.id === id) as Item
 
 describe('picture lookup', () => {
   it('resolves a drawn item to a file under the picture directory', () => {
-    expect(pictureSrc(animals, item(animals, 'dog'))).toBe(`${PICTURE_DIR}/animals/dog.jpg`)
+    expect(pictureSrc(animals, item(animals, 'dog'))).toBe(`${PICTURE_DIR}/animals-1/dog.jpg`)
   })
 
   it('resolves a colour to its swatch', () => {
@@ -38,7 +38,7 @@ describe('picture lookup', () => {
 describe('picture rendering', () => {
   it('draws the picture when there is one', () => {
     const html = renderToStaticMarkup(<Picture lesson={animals} item={item(animals, 'dog')} />)
-    expect(html).toContain('src="/pics/animals/dog.jpg"')
+    expect(html).toContain('src="/pics/animals-1/dog.jpg"')
   })
 
   // The emoji is a required field of an item; the drawing is not. A lesson written today

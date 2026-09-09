@@ -6,6 +6,9 @@ import { SentenceView } from './SentenceView'
 import { SortView } from './SortView'
 import { ListenView } from './ListenView'
 import { TprView } from './TprView'
+import { PhrasesView } from './PhrasesView'
+import { QuizView } from './QuizView'
+import { DescribeView } from './DescribeView'
 import { FinishView } from './FinishView'
 
 /** Views are registered exactly like the logic: a missing type is a compile error. */
@@ -16,6 +19,9 @@ export const blockViews: { [T in BlockType]: BlockView<T> } = {
   sort: SortView,
   listen: ListenView,
   tpr: TprView,
+  phrases: PhrasesView,
+  quiz: QuizView,
+  describe: DescribeView,
   finish: FinishView,
 }
 

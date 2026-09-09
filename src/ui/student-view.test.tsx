@@ -133,7 +133,7 @@ describe("the student's screen carries the exercise and nothing else", () => {
     expect(markup).toContain(lesson.blocks[0]!.title)
     expect(markup).toContain(lesson.title)
     // Was `0%` until the percentage became a star trail (design D75).
-    expect(markup).toContain('0 of 6 done')
+    expect(markup).toContain('0 of 9 done')
   })
 })
 
@@ -151,8 +151,8 @@ describe('the student cannot pace the lesson (design D22)', () => {
 
   it('still shows where in the lesson they are, and how much is done', () => {
     const markup = studentMarkup({ ...testState(), slide: 2 })
-    expect(markup).toContain('3 / 7') // the footer's position is unchanged
-    expect(markup).toContain('0 of 6 done')
+    expect(markup).toContain('3 / 10') // the footer's position is unchanged
+    expect(markup).toContain('0 of 9 done')
   })
 
   it('renders the same footer whether or not the teacher has locked them', () => {
@@ -165,7 +165,7 @@ describe('the student cannot pace the lesson (design D22)', () => {
     expect(markup).toContain('Reset')
     expect(markup).toContain('←')
     expect(markup).toContain('→')
-    expect(markup).toContain('3 / 7')
+    expect(markup).toContain('3 / 10')
   })
 })
 
@@ -268,8 +268,8 @@ describe('the star trail (design D75)', () => {
   it('shows one mark per exercise and none for the closing slide', () => {
     const header = headerOf(soloMarkup())
     // The fixture has seven blocks, six of which are exercises.
-    expect(header.match(/★/g)).toHaveLength(6)
-    expect(header).toContain('0 of 6 done')
+    expect(header.match(/★/g)).toHaveLength(9)
+    expect(header).toContain('0 of 9 done')
   })
 
   it('reports and does not steer — there is no control among the marks', () => {
@@ -280,8 +280,8 @@ describe('the star trail (design D75)', () => {
   })
 
   it('counts a mark as earned only once its exercise is complete', () => {
-    expect(headerOf(soloMarkup())).toContain('0 of 6 done')
-    expect(headerOf(soloMarkup(withFirstExerciseDone()))).toContain('1 of 6 done')
+    expect(headerOf(soloMarkup())).toContain('0 of 9 done')
+    expect(headerOf(soloMarkup(withFirstExerciseDone()))).toContain('1 of 9 done')
   })
 
   it('is the same on the student\'s screen and the teacher\'s for the same state', () => {
@@ -363,12 +363,12 @@ describe('the closing screen shows the stars that were earned (design D82)', () 
 
   it('is gold for what was finished and unfilled for what was not', () => {
     const markup = soloMarkup(almostPerfect())
-    // Five of the fixture's six exercises were completed, so one star stays unfilled.
+    // Eight of the fixture's nine exercises were completed, so one star stays unfilled.
     // `closingStarEarned` contains `closingStar`, so the plain ones are the difference.
     const earnedStars = count(markup, 'closingStarEarned')
-    expect(earnedStars).toBe(5)
+    expect(earnedStars).toBe(8)
     expect(count(markup, 'closingStar') - earnedStars).toBe(1)
-    expect(markup).toContain('5 of 6 stars')
+    expect(markup).toContain('8 of 9 stars')
   })
 
   it('shows the same stars to the student as to the teacher', () => {
@@ -394,11 +394,11 @@ describe('the closing screen shows the stars that were earned (design D82)', () 
     const markup = soloMarkup(almostPerfect())
     expect(headerOf(markup)).not.toContain('done')
     expect(headerOf(markup)).not.toContain('★')
-    expect(markup).toContain('5 of 6 stars')
+    expect(markup).toContain('8 of 9 stars')
   })
 
   it('keeps the trail in the header everywhere else', () => {
-    expect(headerOf(soloMarkup(almostPerfect_onAnExercise()))).toContain('5 of 6 done')
+    expect(headerOf(soloMarkup(almostPerfect_onAnExercise()))).toContain('8 of 9 done')
   })
 
   it('drops the slide title, which said the same as the message in fewer words', () => {
@@ -446,6 +446,6 @@ describe('the header centres what it carries (design D84)', () => {
   it('tells the stylesheet how many marks there are, so the row can be sized', () => {
     // Left to measure itself, a browser sizes the row by the star glyph and the marks
     // huddle; the count is what gives it a real width (design D84).
-    expect(soloMarkup()).toContain('--slots:6')
+    expect(soloMarkup()).toContain('--slots:9')
   })
 })

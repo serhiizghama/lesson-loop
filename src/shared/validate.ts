@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import type { Face, Item, ItemRef, Lesson } from './types'
-import { tagOfFace, tagsUsedByTemplate } from './text'
+import { faceValue, tagOfFace, tagsUsedByTemplate } from './text'
 
 const FIXED_FACES = ['emoji', 'en', 'l1', 'example'] as const
 
@@ -31,6 +31,8 @@ const itemRefSchema = z.discriminatedUnion('select', [
 ])
 
 const blockBase = { id: idSchema, title: z.string().min(1), hint: z.string().min(1).optional() }
+
+const questionSchema = z.object({ label: z.string().min(1), face: faceSchema })
 
 const blockSchema = z.discriminatedUnion('type', [
   z.object({
@@ -74,6 +76,27 @@ const blockSchema = z.discriminatedUnion('type', [
     choices: z.number().int().min(2).optional(),
   }),
   z.object({ ...blockBase, type: z.literal('tpr'), items: itemRefSchema, prompt: z.string().min(1) }),
+  z.object({
+    ...blockBase,
+    type: z.literal('phrases'),
+    lines: z.array(z.string().min(1)).min(1),
+  }),
+  z.object({
+    ...blockBase,
+    type: z.literal('quiz'),
+    items: itemRefSchema,
+    ask: faceSchema,
+    show: faceSchema,
+    count: z.number().int().min(2).optional(),
+    speak: z.string().min(1).optional(),
+  }),
+  z.object({
+    ...blockBase,
+    type: z.literal('describe'),
+    items: itemRefSchema,
+    questions: z.tuple([questionSchema, questionSchema]),
+    sentence: z.string().min(1),
+  }),
   z.object({ ...blockBase, type: z.literal('finish'), message: z.string().min(1) }),
 ])
 
@@ -126,7 +149,9 @@ function crossCheck(lesson: Lesson): string[] {
     if (seenBlocks.has(block.id)) errors.push(`${at}.id: duplicate block id "${block.id}"`)
     seenBlocks.add(block.id)
 
-    if (block.type === 'finish') continue
+    // Neither works on vocabulary: the closing slide has none, and a phrase list carries
+    // its own literal text (design D119).
+    if (block.type === 'finish' || block.type === 'phrases') continue
 
     for (const id of missingIds(lesson, block.items)) {
       errors.push(`${at}.items: block "${block.id}" refers to unknown item "${id}"`)
@@ -213,6 +238,44 @@ function crossCheck(lesson: Lesson): string[] {
       }
       case 'tpr': {
         requireTemplateTags(block.prompt, 'prompt')
+        break
+      }
+      case 'quiz': {
+        requireFace(block.ask, 'ask')
+        requireFace(block.show, 'show')
+        if (block.ask === block.show) {
+          errors.push(
+            `${at}.ask: block "${block.id}" asks and shows by the same face "${block.ask}", ` +
+              `which prints the answer in the question`,
+          )
+        }
+        const choices = block.count ?? 4
+        if (choices > items.length) {
+          errors.push(
+            `${at}.count: block "${block.id}" offers ${choices} choices but selects ${items.length} items`,
+          )
+        }
+        if (block.speak !== undefined) requireTemplateTags(block.speak, 'speak')
+        break
+      }
+      case 'describe': {
+        for (const [qi, question] of block.questions.entries()) {
+          requireFace(question.face, `questions.${qi}.face`)
+          const values = new Set(items.map((it) => faceValue(it, question.face)))
+          if (values.size === 1) {
+            errors.push(
+              `${at}.questions.${qi}.face: every selected item has "${question.face}" = ` +
+                `"${[...values][0]}" — a question with one answer is not a question`,
+            )
+          }
+        }
+        const [first, second] = block.questions
+        if (first.face === second.face) {
+          errors.push(
+            `${at}.questions: block "${block.id}" asks the same thing twice, by "${first.face}"`,
+          )
+        }
+        requireTemplateTags(block.sentence, 'sentence')
         break
       }
     }

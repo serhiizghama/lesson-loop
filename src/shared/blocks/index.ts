@@ -6,6 +6,9 @@ import { sentenceLogic } from './sentence'
 import { sortLogic } from './sort'
 import { listenLogic } from './listen'
 import { tprLogic } from './tpr'
+import { phrasesLogic } from './phrases'
+import { quizLogic } from './quiz'
+import { describeLogic } from './describe'
 import { finishLogic } from './finish'
 
 /**
@@ -19,6 +22,9 @@ export const blockLogic: { [T in BlockType]: BlockLogic<T> } = {
   sort: sortLogic,
   listen: listenLogic,
   tpr: tprLogic,
+  phrases: phrasesLogic,
+  quiz: quizLogic,
+  describe: describeLogic,
   finish: finishLogic,
 }
 
@@ -27,4 +33,7 @@ export { cardsSpeech } from './cards'
 export { matchPairSpeech } from './match'
 export { listenChoices, listenTarget, DEFAULT_CHOICES } from './listen'
 export { tprCurrent } from './tpr'
+export { phraseAt } from './phrases'
+export { quizChoices, quizSpeech, quizTarget, DEFAULT_QUIZ_CHOICES } from './quiz'
+export { currentItem, describeChoices, describeSentence } from './describe'
 export { speakableLines } from './speakable'
