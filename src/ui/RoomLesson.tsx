@@ -59,7 +59,14 @@ export function RoomLesson({ code, teacherKey, onExit }: {
       canSteer={teacher}
       readOnly={!teacher && room.locked}
       soundControlInPanel={teacher}
-      notice={<RoomNotice unsynced={room.connection.unsynced} lockedOut={!teacher && room.locked} />}
+      inkEnabled
+      notice={
+        <RoomNotice
+          unsynced={room.connection.unsynced}
+          lockedOut={!teacher && room.locked}
+          penOff={!teacher && !room.pen}
+        />
+      }
       aside={
         teacher ? (
           <TeacherPanel
@@ -68,6 +75,7 @@ export function RoomLesson({ code, teacherKey, onExit }: {
             state={room.state}
             locked={room.locked}
             muted={room.muted}
+            pen={room.pen}
             connection={room.connection}
             peers={room.peers}
             studentLink={studentLink}
@@ -77,6 +85,7 @@ export function RoomLesson({ code, teacherKey, onExit }: {
             onSwitchLesson={(next: Lesson) => room.switchLesson(next)}
             onSetLocked={room.setLocked}
             onSetMuted={room.setMuted}
+            onSetPen={room.setPen}
           />
         ) : undefined
       }
@@ -96,11 +105,16 @@ function Gate({ children, onExit }: { children: ReactNode; onExit: () => void })
   )
 }
 
-function RoomNotice({ unsynced, lockedOut }: { unsynced: boolean; lockedOut: boolean }) {
-  // Both can be true: the connection went while the teacher had the floor.
+function RoomNotice({ unsynced, lockedOut, penOff }: {
+  unsynced: boolean
+  lockedOut: boolean
+  penOff: boolean
+}) {
+  // All three can be true at once: they are separate rules about separate things.
   return (
     <>
       {lockedOut && <p className={styles.noticeTurn}>✋ It’s the teacher’s turn.</p>}
+      {penOff && <p className={styles.noticeTurn}>✏️ The teacher has the pen just now.</p>}
       {unsynced && (
         <p className={styles.noticeWarn}>
           Working without sync — the lesson still works, and it will catch up on its own.

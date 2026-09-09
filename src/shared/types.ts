@@ -150,3 +150,72 @@ export type Action =
   /** match: side a/b of the pair · sort: 'a' an item, 'b' a bucket key */
   | { t: 'pick'; block: string; side: Side; target: string }
   | { t: 'level'; block: string; level: number }
+
+// ── Participants ─────────────────────────────────────────────────────────────
+
+/**
+ * Which half of the lesson a participant is holding. The room decides this, never the
+ * client (design D12).
+ *
+ * It lives here rather than in `protocol.ts` because a stroke carries the role that made
+ * it, and the data model may not import the wire format. `protocol.ts` re-exports it, so
+ * every existing import of `Role` from there still resolves.
+ */
+export type Role = 'teacher' | 'student'
+
+// ── Ink ──────────────────────────────────────────────────────────────────────
+
+/**
+ * The board's coordinate grid: a point is a pair of integers in `[0, INK_GRID)`, being a
+ * fraction of the exercise stage quantised to 12 bits (design D105).
+ *
+ * Integers rather than fractions because the stage is at most about a thousand pixels
+ * across, so a twelfth of a pixel is already finer than anything an eye or a mouse can
+ * resolve — and because integers delta-encode to one or two digits where floats do not.
+ * The stage is laid out to a fixed reference width and scaled (design D103), so the same
+ * pair names the same content on both screens.
+ */
+export const INK_GRID = 4096
+
+export type Point = { x: number; y: number }
+
+/**
+ * One continuous mark, from the pen going down to it coming up. The smallest thing the
+ * board holds: strokes are added, removed and undone whole, never split or trimmed
+ * (spec `shared-drawing`).
+ */
+export type Stroke = {
+  id: string
+  /** Who drew it. Decides its colour, and what undo and a student's clear may touch. */
+  by: Role
+  colour: string
+  width: number
+  points: Point[]
+  /**
+   * False while the stroke is still being drawn and arriving in parts (design D106). An
+   * unfinished stroke is shown and relayed but never persisted, and is dropped if the
+   * participant drawing it disconnects.
+   */
+  done: boolean
+}
+
+/**
+ * The marks of a lesson, keyed by block id — so a mark belongs to the exercise it was
+ * made on, a reset does not disturb it, and changing the room's lesson discards it with
+ * the rest of that lesson (design D109).
+ *
+ * Deliberately not part of `LessonState`: ink never passes through the reducer and never
+ * enlarges the state snapshot broadcast on every tap (design D101).
+ */
+export type Board = Record<string, Stroke[]>
+
+/** What can be done to a board. Each names the block it applies to; nothing is global. */
+export type InkOp =
+  /**
+   * Adds `stroke`, or appends its points to the stroke already carrying that id — which
+   * is how a long stroke arrives in ordered parts (design D106).
+   */
+  | { t: 'ink'; block: string; stroke: Stroke }
+  | { t: 'ink-erase'; block: string; ids: string[] }
+  | { t: 'ink-undo'; block: string }
+  | { t: 'ink-clear'; block: string }

@@ -48,6 +48,11 @@ function store(state: LessonState, muted: boolean): LessonStore {
     progress: { done: 0, total: 6, percent: 0 },
     muted,
     setMuted: () => {},
+    board: {},
+    ink: () => {},
+    inkRole: 'teacher' as const,
+    pen: true,
+    setPen: () => {},
   }
 }
 

@@ -12,6 +12,8 @@ export type TeacherPanelProps = {
   locked: boolean
   /** Whether the app has been told to stop speaking unasked, on both screens (D66). */
   muted: boolean
+  /** Whether the student may draw on the exercise (design D107). */
+  pen: boolean
   connection: Connection
   peers: Peers
   studentLink: string
@@ -21,6 +23,7 @@ export type TeacherPanelProps = {
   onSwitchLesson: (lesson: Lesson) => void
   onSetLocked: (value: boolean) => void
   onSetMuted: (value: boolean) => void
+  onSetPen: (value: boolean) => void
 }
 
 /**
@@ -114,6 +117,18 @@ export function TeacherPanel(props: TeacherPanelProps) {
           onClick={() => props.onSetMuted(!muted)}
         >
           {muted ? '🔇 Voice off' : '🔊 Voice on'}
+        </button>
+        {/* The third of the same family, and independent of both: the lock says whether
+            the student may act on the exercise, the voice whether the app may talk, and
+            this whether she may draw on it. Taking the pen leaves every mark she has
+            already made where it is (design D107). */}
+        <button
+          type="button"
+          className={props.pen ? styles.panelButton : styles.panelButtonOn}
+          aria-pressed={!props.pen}
+          onClick={() => props.onSetPen(!props.pen)}
+        >
+          {props.pen ? '✏️ Student can draw' : '🚫 Student pen off'}
         </button>
       </div>
 

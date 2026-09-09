@@ -7,7 +7,7 @@
  */
 
 import { RoomCore, type RoomState } from '../src/shared/room'
-import { parseClientMessage, type ServerMessage } from '../src/shared/protocol'
+import { parseClientMessage, toWireInkOp, type ServerMessage } from '../src/shared/protocol'
 import type { Env } from './index'
 import { randomToken } from './codes'
 
@@ -34,7 +34,17 @@ export class Room implements DurableObject {
       // A room written before the sound setting existed has no `muted`, and sound on is
       // what that build behaved as. Reading the stored shape is the adapter's job, not
       // the core's (design D74).
-      if (stored !== undefined) this.#core = new RoomCore({ ...stored, muted: stored.muted ?? false })
+      // A room written before a setting existed has none, and the value below is what
+      // that build behaved as: sound on, the student's pen granted, no marks. Reading the
+      // stored shape is the adapter's job, not the core's (design D74, D110).
+      if (stored !== undefined) {
+        this.#core = new RoomCore({
+          ...stored,
+          muted: stored.muted ?? false,
+          pen: stored.pen ?? true,
+          board: stored.board ?? {},
+        })
+      }
     })
   }
 
@@ -110,6 +120,9 @@ export class Room implements DurableObject {
       }
       this.#sockets.push(socket)
       send(socket.ws, core.stateMessage(joined.role))
+      // The marks as they stand, so a joiner and a reloading participant both land on the
+      // exercise with what is already drawn on it (spec `synced-rooms`).
+      send(socket.ws, core.boardMessage())
       this.#broadcast(core.peersMessage())
       await this.#persist()
       return
@@ -121,12 +134,24 @@ export class Room implements DurableObject {
       await this.#persist()
       return
     }
+    if (outcome.kind === 'ink') {
+      // Relayed to the others and to nobody else: no state broadcast, because ink is not
+      // state (design D101), and not back to the sender, which applied it optimistically
+      // and would append the same points a second time (design D102).
+      this.#relay(socket, { t: 'ink', op: toWireInkOp(outcome.op), by: outcome.by })
+      // Only a finished mark is worth a storage write; the parts of one still being drawn
+      // are relayed and then forgotten (design D106).
+      if (outcome.op.t !== 'ink' || outcome.op.stroke.done) await this.#persist()
+      return
+    }
     if (outcome.kind === 'refused') {
       send(socket.ws, { t: 'refused', reason: outcome.reason })
       // A refusal is also how a device that ran ahead learns the truth, so the room's
-      // account of the state goes back with it.
+      // account goes back with it — of the state, and of the board when it was a mark
+      // that was refused.
       const role = core.roleOf(socket.id)
       if (role !== null) send(socket.ws, core.stateMessage(role))
+      if (message.t === 'ink') send(socket.ws, core.boardMessage())
       return
     }
     if (outcome.kind === 'error') send(socket.ws, { t: 'error', code: outcome.code })
@@ -158,6 +183,13 @@ export class Room implements DurableObject {
     for (const socket of this.#sockets) send(socket.ws, message)
   }
 
+  /** Everyone except the socket the message came from. */
+  #relay(from: Socket, message: ServerMessage): void {
+    for (const socket of this.#sockets) {
+      if (socket !== from) send(socket.ws, message)
+    }
+  }
+
   #close(socket: Socket, reason: string): void {
     try {
       socket.ws.close(4404, reason)
@@ -168,7 +200,7 @@ export class Room implements DurableObject {
 
   async #persist(): Promise<void> {
     if (this.#core === null) return
-    await this.#ctx.storage.put(STORAGE_KEY, this.#core.snapshot)
+    await this.#ctx.storage.put(STORAGE_KEY, this.#core.storable)
     await this.#ctx.storage.setAlarm(Date.now() + this.#ttl())
   }
 

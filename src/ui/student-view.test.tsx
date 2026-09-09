@@ -22,6 +22,11 @@ function store(state: LessonState = testState(), muted = false): LessonStore {
     progress: { done: 0, total: 6, percent: 0 },
     muted,
     setMuted: () => {},
+    board: {},
+    ink: () => {},
+    inkRole: 'teacher' as const,
+    pen: true,
+    setPen: () => {},
   }
 }
 
@@ -59,9 +64,11 @@ function teacherMarkup(state: LessonState = testState(), locked = false, muted =
           state={state}
           locked={locked}
           muted={muted}
+          pen
           connection={{ connected: true, failures: 0, unsynced: false }}
           peers={{ teacher: true, students: 1 }}
           studentLink="https://lessonloop.test/r/AB12"
+          onSetPen={() => {}}
           onPrevious={() => {}}
           onNext={() => {}}
           onReset={() => {}}

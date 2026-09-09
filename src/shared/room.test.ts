@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { MAX_PARTICIPANTS, RoomCore, newClientView, reconcile, viewReceive } from './room'
+import {
+  MAX_PARTICIPANTS, RoomCore, newClientView, reconcile, viewReceive, type RoomState,
+} from './room'
 import { newLessonState } from './reducer'
 import { parseClientMessage, type ServerMessage } from './protocol'
 import { testLesson, testState } from './__fixtures__/lesson'
@@ -315,7 +317,7 @@ describe('a client view reads the room’s sound setting (design D74)', () => {
 
   it('reads a snapshot that carries the setting', () => {
     const view = viewReceive(newClientView(snapshot), {
-      t: 'state', state: snapshot, locked: false, muted: true, role: 'student',
+      t: 'state', state: snapshot, locked: false, muted: true, pen: true, role: 'student',
     })
     expect(view.muted).toBe(true)
   })
@@ -400,5 +402,278 @@ describe('reconcile settles divergence in the room’s favour', () => {
   it('always adopts a snapshot for a different lesson', () => {
     const incoming = newLessonState('other', 7)
     expect(reconcile(local, incoming)).toBe(incoming)
+  })
+})
+
+// ── Ink (design D101, D102, D106, D107) ──────────────────────────────────────
+
+const BLOCK = 'vocab'
+
+function wireStroke(id: string, by: 'teacher' | 'student', done = true, points = [100, 100]) {
+  return { id, by, colour: '#ff0000', width: 20, points, done }
+}
+
+function joined(): RoomCore {
+  const core = room()
+  core.join('t', KEY)
+  core.join('s', null)
+  return core
+}
+
+describe('the teacher decides whether the student may draw (design D107)', () => {
+  it('opens with the student’s pen granted', () => {
+    expect(room().pen).toBe(true)
+  })
+
+  it('applies the teacher’s change', () => {
+    const core = joined()
+    expect(core.handle('t', { t: 'pen', value: false })).toEqual({ kind: 'applied' })
+    expect(core.pen).toBe(false)
+  })
+
+  it('refuses a student’s attempt to grant herself the pen', () => {
+    const core = joined()
+    core.handle('t', { t: 'pen', value: false })
+    expect(core.handle('s', { t: 'pen', value: true })).toEqual({
+      kind: 'refused',
+      reason: 'not-teacher',
+    })
+    expect(core.pen).toBe(false)
+  })
+
+  it('refuses a change that changes nothing', () => {
+    const core = joined()
+    expect(core.handle('t', { t: 'pen', value: true })).toEqual({
+      kind: 'refused',
+      reason: 'no-effect',
+    })
+  })
+
+  it('is independent of the lock and of the sound setting', () => {
+    const core = joined()
+    core.handle('t', { t: 'lock', value: true })
+    expect(core.pen).toBe(true)
+
+    core.handle('t', { t: 'pen', value: false })
+    expect(core.locked).toBe(true)
+    expect(core.muted).toBe(false)
+
+    core.handle('t', { t: 'mute', value: true })
+    expect(core.pen).toBe(false)
+  })
+
+  it('travels in the state message', () => {
+    const core = joined()
+    core.handle('t', { t: 'pen', value: false })
+    const message = core.stateMessage('student')
+    expect(message.t === 'state' && message.pen).toBe(false)
+  })
+})
+
+describe('a mark is relayed, never reduced (design D101)', () => {
+  it('relays an applied stroke with the author the socket had', () => {
+    const core = joined()
+    const outcome = core.handle('s', {
+      t: 'ink',
+      op: { t: 'ink', block: BLOCK, stroke: wireStroke('s1', 'teacher') },
+    })
+    // The stroke claimed the teacher; the socket was the student's, and the socket wins.
+    expect(outcome).toMatchObject({ kind: 'ink', by: 'student' })
+    expect(core.board[BLOCK]?.[0]?.by).toBe('student')
+  })
+
+  it('does not advance the lesson’s version', () => {
+    const core = joined()
+    const before = core.snapshot.state.v
+    core.handle('t', { t: 'ink', op: { t: 'ink', block: BLOCK, stroke: wireStroke('s1', 'teacher') } })
+    expect(core.snapshot.state.v).toBe(before)
+  })
+
+  it('leaves the state message byte-identical (design D101)', () => {
+    const core = joined()
+    const before = JSON.stringify(core.stateMessage('student'))
+    for (let i = 0; i < 20; i += 1) {
+      core.handle('t', {
+        t: 'ink',
+        op: { t: 'ink', block: BLOCK, stroke: wireStroke(`s${i}`, 'teacher') },
+      })
+    }
+    expect(JSON.stringify(core.stateMessage('student'))).toBe(before)
+  })
+
+  it('refuses a student’s mark while the teacher holds the pen', () => {
+    const core = joined()
+    core.handle('t', { t: 'pen', value: false })
+    expect(
+      core.handle('s', { t: 'ink', op: { t: 'ink', block: BLOCK, stroke: wireStroke('s1', 'student') } }),
+    ).toEqual({ kind: 'refused', reason: 'no-pen' })
+    expect(core.board[BLOCK]).toBeUndefined()
+  })
+
+  it('leaves the teacher’s own pen alone when the student’s is withdrawn', () => {
+    const core = joined()
+    core.handle('t', { t: 'pen', value: false })
+    expect(
+      core.handle('t', { t: 'ink', op: { t: 'ink', block: BLOCK, stroke: wireStroke('s1', 'teacher') } }),
+    ).toMatchObject({ kind: 'ink', by: 'teacher' })
+  })
+
+  it('refuses an operation that changes nothing', () => {
+    const core = joined()
+    expect(core.handle('t', { t: 'ink', op: { t: 'ink-undo', block: BLOCK } })).toEqual({
+      kind: 'refused',
+      reason: 'no-effect',
+    })
+  })
+
+  it('rejects a stroke whose points do not decode', () => {
+    const core = joined()
+    const offGrid = { t: 'ink' as const, block: BLOCK, stroke: wireStroke('s1', 'teacher', true, [10, 10, -50, 0]) }
+    expect(core.handle('t', { t: 'ink', op: offGrid })).toEqual({
+      kind: 'error',
+      code: 'bad-message',
+    })
+  })
+
+  it('discards the marks when the room changes lesson', () => {
+    const core = joined()
+    core.handle('t', { t: 'ink', op: { t: 'ink', block: BLOCK, stroke: wireStroke('s1', 'teacher') } })
+    core.handle('t', { t: 'switch-lesson', lesson: otherLesson() })
+    expect(core.board).toEqual({})
+  })
+})
+
+describe('an unfinished stroke does not outlive the hand drawing it (design D106)', () => {
+  it('keeps a completed stroke when its author leaves', () => {
+    const core = joined()
+    core.handle('t', { t: 'ink', op: { t: 'ink', block: BLOCK, stroke: wireStroke('s1', 'teacher', true) } })
+    core.leave('t')
+    expect(core.board[BLOCK]?.map((s) => s.id)).toEqual(['s1'])
+  })
+
+  it('drops an in-flight stroke when its author leaves', () => {
+    const core = joined()
+    core.handle('t', { t: 'ink', op: { t: 'ink', block: BLOCK, stroke: wireStroke('s1', 'teacher', false) } })
+    core.leave('t')
+    expect(core.board[BLOCK]).toBeUndefined()
+  })
+
+  it('leaves the other participant’s in-flight stroke alone', () => {
+    const core = joined()
+    core.handle('t', { t: 'ink', op: { t: 'ink', block: BLOCK, stroke: wireStroke('s1', 'teacher', false) } })
+    core.handle('s', { t: 'ink', op: { t: 'ink', block: BLOCK, stroke: wireStroke('s2', 'student', false) } })
+    core.leave('t')
+    expect(core.board[BLOCK]?.map((s) => s.id)).toEqual(['s2'])
+  })
+
+  it('stores only what was finished', () => {
+    const core = joined()
+    core.handle('t', { t: 'ink', op: { t: 'ink', block: BLOCK, stroke: wireStroke('s1', 'teacher', true) } })
+    core.handle('t', { t: 'ink', op: { t: 'ink', block: BLOCK, stroke: wireStroke('s2', 'teacher', false) } })
+    expect(core.storable.board[BLOCK]?.map((s) => s.id)).toEqual(['s1'])
+    // The live room still shows the one being drawn.
+    expect(core.board[BLOCK]).toHaveLength(2)
+  })
+})
+
+describe('the board reaches a joiner (spec synced-rooms)', () => {
+  it('carries the marks made before they arrived', () => {
+    const core = room()
+    core.join('t', KEY)
+    core.handle('t', { t: 'ink', op: { t: 'ink', block: BLOCK, stroke: wireStroke('s1', 'teacher') } })
+
+    core.join('s', null)
+    const message = core.boardMessage()
+    expect(message.t === 'board' && message.board[BLOCK]?.[0]?.id).toBe('s1')
+  })
+
+  it('is empty for a room nobody has drawn on', () => {
+    const message = joined().boardMessage()
+    expect(message.t === 'board' && message.board).toEqual({})
+  })
+})
+
+describe('the ink messages parse (design D105)', () => {
+  function parsed(value: unknown): ReturnType<typeof parseClientMessage> {
+    return parseClientMessage(JSON.stringify(value))
+  }
+
+  it('accepts each ink operation', () => {
+    expect(parsed({ t: 'ink', op: { t: 'ink', block: 'b', stroke: wireStroke('s1', 'teacher') } })).not.toBeNull()
+    expect(parsed({ t: 'ink', op: { t: 'ink-erase', block: 'b', ids: ['s1'] } })).not.toBeNull()
+    expect(parsed({ t: 'ink', op: { t: 'ink-undo', block: 'b' } })).not.toBeNull()
+    expect(parsed({ t: 'ink', op: { t: 'ink-clear', block: 'b' } })).not.toBeNull()
+    expect(parsed({ t: 'pen', value: false })).not.toBeNull()
+  })
+
+  it('refuses a colour that is not a colour', () => {
+    // It ends up in an SVG attribute; an arbitrary string would be arbitrary CSS.
+    const stroke = { ...wireStroke('s1', 'teacher'), colour: 'red; background: url(x)' }
+    expect(parsed({ t: 'ink', op: { t: 'ink', block: 'b', stroke } })).toBeNull()
+  })
+
+  it('refuses a malformed operation', () => {
+    expect(parsed({ t: 'ink' })).toBeNull()
+    expect(parsed({ t: 'ink', op: { t: 'ink-undo' } })).toBeNull()
+    expect(parsed({ t: 'ink', op: { t: 'nonsense', block: 'b' } })).toBeNull()
+    expect(parsed({ t: 'pen' })).toBeNull()
+    expect(parsed({ t: 'pen', value: 'yes' })).toBeNull()
+  })
+
+  it('refuses a non-integer coordinate at the schema', () => {
+    const stroke = { ...wireStroke('s1', 'teacher'), points: [1, 2.5] }
+    expect(parsed({ t: 'ink', op: { t: 'ink', block: 'b', stroke } })).toBeNull()
+  })
+
+  it('refuses an unbounded stroke', () => {
+    const stroke = { ...wireStroke('s1', 'teacher'), points: new Array(20000).fill(1) }
+    expect(parsed({ t: 'ink', op: { t: 'ink', block: 'b', stroke } })).toBeNull()
+  })
+
+  it('parses an off-grid coordinate but the room refuses it', () => {
+    // The schema checks shape; only the running sums can tell that a point lands off the
+    // board, and that is the room's answer to give.
+    const stroke = wireStroke('s1', 'teacher', true, [10, 10, -50, 0])
+    expect(parsed({ t: 'ink', op: { t: 'ink', block: 'b', stroke } })).not.toBeNull()
+  })
+})
+
+describe('a room stored before drawing existed (design D110)', () => {
+  /**
+   * The Durable Object's constructor fills in what an older build never wrote. The values
+   * below are what that build behaved as: no marks, and the student's pen granted. The
+   * adapter's line is `{ ...stored, pen: stored.pen ?? true, board: stored.board ?? {} }`;
+   * this exercises the core it hands the result to.
+   */
+  function storedBeforeInk(): Omit<RoomState, 'pen' | 'board'> {
+    return {
+      lesson: testLesson(),
+      state: testState(),
+      locked: false,
+      muted: false,
+      teacherKey: KEY,
+      participants: [],
+    }
+  }
+
+  it('loads with an empty board and the pen granted', () => {
+    const stored = storedBeforeInk() as Partial<RoomState>
+    const core = new RoomCore({
+      ...(stored as RoomState),
+      muted: stored.muted ?? false,
+      pen: stored.pen ?? true,
+      board: stored.board ?? {},
+    })
+
+    expect(core.pen).toBe(true)
+    expect(core.board).toEqual({})
+  })
+
+  it('reads a snapshot from an older room as the pen granted', () => {
+    const snapshot = testState()
+    const older = {
+      t: 'state', state: snapshot, locked: false, muted: false, role: 'student',
+    } as unknown as ServerMessage
+    expect(viewReceive(newClientView(snapshot), older).pen).toBe(true)
   })
 })

@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useReducer, useState } from 'react'
+import { applyInk } from '@/shared/ink'
 import { applyAction, createLessonState, lessonProgress } from '@/shared/reducer'
-import type { Action, Lesson, LessonState } from '@/shared/types'
+import type { Action, Board, InkOp, Lesson, LessonState, Role } from '@/shared/types'
 
 /**
  * The single point where lesson state changes. Every view emits actions through this
@@ -29,10 +30,37 @@ export function useLesson(lesson: Lesson) {
   // `roomStoreIsALessonStore` keeps compiling.
   const setMuted = useCallback((value: boolean) => setMutedState(value), [])
 
+  /**
+   * The marks, held here for the same reason `muted` is: a room stands in for a local
+   * lesson, and the player must not be able to tell which it is holding (design D13,
+   * D111). Playing alone applies the very same `applyInk` the room applies and sends
+   * nothing at all.
+   */
+  const [board, setBoard] = useState<Board>({})
+
+  const ink = useCallback((op: InkOp) => {
+    setBoard((current) => applyInk(current, op, SOLO_ROLE))
+  }, [])
+
+  // Nobody to take the pen from, and nobody to take it: solo play always has it.
+  const pen = true
+  const setPen = useCallback((_value: boolean) => {}, [])
+
   const dispatch = useCallback((action: Action) => rawDispatch(action), [])
   const progress = useMemo(() => lessonProgress(lesson, state), [lesson, state])
 
-  return { state, dispatch, progress, muted, setMuted }
+  return {
+    state, dispatch, progress, muted, setMuted, board, ink, pen, setPen,
+    /**
+     * Alone, every mark is the teacher's: a lesson opened from the home screen is her own
+     * screen without a room, so there is no second person for a mark to belong to. Widened
+     * to `Role` so that `useRoom`, whose role is whatever the room said, still satisfies
+     * `LessonStore` (design D13).
+     */
+    inkRole: SOLO_ROLE as Role,
+  }
 }
+
+const SOLO_ROLE: Role = 'teacher'
 
 export type LessonStore = ReturnType<typeof useLesson>

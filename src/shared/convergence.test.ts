@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import {
-  RoomCore, newClientView, viewAct, viewConnected, viewReceive, type ClientView,
+  RoomCore, newClientView, viewAct, viewConnected, viewInk, viewReceive, type ClientView,
 } from './room'
-import { hello, type ClientMessage, type Role, type ServerMessage } from './protocol'
+import { hello, toWireInkOp, type ClientMessage, type Role, type ServerMessage } from './protocol'
 import { testLesson, testState } from './__fixtures__/lesson'
-import type { Action, Lesson, LessonState } from './types'
+import type { Action, Board, InkOp, Lesson, LessonState } from './types'
 
 /**
  * The convergence tier of design D19: two clients and one room exchanging the real
@@ -50,10 +50,24 @@ class Client {
     return this.view.muted
   }
 
+  get pen(): boolean {
+    return this.view.pen
+  }
+
+  get board(): Board {
+    return this.view.board
+  }
+
   /** The optimistic half of design D13: the tap lands here before it is ever sent. */
   act(action: Action): ClientMessage {
     this.view = viewAct(this.view, this.lesson, action)
     return { t: 'action', action }
+  }
+
+  /** The same, for a mark: it appears here first and the room hears about it after. */
+  ink(op: InkOp): ClientMessage {
+    this.view = viewInk(this.view, op, this.view.role ?? 'teacher')
+    return { t: 'ink', op: toWireInkOp(op) }
   }
 
   receive(message: ServerMessage): void {
@@ -82,6 +96,7 @@ class Table {
     if (!this.clients.includes(client)) this.clients.push(client)
     client.markFresh()
     client.receive(this.core.stateMessage(joined.role))
+    client.receive(this.core.boardMessage())
     this.#broadcastPeers()
   }
 
@@ -98,10 +113,20 @@ class Table {
       for (const peer of this.clients) peer.receive(this.core.stateMessage(this.#roleOf(peer)))
       return
     }
+    if (outcome.kind === 'ink') {
+      // To the others and to nobody else. No state broadcast, because ink is not state
+      // (design D101), and not back to the sender, which already applied it (design D102).
+      const relayed: ServerMessage = { t: 'ink', op: toWireInkOp(outcome.op), by: outcome.by }
+      for (const peer of this.clients) {
+        if (peer !== client) peer.receive(relayed)
+      }
+      return
+    }
     if (outcome.kind === 'refused') {
       client.receive({ t: 'refused', reason: outcome.reason })
       // A refusal is also where a stale device learns the truth, so the state goes back.
       client.receive(this.core.stateMessage(this.#roleOf(client)))
+      if (message.t === 'ink') client.receive(this.core.boardMessage())
       return
     }
     if (outcome.kind === 'error') client.receive({ t: 'error', code: outcome.code })
@@ -219,6 +244,7 @@ describe('two clients and one room end up identical', () => {
       state: { ...ahead, v: ahead.v - 1, slide: 0 },
       locked: false,
       muted: false,
+      pen: true,
       role: 'student',
     })
     expect(student.state).toBe(ahead)
@@ -341,5 +367,247 @@ describe('two clients and one room end up identical', () => {
     expect(reloaded.muted).toBe(false)
     room.connect(reloaded)
     expect(reloaded.muted).toBe(true)
+  })
+})
+
+// ── The board (design D101, D102; spec `synced-rooms`) ───────────────────────
+
+const BLOCK = 'vocab'
+
+function mark(id: string, points = [{ x: 100, y: 100 }], done = true): InkOp {
+  return {
+    t: 'ink',
+    block: BLOCK,
+    stroke: { id, by: 'teacher', colour: '#ff0000', width: 20, points, done },
+  }
+}
+
+function boardIds(client: Client): string[] {
+  return (client.board[BLOCK] ?? []).map((s) => s.id)
+}
+
+describe('a mark reaches the other screen', () => {
+  it('arrives without a state broadcast', () => {
+    const { room, teacher, student } = table()
+    room.connect(teacher)
+    room.connect(student)
+    const before = student.state
+
+    room.send(teacher, teacher.ink(mark('s1')))
+
+    expect(boardIds(student)).toEqual(['s1'])
+    // Ink is not state: the student's lesson state is the very same object it was.
+    expect(student.state).toBe(before)
+  })
+
+  it('does not reach the sender twice', () => {
+    const { room, teacher, student } = table()
+    room.connect(teacher)
+    room.connect(student)
+
+    room.send(teacher, teacher.ink(mark('s1', [{ x: 10, y: 10 }])))
+
+    expect(teacher.board[BLOCK]?.[0]?.points).toEqual([{ x: 10, y: 10 }])
+    expect(boardIds(teacher)).toEqual(['s1'])
+  })
+
+  it('arrives in parts, in order, for a stroke sent in pieces', () => {
+    const { room, teacher, student } = table()
+    room.connect(teacher)
+    room.connect(student)
+
+    room.send(teacher, teacher.ink(mark('s1', [{ x: 10, y: 10 }], false)))
+    room.send(teacher, teacher.ink(mark('s1', [{ x: 20, y: 20 }], false)))
+    room.send(teacher, teacher.ink(mark('s1', [{ x: 30, y: 30 }], true)))
+
+    expect(student.board[BLOCK]?.[0]?.points).toEqual([
+      { x: 10, y: 10 },
+      { x: 20, y: 20 },
+      { x: 30, y: 30 },
+    ])
+    expect(student.board[BLOCK]?.[0]?.done).toBe(true)
+    expect(student.board).toEqual(teacher.board)
+  })
+})
+
+describe('two people drawing at once simply both drew', () => {
+  it('both marks end up on both screens', () => {
+    const { room, teacher, student } = table()
+    room.connect(teacher)
+    room.connect(student)
+
+    const hers = teacher.ink(mark('t1'))
+    const his = student.ink(mark('s1'))
+    room.send(teacher, hers)
+    room.send(student, his)
+
+    // As a set, not as a sequence: each screen applied its own mark before hearing about
+    // the other's, so the two may interleave differently (design D112).
+    expect(boardIds(teacher).sort()).toEqual(['s1', 't1'])
+    expect(boardIds(student).sort()).toEqual(['s1', 't1'])
+  })
+
+  it('one participant’s own marks keep their order on both screens (design D112)', () => {
+    const { room, teacher, student } = table()
+    room.connect(teacher)
+    room.connect(student)
+
+    // The student draws in between, which is exactly what could reorder them.
+    room.send(teacher, teacher.ink(mark('t1')))
+    room.send(student, student.ink(mark('s1')))
+    room.send(teacher, teacher.ink(mark('t2')))
+    room.send(student, student.ink(mark('s2')))
+    room.send(teacher, teacher.ink(mark('t3')))
+
+    const hersOn = (client: Client): string[] =>
+      (client.board[BLOCK] ?? []).filter((s) => s.by === 'teacher').map((s) => s.id)
+
+    expect(hersOn(teacher)).toEqual(['t1', 't2', 't3'])
+    expect(hersOn(student)).toEqual(['t1', 't2', 't3'])
+  })
+
+  it('undo agrees across screens on which mark was the teacher’s last (design D112)', () => {
+    const { room, teacher, student } = table()
+    room.connect(teacher)
+    room.connect(student)
+
+    room.send(teacher, teacher.ink(mark('t1')))
+    room.send(student, student.ink(mark('s1')))
+    room.send(teacher, teacher.ink(mark('t2')))
+
+    room.send(teacher, teacher.ink({ t: 'ink-undo', block: BLOCK }))
+
+    expect(boardIds(teacher).sort()).toEqual(['s1', 't1'])
+    expect(boardIds(student).sort()).toEqual(['s1', 't1'])
+  })
+
+  it('erasing an already-erased mark leaves both agreeing', () => {
+    const { room, teacher, student } = table()
+    room.connect(teacher)
+    room.connect(student)
+    room.send(teacher, teacher.ink(mark('t1')))
+
+    room.send(teacher, teacher.ink({ t: 'ink-erase', block: BLOCK, ids: ['t1'] }))
+    room.send(student, student.ink({ t: 'ink-erase', block: BLOCK, ids: ['t1'] }))
+
+    expect(teacher.board[BLOCK]).toBeUndefined()
+    expect(student.board[BLOCK]).toBeUndefined()
+    expect(student.refusals).toBe(1)
+  })
+})
+
+describe('the board settles a screen that ran ahead', () => {
+  it('a refused mark is answered with the room’s own board', () => {
+    const { room, teacher, student } = table()
+    room.connect(teacher)
+    room.connect(student)
+    room.send(teacher, teacher.ink(mark('t1')))
+    room.send(teacher, { t: 'pen', value: false })
+
+    // The student draws optimistically and is refused: her screen must not keep the mark.
+    room.send(student, student.ink(mark('s1')))
+
+    expect(boardIds(student)).toEqual(['t1'])
+    expect(student.board).toEqual(room.core.board)
+  })
+
+  it('a joiner is handed the marks already made', () => {
+    const { room, teacher, student } = table()
+    room.connect(teacher)
+    room.send(teacher, teacher.ink(mark('t1')))
+
+    room.connect(student)
+
+    expect(boardIds(student)).toEqual(['t1'])
+  })
+
+  it('a reconnecting participant is brought back to the room’s board', () => {
+    const { room, teacher, student } = table()
+    room.connect(teacher)
+    room.connect(student)
+    room.send(teacher, teacher.ink(mark('t1')))
+
+    room.disconnect(student)
+    room.send(teacher, teacher.ink(mark('t2')))
+    room.connect(student)
+
+    expect(boardIds(student)).toEqual(['t1', 't2'])
+  })
+})
+
+describe('the pen reaches both screens (design D107)', () => {
+  it('the student learns her pen was withdrawn', () => {
+    const { room, teacher, student } = table()
+    room.connect(teacher)
+    room.connect(student)
+
+    room.send(teacher, { t: 'pen', value: false })
+
+    expect(student.pen).toBe(false)
+    expect(teacher.pen).toBe(false)
+  })
+
+  it('a joiner inherits a withdrawn pen', () => {
+    const { room, teacher, student } = table()
+    room.connect(teacher)
+    room.send(teacher, { t: 'pen', value: false })
+
+    room.connect(student)
+
+    expect(student.pen).toBe(false)
+  })
+
+  it('the lock and the pen do not move each other', () => {
+    const { room, teacher, student } = table()
+    room.connect(teacher)
+    room.connect(student)
+
+    room.send(teacher, { t: 'lock', value: true })
+    expect(student.pen).toBe(true)
+
+    room.send(teacher, { t: 'pen', value: false })
+    expect(student.locked).toBe(true)
+  })
+})
+
+describe('marks belong to the exercise they were made on (design D109)', () => {
+  it('are still there when the lesson comes back to it', () => {
+    const { room, teacher, student, lesson } = table()
+    room.connect(teacher)
+    room.connect(student)
+    room.send(teacher, teacher.ink(mark('t1')))
+
+    const second = lesson.blocks[1]
+    if (second === undefined) throw new Error('the test lesson needs a second exercise')
+    room.send(teacher, teacher.act({ t: 'nav', slide: 1 }))
+    expect(student.board[second.id]).toBeUndefined()
+
+    room.send(teacher, teacher.act({ t: 'nav', slide: 0 }))
+    expect(boardIds(student)).toEqual(['t1'])
+    expect(boardIds(teacher)).toEqual(['t1'])
+  })
+
+  it('survive a reset of the exercise they are on', () => {
+    const { room, teacher, student } = table()
+    room.connect(teacher)
+    room.connect(student)
+    room.send(teacher, teacher.ink(mark('t1')))
+
+    room.send(teacher, teacher.act({ t: 'reset', block: BLOCK }))
+
+    // A reset re-orders the exercise; it says nothing about what was drawn on it.
+    expect(boardIds(teacher)).toEqual(['t1'])
+    expect(boardIds(student)).toEqual(['t1'])
+  })
+
+  it('are discarded when the room changes lesson', () => {
+    const { room, teacher, student, lesson } = table()
+    room.connect(teacher)
+    room.connect(student)
+    room.send(teacher, teacher.ink(mark('t1')))
+
+    room.send(teacher, { t: 'switch-lesson', lesson: { ...lesson, id: 'other', title: 'Other' } })
+
+    expect(room.core.board).toEqual({})
   })
 })

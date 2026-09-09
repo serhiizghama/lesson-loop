@@ -2,9 +2,15 @@
 
 /* ── Cards ────────────────────────────────────────────────────────────────── */
 
+/*
+ * Five to a row at the stage's reference width, which is what makes a ten-item lesson two
+ * even rows rather than six and a gap. The track minimum is what decides that: the stage
+ * is always laid out at one width now (design D103), so the number of columns is fixed
+ * rather than a consequence of the window, and it is chosen here on purpose.
+ */
 .cardGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
   gap: 0.75rem;
 }
 
@@ -15,7 +21,8 @@
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  min-height: 8.5rem;
+  /* Kept in step with the track above, so a card stays about as tall as it is wide. */
+  min-height: 10rem;
   padding: 1rem 0.75rem;
   text-align: center;
   background: var(--card);

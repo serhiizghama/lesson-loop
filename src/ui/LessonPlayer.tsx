@@ -6,6 +6,12 @@ import { preloadPictures } from '@/blocks/Picture'
 import { speakableLines } from '@/shared/blocks'
 import { blockStateOf, isLessonComplete, isNextDue, lessonTrail } from '@/shared/reducer'
 import { seedFor } from '@/shared/rng'
+import {
+  stageHeight, stageScale, STAGE_REFERENCE_HEIGHT_PX, STAGE_REFERENCE_PX,
+} from './stage'
+import { InkLayer } from './InkLayer'
+import { InkToolbar, sizeOf } from './InkToolbar'
+import { DEFAULT_COLOUR, type Tool } from './ink-tools'
 import type { BlockType, Lesson } from '@/shared/types'
 import { speech } from '@/speech/speech'
 import { quietable } from '@/speech/policy'
@@ -75,13 +81,18 @@ export type LessonPlayerProps = {
    * alone has no panel, so its control is the header's.
    */
   soundControlInPanel?: boolean
+  /**
+   * Whether this lesson can be drawn on at all. Only a room sets it: a lesson played alone
+   * has nobody to show a mark to (design D113).
+   */
+  inkEnabled?: boolean
 }
 
 export function LessonPlayer({
   lesson, store, onExit, notice, aside, headerAction,
-  canSteer = true, readOnly = false, soundControlInPanel = false,
+  canSteer = true, readOnly = false, soundControlInPanel = false, inkEnabled = false,
 }: LessonPlayerProps) {
-  const { state, dispatch, muted, setMuted } = store
+  const { state, dispatch, muted, setMuted, board, ink, inkRole, pen } = store
 
   // Nothing to arm: speech rides on the sticky user activation the tap that opened this
   // lesson already gave (design D39). Leaving still stops whatever is mid-word.
@@ -159,6 +170,27 @@ export function LessonPlayer({
 
   /** The stage, so the star has somewhere to fly *from*. */
   const stageNode = useRef<HTMLElement | null>(null)
+  const fitNode = useRef<HTMLDivElement | null>(null)
+
+  /**
+   * The pencil, and what it is holding. Browser state and nothing else: whether a person
+   * is drawing is a property of their hand, not of the lesson, and two people must be able
+   * to be in different modes at once (design D108).
+   */
+  const [drawing, setDrawing] = useState(false)
+  const [tool, setTool] = useState<Tool>('pen')
+  const [colour, setColour] = useState(() => DEFAULT_COLOUR[store.inkRole])
+  const [size, setSize] = useState(0)
+
+  /**
+   * Whether this screen may draw at all.
+   *
+   * Drawing belongs to a room and to nothing else (design D113): a lesson opened from the
+   * home screen is one person looking at her own exercise, and a mark she makes there has
+   * nobody to reach. In a room the teacher always may draw, and the student may until the
+   * teacher takes the pen (design D107) — independent of the lock, which governs actions.
+   */
+  const canDraw = inkEnabled && (inkRole === 'teacher' || pen)
   /**
    * Where the star has to travel, measured once when the moment starts (design D81). Null
    * means "could not be measured" — a slot that has wrapped away, a layout mid-change —
@@ -200,6 +232,64 @@ export function LessonPlayer({
     // Deliberately keyed on the celebration alone. Re-running this because the state
     // object changed — which it does on every tap — would chime twice for one completion.
   }, [celebrating])
+
+  /**
+   * Lays the exercise out at one reference width and scales it to fit (design D103), so
+   * that both screens show the same arrangement and a position means the same thing on
+   * each — which is what lets a mark be a pair of numbers.
+   *
+   * Done to the DOM rather than through state on purpose. The height this sets is the
+   * wrapper's, and putting it through a render would have the wrapper's own resize
+   * trigger the render that resizes it; measuring and writing in one pass, guarded by the
+   * last values, has no such loop. `useLayoutEffect` runs before paint, so the first frame
+   * is already scaled.
+   *
+   * Without `ResizeObserver` nothing is touched at all and the stage keeps its fluid
+   * layout — the arrangement is then whatever the width gives, which is exactly how it
+   * behaved before this change.
+   */
+  useLayoutEffect(() => {
+    const wrapper = fitNode.current
+    const stage = stageNode.current
+    if (wrapper === null || stage === null) return
+    if (typeof ResizeObserver === 'undefined') return
+
+    wrapper.style.setProperty('--stage-reference', `${STAGE_REFERENCE_PX}px`)
+    wrapper.style.setProperty('--stage-reference-height', `${STAGE_REFERENCE_HEIGHT_PX}px`)
+    wrapper.dataset['scaled'] = 'true'
+
+    let lastScale = -1
+    let lastHeight = -1
+    const measure = (): void => {
+      const available = wrapper.clientWidth
+      // `offsetHeight` is the laid-out height, which a transform does not affect — so this
+      // is the stage's height at the reference width, scaled or not.
+      const natural = stage.offsetHeight
+      if (available === 0 || natural === 0) return
+
+      const scale = stageScale(available)
+      const height = stageHeight(natural, scale)
+      if (scale === lastScale && height === lastHeight) return
+      lastScale = scale
+      lastHeight = height
+      wrapper.style.setProperty('--stage-scale', String(scale))
+      wrapper.style.height = `${height}px`
+    }
+
+    const observer = new ResizeObserver(measure)
+    observer.observe(wrapper)
+    observer.observe(stage)
+    measure()
+
+    return () => {
+      observer.disconnect()
+      delete wrapper.dataset['scaled']
+      wrapper.style.removeProperty('--stage-scale')
+      wrapper.style.removeProperty('--stage-reference')
+      wrapper.style.removeProperty('--stage-reference-height')
+      wrapper.style.height = ''
+    }
+  }, [])
 
   useLayoutEffect(() => {
     if (celebrating === null) {
@@ -337,110 +427,182 @@ export function LessonPlayer({
             </button>
           )}
 
+          {/* The pencil sits here rather than in the teacher's panel, because the student
+              draws too and has no panel: the header is the one surface both of them have.
+              It is a mode switch, like the sound control beside it (design D108). */}
+          {inkEnabled && canDraw && closing === null && (
+            <button
+              type="button"
+              className={drawing ? styles.soundOff : styles.soundOn}
+              aria-pressed={drawing}
+              aria-label={drawing ? 'Stop drawing and use the exercise' : 'Draw on the exercise'}
+              title={drawing ? 'Stop drawing and use the exercise' : 'Draw on the exercise'}
+              onClick={() => setDrawing(!drawing)}
+            >
+              ✏️
+            </button>
+          )}
+
           {headerAction}
         </div>
       </header>
+
+      {/* Directly under the header and above the exercise: the tools must never cover the
+          thing being marked, and the space below the stage is the board itself. */}
+      {closing === null && inkEnabled && (
+        <InkToolbar
+          allowed={canDraw}
+          drawing={drawing}
+          tool={tool}
+          onTool={setTool}
+          colour={colour}
+          onColour={setColour}
+          size={size}
+          onSize={setSize}
+          canUndo={(board[block.id] ?? []).some((s) => s.by === inkRole)}
+          canClear={
+            inkRole === 'teacher'
+              ? (board[block.id] ?? []).length > 0
+              : (board[block.id] ?? []).some((s) => s.by === inkRole)
+          }
+          onUndo={() => ink({ t: 'ink-undo', block: block.id })}
+          onClear={() => ink({ t: 'ink-clear', block: block.id })}
+          />
+      )}
 
       {notice}
 
       <div className={styles.split}>
         {/* `inert` takes the whole exercise out of reach in one place, so no block view
             has to learn what a lock is. The room refuses the action regardless. */}
-        <main className={styles.stage} ref={stageNode} inert={readOnly}>
-          {/* The stars actually earned, one per exercise (design D82). They used to be
-              five painted on the slide, the same five whether a child had finished
-              everything or nothing — and a child notices that stars nobody can fail to get
-              are not worth having. The row lives here rather than in `FinishView` because
-              only the player holds the trail, and widening the block-view contract for the
-              sake of one view is what design D13 exists to prevent. */}
-          {closing !== null && (
-            <div
-              className={styles.closingRow}
-              role="img"
-              aria-label={`${earned} of ${trail.length} stars`}
-            >
-              {trail.map((slot, i) => (
-                <span
-                  key={slot.blockId}
-                  className={slot.done ? styles.closingStarEarned : styles.closingStar}
-                  style={{ animationDelay: `${i * CLOSING_STEP_MS}ms` }}
+        <div className={styles.stageColumn}>
+        <div className={styles.stageFit} ref={fitNode}>
+          <main className={styles.stage} ref={stageNode}>
+            {/* The lock takes the exercise out of reach in one place, so no block view has
+                to learn what a lock is. It stops here rather than on the stage itself
+                because the pen is a separate rule: an exercise can be held while the child
+                is still invited to circle her answer (design D107). */}
+            <div className={styles.stageContent} inert={readOnly}>
+              {/* The stars actually earned, one per exercise (design D82). They used to be
+                  five painted on the slide, the same five whether a child had finished
+                  everything or nothing — and a child notices that stars nobody can fail to get
+                  are not worth having. The row lives here rather than in `FinishView` because
+                  only the player holds the trail, and widening the block-view contract for the
+                  sake of one view is what design D13 exists to prevent. */}
+              {closing !== null && (
+                <div
+                  className={styles.closingRow}
+                  role="img"
+                  aria-label={`${earned} of ${trail.length} stars`}
                 >
-                  ★
+                  {trail.map((slot, i) => (
+                    <span
+                      key={slot.blockId}
+                      className={slot.done ? styles.closingStarEarned : styles.closingStar}
+                      style={{ animationDelay: `${i * CLOSING_STEP_MS}ms` }}
+                    >
+                      ★
+                    </span>
+                  ))}
+              </div>
+            )}
+
+            {/* The closing slide's message is its heading. Its `title` says the same thing
+                in fewer words — "Great job!" above "Great job learning animals!" — so the
+                slide shows one of them, not both. Lessons keep the field; every other block
+                still shows it. */}
+            {closing === null && <h2 className={styles.blockTitle}>{block.title}</h2>}
+            {block.type !== 'finish' && block.hint !== undefined && (
+              <p className={styles.blockHint}>{block.hint}</p>
+            )}
+            <View
+              key={`${block.id}#${generation}`}
+              lesson={lesson}
+              block={block}
+              state={blockState}
+              seed={seedFor(state.seed, block.id, generation)}
+              dispatch={dispatch}
+              speech={voice}
+            />
+
+            {/* The celebration, over the exercise and never in its way: `aria-hidden` so it
+                is not read out, `pointer-events: none` so the exercise stays tappable
+                throughout, and gone the moment `celebrating` clears (spec: it "SHALL NOT
+                block, hide or disable the exercise"). */}
+            {bursting && (
+              <div className={`${styles.flourish} ${styles.flourishBig}`} aria-hidden>
+                {CONFETTI.map((particle, i) => (
+                  <span
+                    key={i}
+                    className={styles.confetti}
+                    style={
+                      {
+                        '--to-x': `${particle.x * 2}px`,
+                        '--to-y': `${particle.y * 2}px`,
+                        '--tint': `hsl(${particle.hue} 85% 62%)`,
+                        animationDelay: `${particle.delay}ms`,
+                      } as CSSProperties
+                    }
+                  />
+                ))}
+              </div>
+            )}
+
+            {celebrating !== null && (
+              <div className={styles.flourish} aria-hidden>
+                <span
+                  className={flight === null ? styles.starPop : styles.starFlies}
+                  style={
+                    flight === null
+                      ? undefined
+                      : ({ '--fly-x': `${flight.dx}px`, '--fly-y': `${flight.dy}px` } as CSSProperties)
+                  }
+                >
+                  ⭐️
                 </span>
-              ))}
+                {CONFETTI.map((particle, i) => (
+                  <span
+                    key={i}
+                    className={styles.confetti}
+                    style={
+                      {
+                        '--to-x': `${particle.x}px`,
+                        '--to-y': `${particle.y}px`,
+                        '--tint': `hsl(${particle.hue} 85% 62%)`,
+                        animationDelay: `${particle.delay}ms`,
+                      } as CSSProperties
+                    }
+                  />
+                ))}
+              </div>
+            )}
             </div>
-          )}
 
-          {/* The closing slide's message is its heading. Its `title` says the same thing
-              in fewer words — "Great job!" above "Great job learning animals!" — so the
-              slide shows one of them, not both. Lessons keep the field; every other block
-              still shows it. */}
-          {closing === null && <h2 className={styles.blockTitle}>{block.title}</h2>}
-          {block.type !== 'finish' && block.hint !== undefined && (
-            <p className={styles.blockHint}>{block.hint}</p>
-          )}
-          <View
-            key={`${block.id}#${generation}`}
-            lesson={lesson}
-            block={block}
-            state={blockState}
-            seed={seedFor(state.seed, block.id, generation)}
-            dispatch={dispatch}
-            speech={voice}
-          />
+            {/* Over the exercise and its feedback, and inert unless this screen's pencil
+                is down — so a tap reaches the card underneath at every other moment
+                (design D108). Not on the closing screen: the pencil belongs to an
+                exercise, and that screen is not one (spec `lesson-player`). */}
+            {/* Rendered whenever the lesson can be drawn on at all, not only when this
+                screen may draw: taking the student's pen stops her making new marks and
+                leaves every mark she has already made on screen (design D107). `drawing`
+                is what makes the layer inert. */}
+            {closing === null && inkEnabled && (
+              <InkLayer
+                block={block.id}
+                strokes={board[block.id] ?? []}
+                drawing={drawing && canDraw}
+                tool={tool}
+                colour={colour}
+                width={sizeOf('pen', size)}
+                radius={sizeOf('eraser', size)}
+                by={inkRole}
+                onInk={ink}
+              />
+            )}
+          </main>
+        </div>
 
-          {/* The celebration, over the exercise and never in its way: `aria-hidden` so it
-              is not read out, `pointer-events: none` so the exercise stays tappable
-              throughout, and gone the moment `celebrating` clears (spec: it "SHALL NOT
-              block, hide or disable the exercise"). */}
-          {bursting && (
-            <div className={`${styles.flourish} ${styles.flourishBig}`} aria-hidden>
-              {CONFETTI.map((particle, i) => (
-                <span
-                  key={i}
-                  className={styles.confetti}
-                  style={
-                    {
-                      '--to-x': `${particle.x * 2}px`,
-                      '--to-y': `${particle.y * 2}px`,
-                      '--tint': `hsl(${particle.hue} 85% 62%)`,
-                      animationDelay: `${particle.delay}ms`,
-                    } as CSSProperties
-                  }
-                />
-              ))}
-            </div>
-          )}
-
-          {celebrating !== null && (
-            <div className={styles.flourish} aria-hidden>
-              <span
-                className={flight === null ? styles.starPop : styles.starFlies}
-                style={
-                  flight === null
-                    ? undefined
-                    : ({ '--fly-x': `${flight.dx}px`, '--fly-y': `${flight.dy}px` } as CSSProperties)
-                }
-              >
-                ⭐️
-              </span>
-              {CONFETTI.map((particle, i) => (
-                <span
-                  key={i}
-                  className={styles.confetti}
-                  style={
-                    {
-                      '--to-x': `${particle.x}px`,
-                      '--to-y': `${particle.y}px`,
-                      '--tint': `hsl(${particle.hue} 85% 62%)`,
-                      animationDelay: `${particle.delay}ms`,
-                    } as CSSProperties
-                  }
-                />
-              ))}
-            </div>
-          )}
-        </main>
+        </div>
 
         {aside}
       </div>

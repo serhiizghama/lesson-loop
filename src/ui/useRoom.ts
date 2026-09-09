@@ -2,11 +2,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { lessonById } from '@/lessons'
 import { lessonProgress, newLessonState } from '@/shared/reducer'
 import {
-  newClientView, viewAct, viewConnected, viewReceive, type ClientView,
+  newClientView, viewAct, viewConnected, viewInk, viewReceive, type ClientView,
 } from '@/shared/room'
-import { hello, type Peers, type Role, type RoomErrorCode } from '@/shared/protocol'
+import {
+  hello, toWireInkOp, type Peers, type Role, type RoomErrorCode,
+} from '@/shared/protocol'
 import { RoomSocket, connectionOf, type Connection } from '@/net/socket'
-import type { Action, Lesson } from '@/shared/types'
+import type { Action, InkOp, Lesson } from '@/shared/types'
 import type { LessonStore } from './useLesson'
 
 export type RoomStore = LessonStore & {
@@ -104,6 +106,20 @@ export function useRoom(code: string, teacherKey: string | null): RoomStore {
     socketRef.current?.send({ t: 'mute', value })
   }, [])
 
+  const setPen = useCallback((value: boolean) => {
+    socketRef.current?.send({ t: 'pen', value })
+  }, [])
+
+  /**
+   * A mark lands here first and is sent afterwards, exactly as a tap is — and with the
+   * socket down this is the whole of it, which is what keeps drawing working unsynced
+   * (spec `shared-drawing`).
+   */
+  const ink = useCallback((op: InkOp) => {
+    setView((current) => viewInk(current, op, current.role ?? 'teacher'))
+    socketRef.current?.send({ t: 'ink', op: toWireInkOp(op) })
+  }, [])
+
   const switchLesson = useCallback((next: Lesson) => {
     socketRef.current?.send({ t: 'switch-lesson', lesson: next })
   }, [])
@@ -128,6 +144,11 @@ export function useRoom(code: string, teacherKey: string | null): RoomStore {
     setLocked,
     setMuted,
     switchLesson,
+    board: view.board,
+    ink,
+    inkRole: view.role ?? 'teacher',
+    pen: view.pen,
+    setPen,
   }
 }
 
