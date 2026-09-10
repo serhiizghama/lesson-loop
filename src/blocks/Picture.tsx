@@ -1,4 +1,5 @@
 import type { Item, Lesson } from '@/shared/types'
+import { topicOf } from '@/shared/narrow'
 import { PICTURE_DIR, pictures } from './pictures'
 import styles from './blocks.module.css'
 
@@ -31,9 +32,15 @@ export function preloadPictures(
   }
 }
 
-/** The picture drawn for an item, or null when the lesson has none. */
+/**
+ * The picture drawn for an item, or null when the lesson has none.
+ *
+ * Filed by *topic*, not by size: the same dog is the same dog in both halves of Animals,
+ * so `animals/wild` and `animals/known` draw from one set (`npm run pictures` writes it
+ * per topic for the same reason).
+ */
 export function pictureSrc(lesson: Lesson, item: Item): string | null {
-  const file = pictures[`${lesson.id}/${item.id}`]
+  const file = pictures[`${topicOf(lesson.id)}/${item.id}`]
   return file === undefined ? null : `${PICTURE_DIR}/${file}`
 }
 

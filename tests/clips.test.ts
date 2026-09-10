@@ -1,9 +1,9 @@
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
+import { existsSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { speakableLines } from '../src/shared/blocks'
 import { CLIP_DIR, clips } from '../src/speech/clips'
-import type { Lesson } from '../src/shared/types'
+import { playableLessons } from './support/play'
 
 /**
  * What the recordings cover, reported rather than enforced.
@@ -14,18 +14,12 @@ import type { Lesson } from '../src/shared/types'
  * *silently*, because a line edited in JSON drops back to the device voice without any
  * visible sign, and that drift is exactly what an author needs told.
  */
-const lessonsDir = join(process.cwd(), 'lessons')
 const clipsDir = join(process.cwd(), 'public', 'audio')
 
-const lessons = readdirSync(lessonsDir)
-  .filter((f) => f.endsWith('.json'))
-  .map((file) => ({
-    file,
-    lesson: JSON.parse(readFileSync(join(lessonsDir, file), 'utf8')) as Lesson,
-  }))
-
 describe('clip coverage', () => {
-  it.each(lessons.map(({ file, lesson }) => [file, lesson] as const))(
+  // Per size, because what a lesson speaks is what its blocks speak, and a topic's
+  // sittings do not carry the same blocks.
+  it.each(playableLessons())(
     '%s — every line it speaks is reported',
     (file, lesson) => {
       const lines = speakableLines(lesson)

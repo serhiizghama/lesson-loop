@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { validateLesson, resolveItems } from '../../src/shared/validate'
+import { choicesOf, narrow } from '../../src/shared/narrow'
 import { applyAction, blockStateOf } from '../../src/shared/reducer'
 import type { Action, Block, Lesson, LessonState } from '../../src/shared/types'
 import type {
@@ -18,6 +19,21 @@ export function loadLesson(file: string): Lesson {
   const result = validateLesson(JSON.parse(readFileSync(join(dir, file), 'utf8')))
   if (!result.ok) throw new Error(result.errors.join('\n'))
   return result.lesson
+}
+
+/**
+ * Every lesson a teacher can actually open: each topic narrowed to each size it offers,
+ * and an un-parted topic once. A topic file is not itself playable — it may select the
+ * words the sitting teaches, which only narrowing can resolve — so anything that plays
+ * the shipped content starts here rather than at `loadLesson`.
+ */
+export function playableLessons(): Array<[name: string, lesson: Lesson]> {
+  return lessonFiles.flatMap((file): Array<[string, Lesson]> => {
+    const topic = loadLesson(file)
+    const sizes = choicesOf(topic)
+    if (sizes.length === 0) return [[file, narrow(topic)]]
+    return sizes.map((size) => [`${file} · ${size.id}`, narrow(topic, size.id)])
+  })
 }
 
 /**

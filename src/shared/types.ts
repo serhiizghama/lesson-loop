@@ -29,11 +29,19 @@ export type Item = {
   tags?: Record<string, string>
 }
 
-/** How a block chooses the items it works with. */
+/**
+ * How a block chooses the items it works with.
+ *
+ * `new` is the words the sitting is teaching, which differ between one part of a topic
+ * and another — so one authored block serves every size the topic offers. It exists only
+ * in a lesson file: `narrow` resolves it to the items it names, and a lesson that has
+ * been built for a size carries none (design D1, D2).
+ */
 export type ItemRef =
   | { select: 'all' }
   | { select: 'ids'; ids: string[] }
   | { select: 'tag'; tag: string }
+  | { select: 'new' }
 
 export type SentenceLevel = {
   /** What the button says, e.g. "It is a…". */
@@ -61,7 +69,13 @@ export type DescribeQuestion = {
   face: Face
 }
 
-type BlockBase = { id: string; title: string; hint?: string }
+/**
+ * `only` names the parts a block belongs to; a block that declares none belongs to every
+ * sitting. It is what keeps a revision exercise out of the first part and lets each part
+ * keep its own model phrases (design D3, D4). Like `parts`, a narrowed lesson never
+ * carries it.
+ */
+type BlockBase = { id: string; title: string; hint?: string; only?: string[] }
 
 /**
  * `speak` is what a block says aloud about one item, as a template: "A {en} says
@@ -156,6 +170,22 @@ export type Block =
 export type BlockType = Block['type']
 export type BlockOf<T extends BlockType> = Extract<Block, { type: T }>
 
+/**
+ * One sitting's worth of a topic: the words it introduces, under a title and a mark of
+ * its own. A part is cumulative in vocabulary and exclusive in exercises — choosing it
+ * carries the words of the parts before it, and teaches only its own (design D3).
+ */
+export type Part = { id: string; title: string; emoji: string; items: string[] }
+
+/**
+ * A topic as it is written, and a lesson as it is played — the same type, because a
+ * narrowed lesson is an ordinary one.
+ *
+ * `parts` is what a topic declares and the teacher chooses from. A lesson that came out
+ * of `narrow` never carries it, nor a block's `only`, nor `select: 'new'`: narrowing
+ * happens before anything is played, so the player, the reducer, the room and the wire
+ * know nothing of parts (design D1, D2).
+ */
 export type Lesson = {
   id: string
   title: string
@@ -165,6 +195,7 @@ export type Lesson = {
   l1: 'ja' | null
   items: Item[]
   blocks: Block[]
+  parts?: Part[]
 }
 
 // ── Runtime state ────────────────────────────────────────────────────────────

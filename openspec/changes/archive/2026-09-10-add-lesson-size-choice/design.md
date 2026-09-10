@@ -136,6 +136,37 @@ per-size loop, because a malformed `parts` makes every derived size meaningless.
 This is the check that would have caught the defect in the teacher's own file, where part
 two's five animals all live in the jungle.
 
+### D6a — A built lesson is named after its size: `animals/wild`
+
+Added during implementation, after a room opened on a part came up blank in a real
+browser. The room does **not** send the lesson over the socket: both participants resolve
+the lesson the room is on from their own copy of `lessons/`, by the id in `LessonState`
+(`useRoom.ts`), and `applyAction` refuses an action whose state names a different lesson
+than the one being played. So a playable lesson has to be *findable by name*, and every
+size is a playable lesson.
+
+`narrow` therefore gives what it builds the id `<topic>/<choice>` — the address without
+its `/l/` — and `lessons.ts` splits into `topicById` (the file, for the home screen) and
+`lessonById` (a size, narrowed on the way out). `RoomLesson` offers the teacher the sizes
+rather than the files when she changes the room's lesson, since a topic is not playable.
+
+Two consequences, both recorded rather than hidden:
+
+- **The size does reach `state.lessonId`, and therefore the wire.** No message *shape*
+  changes and nothing learns what a part is — but the claim "nothing about the choice
+  reaches the wire" was too strong, and the spec says so now. This is what `animals-2`
+  already did when it was a file: the id names which lesson is being played, and a part
+  is a lesson.
+- **A lesson id may carry one slash.** `lessonSchema` allows `<topic>/<size>` because a
+  built lesson is validated like any other when it arrives on `switch-lesson`; a lesson
+  *file* still declares a plain topic id, which `lessons.test.ts` holds.
+
+Pictures are filed by topic, so `animals/known` and `animals/wild` draw one set.
+
+*Rejected:* sending the lesson on join. It is the cleaner architecture and it is a change
+to the room protocol — the one thing this change set out not to touch — and the solo path
+would still need `narrow` anyway.
+
 ### D7 — Switching size starts a fresh lesson, by keying on the address
 
 `App` keys `SoloLesson` on `lesson.id` today. It will key on the full route — topic plus

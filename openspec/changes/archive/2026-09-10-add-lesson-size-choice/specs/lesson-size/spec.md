@@ -53,8 +53,14 @@ The whole-topic choice SHALL teach every word of the topic and SHALL carry every
 the topic declares.
 
 The lesson a choice produces SHALL be indistinguishable, to everything that plays it, from
-a lesson written out by hand: it SHALL declare no parts, and nothing about the choice SHALL
-reach the player, the room, the reducer or the wire.
+a lesson written out by hand: it SHALL declare no parts, and nothing that plays it SHALL
+have to know what a part is.
+
+It SHALL carry a name of its own, distinct from the names of the topic's other sizes,
+because the lesson in play is identified by name wherever it is not carried: a room names
+the lesson it is on rather than sending it. That name is the only thing about the choice
+that travels — no message SHALL carry the choice as a setting, and nothing SHALL act on
+it.
 
 #### Scenario: The first part
 - **WHEN** the first part of a ten-word topic is chosen
@@ -69,6 +75,11 @@ reach the player, the room, the reducer or the wire.
 #### Scenario: What is played knows nothing of parts
 - **WHEN** any choice is taken and the lesson is played
 - **THEN** the lesson that is played declares no parts and selects no items by a part
+
+#### Scenario: A size can be found again by name
+- **WHEN** a participant joins a room that is teaching one part of a topic
+- **THEN** that participant is playing the same lesson, resolved from the name the room
+  gives it, and not the whole topic
 
 ### Requirement: Exercises belong to the sittings they suit
 
@@ -157,5 +168,5 @@ that already governs changing a room's lesson.
 
 #### Scenario: The size does not travel as a setting
 - **WHEN** a room is opened on any size
-- **THEN** what reaches the room is the lesson itself, and the room is not told which size
-  produced it
+- **THEN** what reaches the room is the lesson itself, named after that size, and no
+  message carries the choice as anything the room or the student acts on

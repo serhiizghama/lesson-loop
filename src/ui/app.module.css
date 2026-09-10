@@ -61,27 +61,90 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
   gap: 0.875rem;
+  /* Each card is as tall as its own contents: without this, expanding one topic's sizes
+     stretches every card beside it into a tall empty box (design D8). */
+  align-items: start;
 }
 
+/*
+ * The card is a box now rather than a button, because a topic with parts opens its sizes
+ * inside it and a button may not hold buttons (design D8). The lift on hover moves to the
+ * head, so an expanded card does not shift under the finger reaching for a size.
+ */
 .lessonCard {
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.lessonCardHead {
   display: flex;
   align-items: center;
   gap: 0.9rem;
   min-height: var(--tap);
   padding: 0.9rem 1rem;
   text-align: left;
-  background: var(--card);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
+  background: transparent;
   transition: transform 120ms ease;
 }
 
-.lessonCard:hover {
+.lessonCardHead:hover {
   transform: translateY(-2px);
 }
 
-.lessonCard:active {
+.lessonCardHead:active {
   transform: translateY(0);
+}
+
+/* The sizes, under the topic they belong to and visibly part of the same card. */
+.lessonSizes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0 0.6rem 0.6rem;
+  list-style: none;
+}
+
+.lessonSize {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 0.6rem 0.7rem;
+  text-align: left;
+  background: var(--paper);
+  border-radius: var(--radius);
+}
+
+.lessonSize:hover {
+  background: var(--accent-soft);
+}
+
+.lessonSizeEmoji {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  font-size: 1.3rem;
+  line-height: 1;
+  background: var(--card);
+  border-radius: var(--radius);
+}
+
+.lessonSizeName {
+  /*
+   * A size names what it teaches and which half it is, which is longer than a topic's
+   * name — so it wraps rather than being cut off, and the card grows downward.
+   */
+  font-size: 0.95rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .lessonEmoji {
@@ -275,6 +338,22 @@
  * pushed out of reach.
  */
 @media (max-width: 30rem) {
+  /*
+   * At a phone's width an expanded card still has to be readable: the mark shrinks and
+   * the padding closes up so the longest size label keeps its line rather than pushing
+   * the card wider than the screen.
+   */
+  .lessonSize {
+    gap: 0.55rem;
+    padding: 0.55rem 0.5rem;
+  }
+
+  .lessonSizeEmoji {
+    width: 1.9rem;
+    height: 1.9rem;
+    font-size: 1.1rem;
+  }
+
   .trail {
     order: 5;
     flex-basis: 100%;

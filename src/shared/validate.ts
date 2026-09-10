@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import type { Face, Item, ItemRef, Lesson, Spot } from './types'
+import { WHOLE, choicesOf, narrow } from './narrow'
 import { SCENE_IDS, SCENES } from './scenes'
 import { faceValue, renderTemplate, tagOfFace, tagsUsedByTemplate } from './text'
 
@@ -13,6 +14,17 @@ const faceSchema = z.custom<Face>(
 )
 
 const idSchema = z.string().min(1).regex(/^[a-z0-9-]+$/, 'must be lowercase kebab-case')
+
+/**
+ * A lesson's own id: a topic's, or a topic's plus the size it was built to — `animals`
+ * or `animals/wild`. The second form never appears in a file; it is what `narrow` gives
+ * the lesson it builds, and a built lesson is validated like any other when it arrives
+ * over the wire (`protocol.ts`).
+ */
+const lessonIdSchema = z
+  .string()
+  .min(1)
+  .regex(/^[a-z0-9-]+(?:\/[a-z0-9-]+)?$/, 'must be lowercase kebab-case, optionally <topic>/<size>')
 
 const itemSchema = z.object({
   id: idSchema,
@@ -29,9 +41,29 @@ const itemRefSchema = z.discriminatedUnion('select', [
   z.object({ select: z.literal('all') }),
   z.object({ select: z.literal('ids'), ids: z.array(idSchema).min(1) }),
   z.object({ select: z.literal('tag'), tag: z.string().min(1) }),
+  z.object({ select: z.literal('new') }),
 ])
 
-const blockBase = { id: idSchema, title: z.string().min(1), hint: z.string().min(1).optional() }
+const blockBase = {
+  id: idSchema,
+  title: z.string().min(1),
+  hint: z.string().min(1).optional(),
+  // The parts a block belongs to. Absent means every sitting; empty would mean none,
+  // which is a block nobody could reach.
+  only: z.array(idSchema).min(1).optional(),
+}
+
+/**
+ * A part names its own items; whether those names mean anything is `checkParts`' job,
+ * which reports a part naming nothing, or naming an item the topic does not declare, by
+ * name (design D6).
+ */
+const partSchema = z.object({
+  id: idSchema,
+  title: z.string().min(1),
+  emoji: z.string().min(1),
+  items: z.array(idSchema),
+})
 
 const questionSchema = z.object({ label: z.string().min(1), face: faceSchema })
 
@@ -128,23 +160,38 @@ const blockSchema = z.discriminatedUnion('type', [
 ])
 
 const lessonSchema = z.object({
-  id: idSchema,
+  id: lessonIdSchema,
   title: z.string().min(1),
   emoji: z.string().min(1),
   audience: z.enum(['kids', 'teens', 'adults']),
   l1: z.enum(['ja']).nullable(),
   items: z.array(itemSchema).min(1),
   blocks: z.array(blockSchema).min(1),
+  // Two or more, because one part is no division of a topic: it would offer the teacher
+  // the same lesson under two names.
+  parts: z.array(partSchema).min(2).optional(),
 })
 
 export type ValidationResult =
   | { ok: true; lesson: Lesson }
   | { ok: false; errors: string[] }
 
-/** Resolves the items a block works on, in a stable, declared order. */
-export function resolveItems(lesson: Lesson, ref: ItemRef): Item[] {
+/**
+ * Resolves the items a block works on, in a stable, declared order.
+ *
+ * `select: 'new'` never reaches here: it is a topic's way of saying "the words this
+ * sitting teaches", and `narrow` has resolved it to identifiers before anything is
+ * played. Reaching it is a bug, so it throws rather than guessing (design D1).
+ */
+export function resolveItems(lesson: Lesson, ref: ItemRef, block?: string): Item[] {
   if (ref.select === 'all') return lesson.items
   if (ref.select === 'tag') return lesson.items.filter((i) => i.tags?.[ref.tag] !== undefined)
+  if (ref.select === 'new') {
+    throw new Error(
+      `block "${block ?? '?'}" selects the words the sitting teaches, but this lesson was ` +
+        `never narrowed to a size`,
+    )
+  }
   const byId = new Map(lesson.items.map((i) => [i.id, i]))
   return ref.ids.flatMap((id) => {
     const item = byId.get(id)
@@ -183,7 +230,7 @@ function crossCheck(lesson: Lesson): string[] {
     for (const id of missingIds(lesson, block.items)) {
       errors.push(`${at}.items: block "${block.id}" refers to unknown item "${id}"`)
     }
-    const items = resolveItems(lesson, block.items)
+    const items = resolveItems(lesson, block.items, block.id)
     if (items.length === 0) {
       errors.push(`${at}.items: block "${block.id}" selects no items`)
       continue
@@ -397,7 +444,61 @@ function faceMissing(item: Item, face: Face, lesson: Lesson): boolean {
   return tag === null || item.tags?.[tag] === undefined
 }
 
-/** Validates a lesson's shape and its internal references. Never throws. */
+/**
+ * Checks the parts themselves, before anything is narrowed: a malformed `parts` makes
+ * every size derived from it meaningless, so these run first and alone (design D6).
+ */
+function checkParts(lesson: Lesson): string[] {
+  const errors: string[] = []
+  const parts = lesson.parts ?? []
+  const partIds = new Set<string>()
+  const known = new Set(lesson.items.map((i) => i.id))
+  const claimed = new Map<string, string>()
+
+  for (const [i, part] of parts.entries()) {
+    const at = `parts.${i}`
+    if (partIds.has(part.id)) errors.push(`${at}.id: duplicate part id "${part.id}"`)
+    partIds.add(part.id)
+
+    if (part.items.length === 0) {
+      errors.push(`${at}.items: part "${part.id}" names no items, so it is no sitting at all`)
+    }
+    for (const id of part.items) {
+      if (!known.has(id)) {
+        errors.push(`${at}.items: part "${part.id}" names unknown item "${id}"`)
+        continue
+      }
+      const owner = claimed.get(id)
+      if (owner === undefined) claimed.set(id, part.id)
+      else {
+        errors.push(
+          `${at}.items: item "${id}" is named by part "${owner}" as well as part "${part.id}"`,
+        )
+      }
+    }
+  }
+
+  for (const [i, block] of lesson.blocks.entries()) {
+    for (const id of block.only ?? []) {
+      if (!partIds.has(id)) {
+        errors.push(
+          `blocks.${i}.only: block "${block.id}" belongs to part "${id}", which the topic ` +
+            `does not declare`,
+        )
+      }
+    }
+  }
+  return errors
+}
+
+/**
+ * Validates a lesson's shape and its internal references, at every size it offers.
+ *
+ * A topic can be sound as written and unsound as a sitting — a sorting exercise whose
+ * buckets all fill from one part is no question at all once that part is played alone —
+ * so the cross-checks run over each derived lesson rather than over the file (design D6).
+ * Never throws.
+ */
 export function validateLesson(data: unknown): ValidationResult {
   const parsed = lessonSchema.safeParse(data)
   if (!parsed.success) {
@@ -410,6 +511,16 @@ export function validateLesson(data: unknown): ValidationResult {
     }
   }
   const lesson = parsed.data as Lesson
-  const errors = crossCheck(lesson)
+
+  const structural = checkParts(lesson)
+  if (structural.length > 0) return { ok: false, errors: structural }
+
+  const sizes = lesson.parts === undefined ? [WHOLE] : choicesOf(lesson).map((c) => c.id)
+  const errors = sizes.flatMap((size) => {
+    const built = crossCheck(narrow(lesson, size))
+    // An un-parted topic has one size and no name for it: its errors read as they always did.
+    if (lesson.parts === undefined) return built
+    return built.map((error) => `size "${size}": ${error}`)
+  })
   return errors.length > 0 ? { ok: false, errors } : { ok: true, lesson }
 }

@@ -107,13 +107,20 @@ describe('the answer key names a place in words a teacher can say', () => {
     expect(spotInWords([0.75, 0.87, 0.1, 0.06])).toBe('bottom · right')
   })
 
-  it('names all nine places of the Body Parts diagram distinctly', () => {
-    const labelBlock = bodyParts.blocks.find((b) => b.type === 'hotspot') as {
+  // Two of them: the first sitting labels a face, the second the whole figure. A place
+  // named the same as its neighbour would read as the same answer twice on the key.
+  it('names every place of each Body Parts diagram distinctly', () => {
+    const labels = bodyParts.blocks.filter((b) => b.type === 'hotspot') as Array<{
+      id: string
       spots: Record<string, Spot>
+    }>
+    expect(labels.map((b) => b.id)).toEqual(['label-face', 'label'])
+    for (const block of labels) {
+      const said = Object.values(block.spots).map((spot) => spotInWords(spot))
+      expect(said.length, block.id).toBeGreaterThan(0)
+      expect(new Set(said).size, block.id).toBe(said.length)
     }
-    const said = Object.values(labelBlock.spots).map((spot) => spotInWords(spot))
-    expect(said).toHaveLength(9)
-    expect(new Set(said).size).toBe(9)
+    expect(Object.keys(labels[1]?.spots ?? {})).toHaveLength(9)
   })
 
   it('gives the teacher the word against where it goes', () => {

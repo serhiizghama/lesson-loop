@@ -4,71 +4,318 @@
   "emoji": "🎨",
   "audience": "kids",
   "l1": "ja",
+  "parts": [
+    {
+      "id": "bright",
+      "title": "Colours 1 · First Colours",
+      "emoji": "🔴",
+      "items": [
+        "red",
+        "blue",
+        "yellow",
+        "green",
+        "pink"
+      ]
+    },
+    {
+      "id": "more",
+      "title": "Colours 2 · More Colours",
+      "emoji": "🟣",
+      "items": [
+        "orange",
+        "purple",
+        "brown",
+        "black",
+        "white"
+      ]
+    }
+  ],
   "items": [
-    { "id": "red", "en": "red", "emoji": "🔴", "article": "none", "l1": { "word": "赤", "romaji": "aka" }, "example": "It is red.", "tags": { "thing": "an apple", "where": "plate" } },
-    { "id": "blue", "en": "blue", "emoji": "🔵", "article": "none", "l1": { "word": "青", "romaji": "ao" }, "example": "It is blue.", "tags": { "thing": "the sky", "where": "sky" } },
-    { "id": "yellow", "en": "yellow", "emoji": "🟡", "article": "none", "l1": { "word": "黄色", "romaji": "kiiro" }, "example": "It is yellow.", "tags": { "thing": "the sun", "where": "sky" } },
-    { "id": "green", "en": "green", "emoji": "🟢", "article": "none", "l1": { "word": "緑", "romaji": "midori" }, "example": "It is green.", "tags": { "thing": "the grass", "where": "garden" } },
-    { "id": "orange", "en": "orange", "emoji": "🟠", "article": "none", "l1": { "word": "オレンジ", "romaji": "orenji" }, "example": "It is orange.", "tags": { "thing": "an orange", "where": "plate" } },
-    { "id": "purple", "en": "purple", "emoji": "🟣", "article": "none", "l1": { "word": "紫", "romaji": "murasaki" }, "example": "It is purple.", "tags": { "thing": "a grape", "where": "plate" } },
-    { "id": "pink", "en": "pink", "emoji": "💗", "article": "none", "l1": { "word": "ピンク", "romaji": "pinku" }, "example": "It is pink.", "tags": { "thing": "a flower", "where": "garden" } },
-    { "id": "brown", "en": "brown", "emoji": "🟤", "article": "none", "l1": { "word": "茶色", "romaji": "chairo" }, "example": "It is brown.", "tags": { "thing": "a tree", "where": "garden" } },
-    { "id": "black", "en": "black", "emoji": "⚫", "article": "none", "l1": { "word": "黒", "romaji": "kuro" }, "example": "It is black.", "tags": { "thing": "the night", "where": "sky" } },
-    { "id": "white", "en": "white", "emoji": "⚪", "article": "none", "l1": { "word": "白", "romaji": "shiro" }, "example": "It is white.", "tags": { "thing": "a cloud", "where": "sky" } }
+    {
+      "id": "red",
+      "en": "red",
+      "emoji": "🔴",
+      "article": "none",
+      "l1": {
+        "word": "赤",
+        "romaji": "aka"
+      },
+      "example": "It is red.",
+      "tags": {
+        "thing": "an apple",
+        "where": "plate"
+      }
+    },
+    {
+      "id": "blue",
+      "en": "blue",
+      "emoji": "🔵",
+      "article": "none",
+      "l1": {
+        "word": "青",
+        "romaji": "ao"
+      },
+      "example": "It is blue.",
+      "tags": {
+        "thing": "the sky",
+        "where": "sky"
+      }
+    },
+    {
+      "id": "yellow",
+      "en": "yellow",
+      "emoji": "🟡",
+      "article": "none",
+      "l1": {
+        "word": "黄色",
+        "romaji": "kiiro"
+      },
+      "example": "It is yellow.",
+      "tags": {
+        "thing": "the sun",
+        "where": "sky"
+      }
+    },
+    {
+      "id": "green",
+      "en": "green",
+      "emoji": "🟢",
+      "article": "none",
+      "l1": {
+        "word": "緑",
+        "romaji": "midori"
+      },
+      "example": "It is green.",
+      "tags": {
+        "thing": "the grass",
+        "where": "garden"
+      }
+    },
+    {
+      "id": "orange",
+      "en": "orange",
+      "emoji": "🟠",
+      "article": "none",
+      "l1": {
+        "word": "オレンジ",
+        "romaji": "orenji"
+      },
+      "example": "It is orange.",
+      "tags": {
+        "thing": "an orange",
+        "where": "plate"
+      }
+    },
+    {
+      "id": "purple",
+      "en": "purple",
+      "emoji": "🟣",
+      "article": "none",
+      "l1": {
+        "word": "紫",
+        "romaji": "murasaki"
+      },
+      "example": "It is purple.",
+      "tags": {
+        "thing": "a grape",
+        "where": "plate"
+      }
+    },
+    {
+      "id": "pink",
+      "en": "pink",
+      "emoji": "💗",
+      "article": "none",
+      "l1": {
+        "word": "ピンク",
+        "romaji": "pinku"
+      },
+      "example": "It is pink.",
+      "tags": {
+        "thing": "a flower",
+        "where": "garden"
+      }
+    },
+    {
+      "id": "brown",
+      "en": "brown",
+      "emoji": "🟤",
+      "article": "none",
+      "l1": {
+        "word": "茶色",
+        "romaji": "chairo"
+      },
+      "example": "It is brown.",
+      "tags": {
+        "thing": "a tree",
+        "where": "garden"
+      }
+    },
+    {
+      "id": "black",
+      "en": "black",
+      "emoji": "⚫",
+      "article": "none",
+      "l1": {
+        "word": "黒",
+        "romaji": "kuro"
+      },
+      "example": "It is black.",
+      "tags": {
+        "thing": "the night",
+        "where": "sky"
+      }
+    },
+    {
+      "id": "white",
+      "en": "white",
+      "emoji": "⚪",
+      "article": "none",
+      "l1": {
+        "word": "白",
+        "romaji": "shiro"
+      },
+      "example": "It is white.",
+      "tags": {
+        "thing": "a cloud",
+        "where": "sky"
+      }
+    }
   ],
   "blocks": [
     {
-      "id": "vocab", "type": "cards", "title": "🎨 What Colour Is It?",
+      "id": "vocab",
+      "type": "cards",
+      "title": "🎨 What Colour Is It?",
       "hint": "Tap a colour to hear it and see the Japanese word.",
-      "items": { "select": "all" }, "front": "emoji", "back": ["en", "l1"]
+      "items": {
+        "select": "new"
+      },
+      "front": "emoji",
+      "back": [
+        "en",
+        "l1"
+      ]
     },
     {
-      "id": "things", "type": "cards", "title": "🍎 Colours Around Us",
+      "id": "things",
+      "type": "cards",
+      "title": "🍎 Colours Around Us",
       "hint": "Tap a colour to hear something that has it.",
-      "items": { "select": "tag", "tag": "thing" }, "front": "emoji", "back": ["en", "tag:thing"],
+      "items": {
+        "select": "new"
+      },
+      "front": "emoji",
+      "back": [
+        "en",
+        "tag:thing"
+      ],
       "speak": "{en} — like {tag:thing}!"
     },
     {
-      "id": "pairs", "type": "match", "title": "🎯 Matching Game",
+      "id": "pairs",
+      "type": "match",
+      "title": "🎯 Matching Game",
+      "only": [
+        "more"
+      ],
       "hint": "Tap the colour, then tap the matching word.",
-      "items": { "select": "all" }, "left": "emoji", "right": "en", "count": 6
+      "items": {
+        "select": "all"
+      },
+      "left": "emoji",
+      "right": "en",
+      "count": 6
     },
     {
-      "id": "say", "type": "sentence", "title": "💬 Say It Bigger!",
+      "id": "say",
+      "type": "sentence",
+      "title": "💬 Say It Bigger!",
       "hint": "Choose a colour. Then grow your sentence, one step at a time.",
-      "items": { "select": "all" },
+      "items": {
+        "select": "new"
+      },
       "levels": [
-        { "label": "One word", "template": "{en}" },
-        { "label": "It is…", "template": "{it} {be} {en}." },
-        { "label": "I like…", "template": "I like {en}." }
+        {
+          "label": "One word",
+          "template": "{en}"
+        },
+        {
+          "label": "It is…",
+          "template": "{it} {be} {en}."
+        },
+        {
+          "label": "I like…",
+          "template": "I like {en}."
+        }
       ]
     },
     {
-      "id": "hear", "type": "listen", "title": "👂 Which Colour Is It?",
+      "id": "hear",
+      "type": "listen",
+      "title": "👂 Which Colour Is It?",
       "hint": "Listen, then tap the colour you heard.",
-      "items": { "select": "all" }, "choices": 4
+      "items": {
+        "select": "all"
+      },
+      "choices": 4
     },
     {
-      "id": "thingmatch", "type": "match", "title": "🔗 What Is That Colour?",
+      "id": "thingmatch",
+      "type": "match",
+      "title": "🔗 What Is That Colour?",
       "hint": "Tap a colour, then tap the thing that has it.",
-      "items": { "select": "tag", "tag": "thing" }, "left": "emoji", "right": "tag:thing", "count": 5,
+      "items": {
+        "select": "tag",
+        "tag": "thing"
+      },
+      "left": "emoji",
+      "right": "tag:thing",
+      "count": 5,
       "speak": "{en} — like {tag:thing}!"
     },
     {
-      "id": "where", "type": "sort", "title": "🔍 Where Did We See It?",
+      "id": "where",
+      "type": "sort",
+      "title": "🔍 Where Did We See It?",
       "hint": "Tap a colour, then tap where we saw it.",
-      "items": { "select": "all" }, "by": "where",
+      "items": {
+        "select": "all"
+      },
+      "by": "where",
       "buckets": [
-        { "key": "sky", "label": "In the sky", "emoji": "☁️" },
-        { "key": "garden", "label": "In the garden", "emoji": "🌳" },
-        { "key": "plate", "label": "On my plate", "emoji": "🍽️" }
+        {
+          "key": "sky",
+          "label": "In the sky",
+          "emoji": "☁️"
+        },
+        {
+          "key": "garden",
+          "label": "In the garden",
+          "emoji": "🌳"
+        },
+        {
+          "key": "plate",
+          "label": "On my plate",
+          "emoji": "🍽️"
+        }
       ]
     },
     {
-      "id": "touch", "type": "tpr", "title": "🎮 Colour Hunt!",
+      "id": "touch",
+      "type": "tpr",
+      "title": "🎮 Colour Hunt!",
       "hint": "Listen, then run and touch that colour!",
-      "items": { "select": "all" }, "prompt": "Touch something {en}!"
+      "items": {
+        "select": "all"
+      },
+      "prompt": "Touch something {en}!"
     },
-    { "id": "done", "type": "finish", "title": "🎉 Great job!", "message": "Great job learning colours!" }
+    {
+      "id": "done",
+      "type": "finish",
+      "title": "🎉 Great job!",
+      "message": "Great job learning colours!"
+    }
   ]
 }

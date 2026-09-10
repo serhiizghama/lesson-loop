@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { createLessonState } from '../src/shared/reducer'
 import { RoomCore } from '../src/shared/room'
 import type { Lesson } from '../src/shared/types'
-import { lessonFiles, loadLesson, playToTheEnd } from './support/play'
+import { playToTheEnd, playableLessons } from './support/play'
 
 /**
  * The room broadcasts its whole state after every action rather than a patch (design
@@ -12,10 +12,10 @@ import { lessonFiles, loadLesson, playToTheEnd } from './support/play'
  */
 const LIMIT_BYTES = 32 * 1024
 
+/** The largest lesson anyone can open — a size, not a file: only a size is ever played. */
 function largestLesson(): Lesson {
-  const lessons = lessonFiles.map(loadLesson)
-  const biggest = lessons
-    .map((lesson) => ({ lesson, size: JSON.stringify(lesson).length }))
+  const biggest = playableLessons()
+    .map(([, lesson]) => ({ lesson, size: JSON.stringify(lesson).length }))
     .sort((a, b) => b.size - a.size)[0]
   if (biggest === undefined) throw new Error('lessons/ is empty')
   return biggest.lesson

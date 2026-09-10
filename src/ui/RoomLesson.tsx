@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { lessons } from '@/lessons'
+import { playableLessons } from '@/lessons'
 import type { Lesson } from '@/shared/types'
 import { LessonPlayer } from './LessonPlayer'
 import { TeacherPanel } from './TeacherPanel'
@@ -71,7 +71,9 @@ export function RoomLesson({ code, teacherKey, onExit }: {
         teacher ? (
           <TeacherPanel
             lesson={lesson}
-            lessons={lessons}
+            /* Every size, not every file: a room is switched onto a lesson, and a topic
+               is not one — its exercises still say "the words this sitting teaches". */
+            lessons={playableLessons()}
             state={room.state}
             locked={room.locked}
             muted={room.muted}

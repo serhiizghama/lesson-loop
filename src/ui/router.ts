@@ -10,8 +10,12 @@ import { useCallback, useEffect, useState } from 'react'
  */
 export type Route =
   | { name: 'home' }
-  /** A lesson opened from the home screen: solo, offline, no room. */
-  | { name: 'lesson'; lessonId: string }
+  /**
+   * A lesson opened from the home screen: solo, offline, no room. `choice` is the size
+   * the teacher picked — a part's id, or `all` — and is absent when the address names
+   * only the topic, which offers its sizes instead of starting one (design D5).
+   */
+  | { name: 'lesson'; lessonId: string; choice?: string }
   | { name: 'teacher'; code: string; key: string }
   | { name: 'student'; code: string }
   | { name: 'unknown' }
@@ -20,7 +24,11 @@ export function parseRoute(pathname: string, hash: string): Route {
   const parts = pathname.split('/').filter((p) => p !== '')
   if (parts.length === 0) return { name: 'home' }
 
-  const [head, tail] = parts
+  const [head, tail, size] = parts
+  // The third segment belongs to `l` alone: a room's address is its code and nothing else.
+  if (parts.length === 3 && head === 'l' && tail !== undefined && size !== undefined) {
+    return { name: 'lesson', lessonId: tail, choice: size }
+  }
   if (parts.length === 2 && tail !== undefined) {
     if (head === 'l') return { name: 'lesson', lessonId: tail }
     if (head === 'r') return { name: 'student', code: tail.toUpperCase() }
@@ -30,7 +38,8 @@ export function parseRoute(pathname: string, hash: string): Route {
 }
 
 export const homePath = '/'
-export const lessonPath = (lessonId: string): string => `/l/${lessonId}`
+export const lessonPath = (lessonId: string, choice?: string): string =>
+  choice === undefined ? `/l/${lessonId}` : `/l/${lessonId}/${choice}`
 export const studentPath = (code: string): string => `/r/${code}`
 export const teacherPath = (code: string, key: string): string => `/t/${code}#${key}`
 

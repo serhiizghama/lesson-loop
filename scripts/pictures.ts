@@ -57,7 +57,7 @@ const STYLE =
  * attached, which holds line weight and palette together far better than repeating
  * adjectives does. Delete it and the whole set redraws — that is the intent.
  */
-const ANCHOR = 'animals-1/dog'
+const ANCHOR = 'animals/dog'
 
 type Recipe = {
   /** The subject, as the model is asked for it. */
@@ -67,10 +67,9 @@ type Recipe = {
 /**
  * Ordered only in that the anchor is drawn first; everything else is drawn against it.
  *
- * Keyed by *topic*, not by lesson: a topic too long for one sitting is split across
- * several lesson files (design D112), and the same dog is the same dog in both halves of
- * Animals. `recipeFor` falls back from the lesson to its topic, so splitting a topic
- * costs no entries here and adds no duplicates to maintain.
+ * Keyed by *topic*, not by lesson: the same dog is the same dog in both halves of
+ * Animals, and a topic keeps one set of pictures however it is divided into parts.
+ * `recipeFor` falls back from the lesson to its topic.
  */
 const SUBJECTS: Record<string, Recipe> = {
   // ── animals ───────────────────────────────────────────────────────────────
@@ -217,9 +216,10 @@ function die(message: string): never {
 }
 
 /**
- * The topic a lesson belongs to: `animals-2` is Animals, `colours` is Colours. A trailing
- * part number is the only thing stripped, so a lesson whose id genuinely ends in a digit
- * has to avoid the hyphen — which every id here does.
+ * The topic a lesson belongs to. A topic is one file now — it declares its parts inside
+ * itself rather than being split across `-1` and `-2` files — so this is the identity
+ * for every shipped lesson. The trailing part number is still stripped, for a lesson
+ * written before the merge.
  */
 function topicOf(lessonId: string): string {
   return lessonId.replace(/-\d+$/, '')

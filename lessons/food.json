@@ -4,60 +4,291 @@
   "emoji": "🍱",
   "audience": "kids",
   "l1": "ja",
+  "parts": [
+    {
+      "id": "everyday",
+      "title": "Food 1 · Everyday Food",
+      "emoji": "🍎",
+      "items": [
+        "apple",
+        "banana",
+        "rice",
+        "milk",
+        "cake"
+      ]
+    },
+    {
+      "id": "more",
+      "title": "Food 2 · More Food",
+      "emoji": "🍞",
+      "items": [
+        "egg",
+        "bread",
+        "noodles",
+        "water",
+        "ice-cream"
+      ]
+    }
+  ],
   "items": [
-    { "id": "apple", "en": "apple", "emoji": "🍎", "l1": { "word": "りんご", "romaji": "ringo" }, "example": "It is an apple.", "tags": { "group": "fruit", "act": "Take a big bite of an apple!" } },
-    { "id": "banana", "en": "banana", "emoji": "🍌", "l1": { "word": "バナナ", "romaji": "banana" }, "example": "It is a banana.", "tags": { "group": "fruit", "act": "Peel a banana and eat it!" } },
-    { "id": "egg", "en": "egg", "emoji": "🥚", "l1": { "word": "たまご", "romaji": "tamago" }, "example": "It is an egg.", "tags": { "group": "meal", "act": "Crack an egg — crack, crack!" } },
-    { "id": "rice", "en": "rice", "emoji": "🍙", "article": "none", "l1": { "word": "ごはん", "romaji": "gohan" }, "example": "It is rice.", "tags": { "group": "meal", "act": "Eat rice with chopsticks!" } },
-    { "id": "bread", "en": "bread", "emoji": "🍞", "article": "none", "l1": { "word": "パン", "romaji": "pan" }, "example": "It is bread.", "tags": { "group": "meal", "act": "Munch some bread — nom, nom!" } },
-    { "id": "noodles", "en": "noodles", "emoji": "🍜", "plural": true, "l1": { "word": "めん", "romaji": "men" }, "example": "They are noodles.", "tags": { "group": "meal", "act": "Slurp your noodles!" } },
-    { "id": "milk", "en": "milk", "emoji": "🥛", "article": "none", "l1": { "word": "ミルク", "romaji": "miruku" }, "example": "It is milk.", "tags": { "group": "drink", "act": "Drink your milk — glug, glug!" } },
-    { "id": "water", "en": "water", "emoji": "💧", "article": "none", "l1": { "word": "水", "romaji": "mizu" }, "example": "It is water.", "tags": { "group": "drink", "act": "Drink a big glass of water!" } },
-    { "id": "cake", "en": "cake", "emoji": "🍰", "l1": { "word": "ケーキ", "romaji": "keeki" }, "example": "It is a cake.", "tags": { "group": "treat", "act": "Blow out the candles on the cake!" } },
-    { "id": "ice-cream", "en": "ice cream", "emoji": "🍦", "article": "none", "l1": { "word": "アイス", "romaji": "aisu" }, "example": "It is ice cream.", "tags": { "group": "treat", "act": "Lick your ice cream — yum!" } }
+    {
+      "id": "apple",
+      "en": "apple",
+      "emoji": "🍎",
+      "l1": {
+        "word": "りんご",
+        "romaji": "ringo"
+      },
+      "example": "It is an apple.",
+      "tags": {
+        "group": "fruit",
+        "act": "Take a big bite of an apple!"
+      }
+    },
+    {
+      "id": "banana",
+      "en": "banana",
+      "emoji": "🍌",
+      "l1": {
+        "word": "バナナ",
+        "romaji": "banana"
+      },
+      "example": "It is a banana.",
+      "tags": {
+        "group": "fruit",
+        "act": "Peel a banana and eat it!"
+      }
+    },
+    {
+      "id": "egg",
+      "en": "egg",
+      "emoji": "🥚",
+      "l1": {
+        "word": "たまご",
+        "romaji": "tamago"
+      },
+      "example": "It is an egg.",
+      "tags": {
+        "group": "meal",
+        "act": "Crack an egg — crack, crack!"
+      }
+    },
+    {
+      "id": "rice",
+      "en": "rice",
+      "emoji": "🍙",
+      "article": "none",
+      "l1": {
+        "word": "ごはん",
+        "romaji": "gohan"
+      },
+      "example": "It is rice.",
+      "tags": {
+        "group": "meal",
+        "act": "Eat rice with chopsticks!"
+      }
+    },
+    {
+      "id": "bread",
+      "en": "bread",
+      "emoji": "🍞",
+      "article": "none",
+      "l1": {
+        "word": "パン",
+        "romaji": "pan"
+      },
+      "example": "It is bread.",
+      "tags": {
+        "group": "meal",
+        "act": "Munch some bread — nom, nom!"
+      }
+    },
+    {
+      "id": "noodles",
+      "en": "noodles",
+      "emoji": "🍜",
+      "plural": true,
+      "l1": {
+        "word": "めん",
+        "romaji": "men"
+      },
+      "example": "They are noodles.",
+      "tags": {
+        "group": "meal",
+        "act": "Slurp your noodles!"
+      }
+    },
+    {
+      "id": "milk",
+      "en": "milk",
+      "emoji": "🥛",
+      "article": "none",
+      "l1": {
+        "word": "ミルク",
+        "romaji": "miruku"
+      },
+      "example": "It is milk.",
+      "tags": {
+        "group": "drink",
+        "act": "Drink your milk — glug, glug!"
+      }
+    },
+    {
+      "id": "water",
+      "en": "water",
+      "emoji": "💧",
+      "article": "none",
+      "l1": {
+        "word": "水",
+        "romaji": "mizu"
+      },
+      "example": "It is water.",
+      "tags": {
+        "group": "drink",
+        "act": "Drink a big glass of water!"
+      }
+    },
+    {
+      "id": "cake",
+      "en": "cake",
+      "emoji": "🍰",
+      "l1": {
+        "word": "ケーキ",
+        "romaji": "keeki"
+      },
+      "example": "It is a cake.",
+      "tags": {
+        "group": "treat",
+        "act": "Blow out the candles on the cake!"
+      }
+    },
+    {
+      "id": "ice-cream",
+      "en": "ice cream",
+      "emoji": "🍦",
+      "article": "none",
+      "l1": {
+        "word": "アイス",
+        "romaji": "aisu"
+      },
+      "example": "It is ice cream.",
+      "tags": {
+        "group": "treat",
+        "act": "Lick your ice cream — yum!"
+      }
+    }
   ],
   "blocks": [
     {
-      "id": "vocab", "type": "cards", "title": "🍽️ What Is It?",
+      "id": "vocab",
+      "type": "cards",
+      "title": "🍽️ What Is It?",
       "hint": "Tap a card to hear it and see the Japanese word.",
-      "items": { "select": "all" }, "front": "emoji", "back": ["en", "l1"]
+      "items": {
+        "select": "new"
+      },
+      "front": "emoji",
+      "back": [
+        "en",
+        "l1"
+      ]
     },
     {
-      "id": "pairs", "type": "match", "title": "🎯 Matching Game",
+      "id": "pairs",
+      "type": "match",
+      "title": "🎯 Matching Game",
+      "only": [
+        "more"
+      ],
       "hint": "Tap the picture, then tap the matching word.",
-      "items": { "select": "all" }, "left": "emoji", "right": "en", "count": 6
+      "items": {
+        "select": "all"
+      },
+      "left": "emoji",
+      "right": "en",
+      "count": 6
     },
     {
-      "id": "say", "type": "sentence", "title": "💬 Say It Bigger!",
+      "id": "say",
+      "type": "sentence",
+      "title": "💬 Say It Bigger!",
       "hint": "Choose a food. Then grow your sentence, one step at a time.",
-      "items": { "select": "all" },
+      "items": {
+        "select": "new"
+      },
       "levels": [
-        { "label": "One word", "template": "{en}" },
-        { "label": "It is…", "template": "{it} {be} {article} {en}." },
-        { "label": "I want…", "template": "I want {article} {en}, please." }
+        {
+          "label": "One word",
+          "template": "{en}"
+        },
+        {
+          "label": "It is…",
+          "template": "{it} {be} {article} {en}."
+        },
+        {
+          "label": "I want…",
+          "template": "I want {article} {en}, please."
+        }
       ]
     },
     {
-      "id": "hear", "type": "listen", "title": "👂 Which One Is It?",
+      "id": "hear",
+      "type": "listen",
+      "title": "👂 Which One Is It?",
       "hint": "Listen, then tap the food you heard.",
-      "items": { "select": "all" }, "choices": 4
+      "items": {
+        "select": "all"
+      },
+      "choices": 4
     },
     {
-      "id": "groups", "type": "sort", "title": "🧺 Put It Away!",
+      "id": "groups",
+      "type": "sort",
+      "title": "🧺 Put It Away!",
       "hint": "Tap a food, then tap the basket it belongs in.",
-      "items": { "select": "all" }, "by": "group",
+      "items": {
+        "select": "all"
+      },
+      "by": "group",
       "buckets": [
-        { "key": "fruit", "label": "Fruit", "emoji": "🍓" },
-        { "key": "meal", "label": "A meal", "emoji": "🍽️" },
-        { "key": "drink", "label": "A drink", "emoji": "🥤" },
-        { "key": "treat", "label": "A treat", "emoji": "🍬" }
+        {
+          "key": "fruit",
+          "label": "Fruit",
+          "emoji": "🍓"
+        },
+        {
+          "key": "meal",
+          "label": "A meal",
+          "emoji": "🍽️"
+        },
+        {
+          "key": "drink",
+          "label": "A drink",
+          "emoji": "🥤"
+        },
+        {
+          "key": "treat",
+          "label": "A treat",
+          "emoji": "🍬"
+        }
       ]
     },
     {
-      "id": "eat", "type": "tpr", "title": "🎮 Let's Eat!",
+      "id": "eat",
+      "type": "tpr",
+      "title": "🎮 Let's Eat!",
       "hint": "Listen, then act it out!",
-      "items": { "select": "tag", "tag": "act" }, "prompt": "{tag:act}"
+      "items": {
+        "select": "tag",
+        "tag": "act"
+      },
+      "prompt": "{tag:act}"
     },
-    { "id": "done", "type": "finish", "title": "🎉 Great job!", "message": "Great job learning food words!" }
+    {
+      "id": "done",
+      "type": "finish",
+      "title": "🎉 Great job!",
+      "message": "Great job learning food words!"
+    }
   ]
 }

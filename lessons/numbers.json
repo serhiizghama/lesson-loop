@@ -4,63 +4,308 @@
   "emoji": "🔢",
   "audience": "kids",
   "l1": "ja",
+  "parts": [
+    {
+      "id": "small",
+      "title": "Numbers 1 · One to Five",
+      "emoji": "5️⃣",
+      "items": [
+        "one",
+        "two",
+        "three",
+        "four",
+        "five"
+      ]
+    },
+    {
+      "id": "big",
+      "title": "Numbers 2 · Six to Ten",
+      "emoji": "🔟",
+      "items": [
+        "six",
+        "seven",
+        "eight",
+        "nine",
+        "ten"
+      ]
+    }
+  ],
   "items": [
-    { "id": "one", "en": "one", "emoji": "1️⃣", "article": "none", "l1": { "word": "一", "romaji": "ichi" }, "example": "It is one.", "tags": { "dots": "🍎", "size": "small", "move": "Clap one time!" } },
-    { "id": "two", "en": "two", "emoji": "2️⃣", "article": "none", "l1": { "word": "二", "romaji": "ni" }, "example": "It is two.", "tags": { "dots": "🍎🍎", "size": "small", "move": "Jump two times!" } },
-    { "id": "three", "en": "three", "emoji": "3️⃣", "article": "none", "l1": { "word": "三", "romaji": "san" }, "example": "It is three.", "tags": { "dots": "🍎🍎🍎", "size": "small", "move": "Clap three times!" } },
-    { "id": "four", "en": "four", "emoji": "4️⃣", "article": "none", "l1": { "word": "四", "romaji": "yon" }, "example": "It is four.", "tags": { "dots": "🍎🍎🍎🍎", "size": "small", "move": "Stomp four times!" } },
-    { "id": "five", "en": "five", "emoji": "5️⃣", "article": "none", "l1": { "word": "五", "romaji": "go" }, "example": "It is five.", "tags": { "dots": "🍎🍎🍎🍎🍎", "size": "small", "move": "Wave five times!" } },
-    { "id": "six", "en": "six", "emoji": "6️⃣", "article": "none", "l1": { "word": "六", "romaji": "roku" }, "example": "It is six.", "tags": { "size": "big", "move": "Jump six times!" } },
-    { "id": "seven", "en": "seven", "emoji": "7️⃣", "article": "none", "l1": { "word": "七", "romaji": "nana" }, "example": "It is seven.", "tags": { "size": "big", "move": "Clap seven times!" } },
-    { "id": "eight", "en": "eight", "emoji": "8️⃣", "article": "none", "l1": { "word": "八", "romaji": "hachi" }, "example": "It is eight.", "tags": { "size": "big", "move": "Touch your nose eight times!" } },
-    { "id": "nine", "en": "nine", "emoji": "9️⃣", "article": "none", "l1": { "word": "九", "romaji": "kyuu" }, "example": "It is nine.", "tags": { "size": "big", "move": "Blink nine times!" } },
-    { "id": "ten", "en": "ten", "emoji": "🔟", "article": "none", "l1": { "word": "十", "romaji": "juu" }, "example": "It is ten.", "tags": { "size": "big", "move": "Clap ten times — count them out loud!" } }
+    {
+      "id": "one",
+      "en": "one",
+      "emoji": "1️⃣",
+      "article": "none",
+      "l1": {
+        "word": "一",
+        "romaji": "ichi"
+      },
+      "example": "It is one.",
+      "tags": {
+        "dots": "🍎",
+        "size": "small",
+        "move": "Clap one time!"
+      }
+    },
+    {
+      "id": "two",
+      "en": "two",
+      "emoji": "2️⃣",
+      "article": "none",
+      "l1": {
+        "word": "二",
+        "romaji": "ni"
+      },
+      "example": "It is two.",
+      "tags": {
+        "dots": "🍎🍎",
+        "size": "small",
+        "move": "Jump two times!"
+      }
+    },
+    {
+      "id": "three",
+      "en": "three",
+      "emoji": "3️⃣",
+      "article": "none",
+      "l1": {
+        "word": "三",
+        "romaji": "san"
+      },
+      "example": "It is three.",
+      "tags": {
+        "dots": "🍎🍎🍎",
+        "size": "small",
+        "move": "Clap three times!"
+      }
+    },
+    {
+      "id": "four",
+      "en": "four",
+      "emoji": "4️⃣",
+      "article": "none",
+      "l1": {
+        "word": "四",
+        "romaji": "yon"
+      },
+      "example": "It is four.",
+      "tags": {
+        "dots": "🍎🍎🍎🍎",
+        "size": "small",
+        "move": "Stomp four times!"
+      }
+    },
+    {
+      "id": "five",
+      "en": "five",
+      "emoji": "5️⃣",
+      "article": "none",
+      "l1": {
+        "word": "五",
+        "romaji": "go"
+      },
+      "example": "It is five.",
+      "tags": {
+        "dots": "🍎🍎🍎🍎🍎",
+        "size": "small",
+        "move": "Wave five times!"
+      }
+    },
+    {
+      "id": "six",
+      "en": "six",
+      "emoji": "6️⃣",
+      "article": "none",
+      "l1": {
+        "word": "六",
+        "romaji": "roku"
+      },
+      "example": "It is six.",
+      "tags": {
+        "size": "big",
+        "move": "Jump six times!"
+      }
+    },
+    {
+      "id": "seven",
+      "en": "seven",
+      "emoji": "7️⃣",
+      "article": "none",
+      "l1": {
+        "word": "七",
+        "romaji": "nana"
+      },
+      "example": "It is seven.",
+      "tags": {
+        "size": "big",
+        "move": "Clap seven times!"
+      }
+    },
+    {
+      "id": "eight",
+      "en": "eight",
+      "emoji": "8️⃣",
+      "article": "none",
+      "l1": {
+        "word": "八",
+        "romaji": "hachi"
+      },
+      "example": "It is eight.",
+      "tags": {
+        "size": "big",
+        "move": "Touch your nose eight times!"
+      }
+    },
+    {
+      "id": "nine",
+      "en": "nine",
+      "emoji": "9️⃣",
+      "article": "none",
+      "l1": {
+        "word": "九",
+        "romaji": "kyuu"
+      },
+      "example": "It is nine.",
+      "tags": {
+        "size": "big",
+        "move": "Blink nine times!"
+      }
+    },
+    {
+      "id": "ten",
+      "en": "ten",
+      "emoji": "🔟",
+      "article": "none",
+      "l1": {
+        "word": "十",
+        "romaji": "juu"
+      },
+      "example": "It is ten.",
+      "tags": {
+        "size": "big",
+        "move": "Clap ten times — count them out loud!"
+      }
+    }
   ],
   "blocks": [
     {
-      "id": "vocab", "type": "cards", "title": "🔢 Numbers 1 to 10",
+      "id": "vocab",
+      "type": "cards",
+      "title": "🔢 Numbers 1 to 10",
       "hint": "Tap a number to hear it and see the Japanese word.",
-      "items": { "select": "all" }, "front": "emoji", "back": ["en", "l1"]
+      "items": {
+        "select": "new"
+      },
+      "front": "emoji",
+      "back": [
+        "en",
+        "l1"
+      ]
     },
     {
-      "id": "count", "type": "cards", "title": "🍎 How Many Apples?",
+      "id": "count",
+      "type": "cards",
+      "title": "🍎 How Many Apples?",
       "hint": "Count the apples out loud, then tap to check.",
-      "items": { "select": "tag", "tag": "dots" }, "front": "tag:dots", "back": ["en", "l1"]
+      "items": {
+        "select": "tag",
+        "tag": "dots"
+      },
+      "front": "tag:dots",
+      "back": [
+        "en",
+        "l1"
+      ]
     },
     {
-      "id": "pairs", "type": "match", "title": "🎯 Matching Game",
+      "id": "pairs",
+      "type": "match",
+      "title": "🎯 Matching Game",
+      "only": [
+        "big"
+      ],
       "hint": "Tap the number, then tap the matching word.",
-      "items": { "select": "all" }, "left": "emoji", "right": "en", "count": 6
+      "items": {
+        "select": "all"
+      },
+      "left": "emoji",
+      "right": "en",
+      "count": 6
     },
     {
-      "id": "hear", "type": "listen", "title": "👂 Which Number Is It?",
+      "id": "hear",
+      "type": "listen",
+      "title": "👂 Which Number Is It?",
       "hint": "Listen, then tap the number you heard.",
-      "items": { "select": "all" }, "choices": 4
+      "items": {
+        "select": "all"
+      },
+      "choices": 4
     },
     {
-      "id": "say", "type": "sentence", "title": "💬 Say It Bigger!",
+      "id": "say",
+      "type": "sentence",
+      "title": "💬 Say It Bigger!",
       "hint": "Choose a number. Then grow your sentence, one step at a time.",
-      "items": { "select": "all" },
+      "items": {
+        "select": "new"
+      },
       "levels": [
-        { "label": "One word", "template": "{en}" },
-        { "label": "Number…", "template": "Number {en}." },
-        { "label": "I can count to…", "template": "I can count to {en}." }
+        {
+          "label": "One word",
+          "template": "{en}"
+        },
+        {
+          "label": "Number…",
+          "template": "Number {en}."
+        },
+        {
+          "label": "I can count to…",
+          "template": "I can count to {en}."
+        }
       ]
     },
     {
-      "id": "sizes", "type": "sort", "title": "📏 Small Or Big?",
+      "id": "sizes",
+      "type": "sort",
+      "title": "📏 Small Or Big?",
+      "only": [
+        "big"
+      ],
       "hint": "Tap a number, then tap where it goes.",
-      "items": { "select": "all" }, "by": "size",
+      "items": {
+        "select": "all"
+      },
+      "by": "size",
       "buckets": [
-        { "key": "small", "label": "Small: 1–5", "emoji": "🐭" },
-        { "key": "big", "label": "Big: 6–10", "emoji": "🐘" }
+        {
+          "key": "small",
+          "label": "Small: 1–5",
+          "emoji": "🐭"
+        },
+        {
+          "key": "big",
+          "label": "Big: 6–10",
+          "emoji": "🐘"
+        }
       ]
     },
     {
-      "id": "moves", "type": "tpr", "title": "🎮 Move And Count!",
+      "id": "moves",
+      "type": "tpr",
+      "title": "🎮 Move And Count!",
       "hint": "Listen, then do it — and count out loud!",
-      "items": { "select": "tag", "tag": "move" }, "prompt": "{tag:move}"
+      "items": {
+        "select": "tag",
+        "tag": "move"
+      },
+      "prompt": "{tag:move}"
     },
-    { "id": "done", "type": "finish", "title": "🎉 Great job!", "message": "Great job counting to ten!" }
+    {
+      "id": "done",
+      "type": "finish",
+      "title": "🎉 Great job!",
+      "message": "Great job counting to ten!"
+    }
   ]
 }

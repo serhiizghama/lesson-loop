@@ -1,0 +1,82 @@
+{
+  "id": "shapes",
+  "title": "Shapes",
+  "emoji": "🔷",
+  "audience": "kids",
+  "l1": "ja",
+  "parts": [
+    { "id": "basic", "title": "Shapes 1 · Basic Shapes", "emoji": "🔵", "items": ["circle", "square", "triangle", "rectangle"] },
+    { "id": "more", "title": "Shapes 2 · More Shapes", "emoji": "⭐", "items": ["star", "heart", "oval", "diamond"] }
+  ],
+  "items": [
+    { "id": "star", "en": "star", "emoji": "⭐", "article": "a", "l1": { "word": "星", "romaji": "hoshi" }, "example": "It is a star.", "tags": { "colour": "yellow", "thing": "the night sky 🌌" } },
+    { "id": "heart", "en": "heart", "emoji": "❤️", "article": "a", "l1": { "word": "ハート", "romaji": "haato" }, "example": "It is a heart.", "tags": { "colour": "red", "thing": "a valentine card 💌" } },
+    { "id": "oval", "en": "oval", "emoji": "🥚", "article": "an", "l1": { "word": "楕円", "romaji": "daen" }, "example": "It is an oval.", "tags": { "colour": "green", "thing": "an egg 🥚" } },
+    { "id": "diamond", "en": "diamond", "emoji": "💎", "article": "a", "l1": { "word": "ひし形", "romaji": "hishigata" }, "example": "It is a diamond.", "tags": { "colour": "blue", "thing": "a kite 🪁" } },
+    { "id": "circle", "en": "circle", "emoji": "🔴", "article": "a", "l1": { "word": "丸", "romaji": "maru" }, "example": "It is a circle.", "tags": { "colour": "red", "thing": "a plate 🍽️" } },
+    { "id": "square", "en": "square", "emoji": "🟦", "article": "a", "l1": { "word": "四角", "romaji": "shikaku" }, "example": "It is a square.", "tags": { "colour": "blue", "thing": "a box 📦" } },
+    { "id": "triangle", "en": "triangle", "emoji": "🔺", "article": "a", "l1": { "word": "三角", "romaji": "sankaku" }, "example": "It is a triangle.", "tags": { "colour": "yellow", "thing": "a slice of pizza 🍕" } },
+    { "id": "rectangle", "en": "rectangle", "emoji": "▭", "article": "a", "l1": { "word": "長方形", "romaji": "chouhoukei" }, "example": "It is a rectangle.", "tags": { "colour": "green", "thing": "a door 🚪" } }
+  ],
+  "blocks": [
+    {
+      "id": "vocab", "type": "cards", "title": "🧠 What Shape Is It?",
+      "hint": "Tap a card to hear it and see the Japanese word.",
+      "items": { "select": "new" }, "front": "emoji", "back": ["en", "l1"]
+    },
+    {
+      "id": "talk", "type": "phrases", "title": "🗣️ Say It With Me",
+      "hint": "Tap 🔊 to hear the sentence, then say it out loud.",
+      "only": ["basic"],
+      "lines": [
+        "What shape is it?",
+        "It is a circle.",
+        "Is it a square?",
+        "Yes, it is.",
+        "No, it isn't.",
+        "What colour is it?",
+        "It is red."
+      ]
+    },
+    {
+      "id": "talk-more", "type": "phrases", "title": "🗣️ Say It With Me",
+      "hint": "Tap 🔊 to hear the sentence, then say it out loud.",
+      "only": ["more"],
+      "lines": [
+        "What shape is it?",
+        "It is a star.",
+        "I see a heart.",
+        "What colour is the star?",
+        "The star is yellow."
+      ]
+    },
+    {
+      "id": "hunt", "type": "quiz", "title": "🔍 Shape Hunt",
+      "hint": "What shape is it? Tap the shape you see it in.",
+      "items": { "select": "new" }, "ask": "tag:thing", "show": "emoji", "count": 4,
+      "speak": "{it} {be} {article} {en}."
+    },
+    {
+      "id": "name", "type": "quiz", "title": "❓ Name The Shape",
+      "hint": "Look at the shape, then tap its name.",
+      "items": { "select": "new" }, "ask": "emoji", "show": "en", "count": 4
+    },
+    {
+      "id": "pairs", "type": "match", "title": "🎯 Matching Game",
+      "hint": "Every shape you know. Tap the shape, then tap its name.",
+      "only": ["more"],
+      "items": { "select": "all" }, "left": "emoji", "right": "en", "count": 6
+    },
+    {
+      "id": "both", "type": "describe", "title": "🎨 Shape And Colour",
+      "hint": "Two things about one shape. Answer both.",
+      "items": { "select": "all" },
+      "questions": [
+        { "label": "What shape is it?", "face": "en" },
+        { "label": "What colour is it?", "face": "tag:colour" }
+      ],
+      "sentence": "The {en} {be} {tag:colour}."
+    },
+    { "id": "done", "type": "finish", "title": "🎉 Great job!", "message": "Great job! You know your shapes now!" }
+  ]
+}

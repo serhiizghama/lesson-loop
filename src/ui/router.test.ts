@@ -11,6 +11,21 @@ describe('parseRoute', () => {
     expect(parseRoute('/l/animals', '')).toEqual({ name: 'lesson', lessonId: 'animals' })
   })
 
+  it('reads the size a lesson was opened at (design D5)', () => {
+    expect(parseRoute('/l/animals/wild', '')).toEqual({
+      name: 'lesson', lessonId: 'animals', choice: 'wild',
+    })
+    expect(parseRoute('/l/animals/all', '')).toEqual({
+      name: 'lesson', lessonId: 'animals', choice: 'all',
+    })
+  })
+
+  it('reads a size the topic has not got, leaving the app to say so', () => {
+    expect(parseRoute('/l/animals/nope', '')).toEqual({
+      name: 'lesson', lessonId: 'animals', choice: 'nope',
+    })
+  })
+
   it("reads the student's link, which carries nothing but the code", () => {
     expect(parseRoute('/r/ab12', '')).toEqual({ name: 'student', code: 'AB12' })
   })
@@ -27,11 +42,16 @@ describe('parseRoute', () => {
 
   it('does not recognise a path it does not serve', () => {
     expect(parseRoute('/t/AB12/extra', '')).toEqual({ name: 'unknown' })
+    expect(parseRoute('/r/AB12/extra', '')).toEqual({ name: 'unknown' })
+    expect(parseRoute('/l/animals/wild/more', '')).toEqual({ name: 'unknown' })
     expect(parseRoute('/nonsense', '')).toEqual({ name: 'unknown' })
   })
 
   it('builds the links it parses', () => {
     expect(parseRoute(lessonPath('animals'), '')).toEqual({ name: 'lesson', lessonId: 'animals' })
+    expect(parseRoute(lessonPath('animals', 'wild'), '')).toEqual({
+      name: 'lesson', lessonId: 'animals', choice: 'wild',
+    })
     expect(parseRoute(studentPath('AB12'), '')).toEqual({ name: 'student', code: 'AB12' })
 
     const teacher = teacherPath('AB12', 'key')

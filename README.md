@@ -207,7 +207,9 @@ tell it:
 ### Exercise blocks
 
 Every block takes `id`, `title`, an optional `hint`, and an `items` selector — one of
-`{"select":"all"}`, `{"select":"ids","ids":[…]}`, or `{"select":"tag","tag":"sound"}`.
+`{"select":"all"}`, `{"select":"ids","ids":[…]}`, `{"select":"tag","tag":"sound"}`, or
+`{"select":"new"}` for the words this sitting teaches (see **How long is a lesson?**). A
+block may also carry `"only": ["<part id>"]`.
 
 | `type` | What the learner does | Extra fields |
 |---|---|---|
@@ -256,10 +258,39 @@ with different words.
 sentences a child says *around* the words — "Is it a square?", "Yes, it is." — are facts
 about English, not about any one item, so there is nothing to render them from.
 
-**A lesson introduces at most five new words.** A topic longer than that becomes several
-lesson files — `animals-1.json`, `animals-2.json` — rather than one long lesson; a later
-part carries the whole vocabulary so it can revise, and only the words no earlier part
-carried count as new. `tests/lesson-length.test.ts` enforces it.
+### How long is a lesson?
+
+**A sitting introduces at most five new words** — but which sitting today is, is the
+teacher's to say, not the file's. A topic is one file that declares its **parts**, and she
+picks the size when she opens it: each part, or the whole topic.
+
+```jsonc
+"parts": [
+  { "id": "known", "title": "Animals 1 · You Know These", "emoji": "🐶",
+    "items": ["dog", "cat", "rabbit", "duck", "fish"] },
+  { "id": "wild",  "title": "Animals 2 · Wild Animals",   "emoji": "🦁",
+    "items": ["bird", "elephant", "lion", "monkey", "bear"] }
+]
+```
+
+Two rules make one authored block serve every size:
+
+- **A part carries the words of the parts before it and teaches only its own.** So
+  `{"select":"new"}` is that part's five words, while `{"select":"all"}` is everything the
+  sitting carries — which for a later part is more, and is what lets it revise.
+- **A block may name the parts it belongs to**, with `"only": ["wild"]`. A block that names
+  none belongs to every sitting. This is how a revision exercise stays out of the sitting
+  with nothing to revise yet, and how each half keeps its own model phrases.
+
+The whole-topic choice carries every word and every block, in file order.
+
+A topic short enough for one sitting declares no `parts`, offers nothing to choose, and
+opens as one lesson — exactly as every lesson did before. Each part is capped at five words
+by `tests/lesson-length.test.ts`; the whole-topic choice is deliberately exempt, because
+that is the teacher saying this child has met these words before.
+
+Every size is validated at load, so a part that leaves a sorting exercise with one usable
+bucket fails on the home screen rather than in front of a child.
 
 ### If a lesson is wrong
 

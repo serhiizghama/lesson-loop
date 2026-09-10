@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import { createLessonState, isBlockComplete, lessonProgress } from '../src/shared/reducer'
 import { applyAction } from '../src/shared/reducer'
-import { complete, lessonFiles, loadLesson } from './support/play'
+import { complete, playableLessons } from './support/play'
 
-describe.each(lessonFiles)('%s plays from start to finish', (file) => {
-  const lesson = loadLesson(file)
-
+/**
+ * Every size of every topic, because a size is a lesson nobody wrote down: a part can be
+ * unplayable while the file it came from is sound (design D6).
+ */
+describe.each(playableLessons())('%s plays from start to finish', (_name, lesson) => {
   it('reaches every block and finishes at 100%', () => {
     let state = createLessonState(lesson.id)
     for (const [index, block] of lesson.blocks.entries()) {

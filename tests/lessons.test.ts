@@ -19,6 +19,12 @@ describe('shipped lessons', () => {
     expect(result.ok).toBe(true)
   })
 
+  // A file is a topic; `<topic>/<size>` is what `narrow` builds and never what is written.
+  it.each(files)('%s declares a topic id, not a size', (file) => {
+    const data = JSON.parse(readFileSync(join(dir, file), 'utf8')) as { id: string }
+    expect(data.id).not.toContain('/')
+  })
+
   it('lesson ids are unique across files', () => {
     const ids = files.map((f) => {
       const data = JSON.parse(readFileSync(join(dir, f), 'utf8')) as { id: string }

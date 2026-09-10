@@ -4,6 +4,32 @@
   "emoji": "🧍",
   "audience": "kids",
   "l1": "ja",
+  "parts": [
+    {
+      "id": "face",
+      "title": "My Body 1 · My Face",
+      "emoji": "👀",
+      "items": [
+        "eyes",
+        "ears",
+        "nose",
+        "mouth",
+        "hair"
+      ]
+    },
+    {
+      "id": "body",
+      "title": "My Body 2 · Head to Toe",
+      "emoji": "🧍",
+      "items": [
+        "teeth",
+        "hand",
+        "foot",
+        "leg",
+        "arm"
+      ]
+    }
+  ],
   "items": [
     {
       "id": "eyes",
@@ -117,7 +143,7 @@
       "title": "🧠 What Is It?",
       "hint": "Tap a card to hear it and see the Japanese word.",
       "items": {
-        "select": "all"
+        "select": "new"
       },
       "front": "emoji",
       "back": [
@@ -129,6 +155,9 @@
       "id": "pairs",
       "type": "match",
       "title": "🎯 Matching Game",
+      "only": [
+        "body"
+      ],
       "hint": "Tap the picture, then tap the matching word.",
       "items": {
         "select": "all"
@@ -143,7 +172,7 @@
       "title": "💬 Say It Bigger!",
       "hint": "Choose a body part. Then grow your sentence, one step at a time.",
       "items": {
-        "select": "all"
+        "select": "new"
       },
       "levels": [
         {
@@ -161,9 +190,65 @@
       ]
     },
     {
+      "id": "label-face",
+      "type": "hotspot",
+      "title": "👀 Label the Face",
+      "only": [
+        "face"
+      ],
+      "hint": "Tap a word, then tap the place on the picture where it belongs.",
+      "items": {
+        "select": "ids",
+        "ids": [
+          "hair",
+          "eyes",
+          "ears",
+          "nose",
+          "mouth"
+        ]
+      },
+      "scene": "body",
+      "spots": {
+        "hair": [
+          0.1714,
+          0.0458,
+          0.3714,
+          0.1667
+        ],
+        "eyes": [
+          0.2214,
+          0.3125,
+          0.2714,
+          0.125
+        ],
+        "ears": [
+          0.0514,
+          0.4188,
+          0.1029,
+          0.2042
+        ],
+        "nose": [
+          0.3071,
+          0.5458,
+          0.1,
+          0.1375
+        ],
+        "mouth": [
+          0.2643,
+          0.8021,
+          0.1857,
+          0.125
+        ]
+      },
+      "speak": "{this} {be} my {en}."
+    },
+    {
       "id": "label",
       "type": "hotspot",
       "title": "🧍 Label the Body",
+      "only": [
+        "body"
+      ],
       "hint": "Tap a word, then tap the place on the picture where it belongs.",
       "items": {
         "select": "ids",
@@ -244,18 +329,7 @@
       "title": "🧩 Build It",
       "hint": "Tap the words in order to build the sentence.",
       "items": {
-        "select": "ids",
-        "ids": [
-          "hair",
-          "eyes",
-          "ears",
-          "nose",
-          "mouth",
-          "arm",
-          "hand",
-          "leg",
-          "foot"
-        ]
+        "select": "new"
       },
       "template": "{this} {be} my {en}."
     },

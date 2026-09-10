@@ -200,8 +200,179 @@ describe('spoken templates', () => {
   })
 })
 
+/** `base()` plus the two halves it could be taught in, and a block belonging to one. */
+function topic(): Lesson {
+  const lesson = structuredClone(base())
+  lesson.parts = [
+    { id: 'farm', title: 'Farm Animals', emoji: '🏡', items: ['dog', 'cat'] },
+    { id: 'wild', title: 'Wild Animals', emoji: '🦁', items: ['lion'] },
+  ]
+  lesson.blocks.push({
+    id: 'homes', type: 'sort', title: 'Where do they live?', only: ['wild'],
+    items: { select: 'all' }, by: 'habitat',
+    buckets: [
+      { key: 'farm', label: 'Farm', emoji: '🏡' },
+      { key: 'jungle', label: 'Jungle', emoji: '🌴' },
+    ],
+  })
+  return lesson
+}
+
+describe('a topic declaring parts', () => {
+  it('accepts parts and a block that names one of them', () => {
+    const result = validateLesson(topic())
+    if (!result.ok) throw new Error(result.errors.join('\n'))
+    expect(result.lesson.parts).toHaveLength(2)
+  })
+
+  it('accepts a block selecting the words the sitting teaches', () => {
+    const lesson = topic()
+    lesson.blocks[0] = { ...lesson.blocks[0]!, items: { select: 'new' } } as Lesson['blocks'][number]
+    expect(validateLesson(lesson).ok).toBe(true)
+  })
+
+  it('refuses a block that belongs to no part at all', () => {
+    const lesson = topic()
+    ;(lesson.blocks[1] as { only: string[] }).only = []
+    expect(validateLesson(lesson).ok).toBe(false)
+  })
+
+  it('refuses a single part, which is no division of a topic', () => {
+    const lesson = topic()
+    lesson.parts = [{ id: 'farm', title: 'Farm', emoji: '🏡', items: ['dog', 'cat', 'lion'] }]
+    expect(validateLesson(lesson).ok).toBe(false)
+  })
+
+  /** The message for a topic broken in exactly one way. */
+  function errorsOfTopic(mutate: (l: Lesson) => void): string {
+    const lesson = topic()
+    mutate(lesson)
+    const result = validateLesson(lesson)
+    expect(result.ok).toBe(false)
+    return result.ok ? '' : result.errors.join('\n')
+  }
+
+  it('names the part and the item when a part names a word the topic has not got', () => {
+    const message = errorsOfTopic((l) => {
+      l.parts![1]!.items.push('tiger')
+    })
+    expect(message).toContain('"wild"')
+    expect(message).toContain('"tiger"')
+  })
+
+  it('names both parts when they claim the same word', () => {
+    const message = errorsOfTopic((l) => {
+      l.parts![1]!.items.push('dog')
+    })
+    expect(message).toContain('"dog"')
+    expect(message).toContain('"farm"')
+    expect(message).toContain('"wild"')
+  })
+
+  it('refuses a part that names nothing, naming it', () => {
+    const message = errorsOfTopic((l) => {
+      l.parts![1]!.items = []
+    })
+    expect(message).toContain('"wild"')
+    expect(message).toContain('names no items')
+  })
+
+  it('refuses a block belonging to a part the topic does not declare, naming both', () => {
+    const message = errorsOfTopic((l) => {
+      ;(l.blocks[1] as { only: string[] }).only = ['nope']
+    })
+    expect(message).toContain('"homes"')
+    expect(message).toContain('"nope"')
+  })
+})
+
+describe('validation at every size a topic offers', () => {
+  /**
+   * The defect in the teacher's own re-cut of Animals: sound as a ten-word file, and no
+   * question at all once the second half is played alone, because every one of its
+   * animals lives in the same place (proposal, design D6).
+   */
+  function withBuckets(farmForWild: boolean): Lesson {
+    const item = (id: string, habitat: string) => ({
+      id, en: id, emoji: '🐾', tags: { habitat },
+    })
+    return {
+      id: 'animals',
+      title: 'Animals',
+      emoji: '🐾',
+      audience: 'kids',
+      l1: null,
+      items: [
+        item('dog', 'farm'), item('cat', 'farm'),
+        item('lion', 'jungle'), item('bird', farmForWild ? 'farm' : 'jungle'),
+      ],
+      parts: [
+        { id: 'known', title: 'Known', emoji: '🐶', items: ['dog', 'cat'] },
+        { id: 'wild', title: 'Wild', emoji: '🦁', items: ['lion', 'bird'] },
+      ],
+      blocks: [
+        {
+          id: 'homes', type: 'sort', title: 'Where do they live?', only: ['wild'],
+          items: { select: 'new' }, by: 'habitat',
+          buckets: [
+            { key: 'farm', label: 'Farm', emoji: '🏡' },
+            { key: 'jungle', label: 'Jungle', emoji: '🌴' },
+          ],
+        },
+      ],
+    }
+  }
+
+  it('refuses a size whose sorting exercise has only one bucket to fill, naming both', () => {
+    const result = validateLesson(withBuckets(false))
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    const message = result.errors.join('\n')
+    expect(message).toContain('size "wild"')
+    expect(message).toContain('farm')
+  })
+
+  it('passes once the part spreads across the buckets', () => {
+    const result = validateLesson(withBuckets(true))
+    if (!result.ok) throw new Error(result.errors.join('\n'))
+    expect(result.ok).toBe(true)
+  })
+
+  it('checks a match against each size, not only against the file', () => {
+    const lesson = topic()
+    lesson.blocks.push({
+      id: 'pairs', type: 'match', title: 'Matching', items: { select: 'new' },
+      left: 'emoji', right: 'en', count: 3,
+    })
+    const result = validateLesson(lesson)
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    // Three pairs is fine for the whole topic and for its first half, and one word too
+    // many for the half that teaches only the lion.
+    const message = result.errors.join('\n')
+    expect(message).toContain('size "wild"')
+    expect(message).toContain('"pairs"')
+    expect(message).not.toContain('size "all"')
+  })
+
+  it('checks a listening exercise against each size', () => {
+    const lesson = topic()
+    lesson.blocks.push({
+      id: 'hear', type: 'listen', title: 'Which one?', items: { select: 'new' }, choices: 3,
+    })
+    const result = validateLesson(lesson)
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.errors.join('\n')).toContain('size "wild"')
+  })
+})
+
 describe('resolveItems', () => {
   const lesson = base()
+
+  it('throws on the words a sitting teaches, which narrowing should have resolved', () => {
+    expect(() => resolveItems(lesson, { select: 'new' }, 'vocab')).toThrow(/"vocab"/)
+  })
 
   it('selects every item', () => {
     expect(resolveItems(lesson, { select: 'all' }).map((i) => i.id)).toEqual(['dog', 'cat', 'lion'])
