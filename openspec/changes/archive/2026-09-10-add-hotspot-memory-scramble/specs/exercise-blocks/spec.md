@@ -13,10 +13,13 @@ Tapping a word SHALL speak it. A block MAY declare a line spoken when a placemen
 correct; where it does, that line SHALL be spoken, so a placement is heard as a sentence
 about the thing labelled rather than as a bare word.
 
-Every place SHALL be tappable with a child's finger regardless of how small it is drawn:
-a place drawn smaller than a comfortable tap target SHALL still accept a tap aimed at it.
-The drawing SHALL scale with the space available without the places drifting off the parts
-they mark.
+Every place SHALL be reachable by a young child's finger at the narrowest width the app
+supports, however small it is drawn: the area that accepts a tap SHALL be enlarged around a
+small place while what is shown stays the size it was drawn, and two places SHALL never be
+enlarged so far into each other that a learner cannot tell which one a tap will reach. A
+place that cannot be made reachable SHALL be treated as a fault in the drawing, which the
+app supplies, and never as something the lesson must work around. A tap that lands on the
+drawing but on no place SHALL do nothing at all, and SHALL NOT count as a wrong placement.
 
 #### Scenario: A correct placement
 - **WHEN** the learner taps a word and then taps the place on the drawing that word names
@@ -37,9 +40,14 @@ they mark.
 - **THEN** nothing is placed, nothing is refused, and no mistake is recorded
 
 #### Scenario: A small place is still tappable
-- **WHEN** a place is declared small enough to be drawn as a few millimetres on a tablet
-- **THEN** a tap aimed at it is accepted, and the drawing shows which place the tap
-  belongs to
+- **WHEN** a place is drawn only a few millimetres across on the narrowest supported screen
+- **THEN** a tap aimed at it is accepted, and the drawing shows which place the tap belongs
+  to
+
+#### Scenario: A tap that misses every place
+- **WHEN** the learner is holding a word and taps a part of the drawing that no place covers
+- **THEN** nothing is placed and nothing is refused: the word stays held and no mistake is
+  shown
 
 #### Scenario: Completing the diagram
 - **WHEN** the last unplaced word is placed correctly
@@ -158,15 +166,49 @@ complete when a sentence has been built for every selected item.
 
 ## MODIFIED Requirements
 
+### Requirement: Every exercise is driven by tapping
+
+All exercises SHALL be operated by tapping: selecting a thing, then selecting where it
+belongs. Dragging SHALL NOT be required anywhere. Tap targets SHALL be large enough for a
+young child using a finger on a tablet, measured as the learner meets them on the screen
+rather than as the exercise is laid out.
+
+Freehand drawing over an exercise SHALL be the one exception to this, and SHALL never be a
+way of answering: while a participant is drawing, their pointer input SHALL make marks
+only, and SHALL NOT select, pair, flip, sort, or complete anything. No exercise SHALL
+require a drawn mark to be answered or completed, and every exercise SHALL remain fully
+answerable by tapping with nothing ever drawn on it.
+
+#### Scenario: A pairing is made without dragging
+- **WHEN** the learner taps a picture and then taps a word
+- **THEN** the pairing is attempted, and at no point was a drag gesture necessary
+
+#### Scenario: Drawing answers nothing
+- **WHEN** a participant draws across the items of any exercise
+- **THEN** marks are made, no selection or pairing is attempted, and the exercise's
+  progress is unchanged
+
+#### Scenario: Every exercise is completable without drawing
+- **WHEN** each exercise the engine offers is played to completion by tapping alone
+- **THEN** each completes as it does today and nothing was drawn
+
+#### Scenario: A tap target measured on the screen, not in the layout
+- **WHEN** an exercise is shown at the narrowest width the app supports, where what is laid
+  out is shown smaller than it was laid out
+- **THEN** everything the learner must tap is still large enough for a finger at the size it
+  actually appears
+
 ### Requirement: An exercise speaks unasked only while the lesson's sound is on
 
 Everywhere these exercises speak of their own accord — a revealed card, a tapped tile, a
 completed pair, an item picked to sort, a chosen word and scaffold level, the word being
-asked in a listening exercise, the instruction in a physical-response exercise, a card
-turned up in a memory exercise, a word chosen from a label bank, a placement on a diagram,
-a sentence finished in an assembly exercise — they SHALL do so only while the lesson's
-sound is on. Every control a learner presses in order to hear a line SHALL speak it whether
-the sound is on or off.
+asked in a listening exercise, the instruction in a physical-response exercise, the line a
+quiz declares for a correctly answered prompt, the sentence a description exercise produces
+when both of its questions are answered, a card turned up in a memory exercise, a word
+chosen from a label bank, a placement on a diagram, a sentence finished in an assembly
+exercise — they SHALL do so only while the lesson's sound is on. Every control a learner
+presses in order to hear a line SHALL speak it whether the sound is on or off; the control
+on a phrase in a phrase-list exercise is such a control.
 
 No exercise SHALL become unanswerable, uncompletable or unclear because the sound is off:
 what an exercise scores, what counts as correct, and what it shows SHALL be exactly as they
@@ -191,6 +233,21 @@ are with the sound on.
 - **WHEN** the sound is off and the learner picks a word and then a scaffold level
 - **THEN** the sentence is rendered as usual and is not spoken, and pressing the control
   that speaks it does speak it
+
+#### Scenario: A phrase list with the sound off
+- **WHEN** the sound is off and the learner taps a phrase's control
+- **THEN** the phrase is spoken, because the control exists in order to hear it, and the
+  phrase counts as heard
+
+#### Scenario: A quiz with the sound off
+- **WHEN** the sound is off and the learner answers a prompt correctly in a block that
+  declares a spoken line
+- **THEN** the answer is accepted and the exercise moves on as usual, and the line is not
+  spoken
+
+#### Scenario: A description with the sound off
+- **WHEN** the sound is off and the learner answers both questions about an item
+- **THEN** the combined sentence is shown as usual and is not spoken
 
 #### Scenario: A memory exercise with the sound off
 - **WHEN** the sound is off and the learner turns up cards and closes a pair
