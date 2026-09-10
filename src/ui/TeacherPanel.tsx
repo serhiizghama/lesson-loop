@@ -3,6 +3,7 @@ import { answerKeyFor, isNextDue } from '@/shared/reducer'
 import type { Lesson, LessonState } from '@/shared/types'
 import type { Peers } from '@/shared/protocol'
 import type { Connection } from '@/net/socket'
+import { guidePath } from './router'
 import styles from './app.module.css'
 
 export type TeacherPanelProps = {
@@ -171,6 +172,23 @@ export function TeacherPanel(props: TeacherPanelProps) {
           </div>
         )}
       </div>
+
+      {/*
+        The teacher's guide (spec `teacher-guide`). It is offered here and on no other
+        screen: the panel is the one surface in the app that exists only for her, so an
+        entry here can never be found by a student.
+
+        A link in a new tab, not a route: she is mid-lesson, and reading the guide must
+        not take the room off her screen.
+      */}
+      <a
+        className={styles.panelGuide}
+        href={guidePath}
+        target="_blank"
+        rel="noreferrer"
+      >
+        📖 Teacher guide
+      </a>
 
       {/* An exercise with nothing to be right about shows no key, and the space it
           would have taken is not left empty-looking (spec). */}

@@ -2,6 +2,7 @@ import { lessonFailures, lessons, topicById } from '@/lessons'
 import { WHOLE, choicesOf, narrow, offersChoice } from '@/shared/narrow'
 import type { SizeChoice } from '@/shared/narrow'
 import type { Lesson } from '@/shared/types'
+import { Guide } from './Guide'
 import { RoomLesson } from './RoomLesson'
 import { SoloLesson } from './SoloLesson'
 import { homePath, lessonPath, useRoute } from './router'
@@ -44,6 +45,9 @@ export function App() {
     const key = route.name === 'teacher' && route.key !== '' ? route.key : null
     return <RoomLesson key={route.code} code={route.code} teacherKey={key} onExit={home} />
   }
+
+  // Documentation, not a lesson: no player, no store, no socket (design D9).
+  if (route.name === 'guide') return <Guide onExit={home} />
 
   if (route.name === 'unknown') return <Missing what="page" onHome={home} />
 

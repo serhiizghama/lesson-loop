@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseRoute, lessonPath, studentPath, teacherPath } from './router'
+import { parseRoute, guidePath, lessonPath, studentPath, teacherPath } from './router'
 
 describe('parseRoute', () => {
   it('reads the home screen', () => {
@@ -26,6 +26,14 @@ describe('parseRoute', () => {
     })
   })
 
+  it("reads the teacher's guide", () => {
+    expect(parseRoute('/guide', '')).toEqual({ name: 'guide' })
+  })
+
+  it('leaves the guide’s fragment to the browser, because there it names a section', () => {
+    expect(parseRoute('/guide', '#pacing')).toEqual({ name: 'guide' })
+  })
+
   it("reads the student's link, which carries nothing but the code", () => {
     expect(parseRoute('/r/ab12', '')).toEqual({ name: 'student', code: 'AB12' })
   })
@@ -44,10 +52,12 @@ describe('parseRoute', () => {
     expect(parseRoute('/t/AB12/extra', '')).toEqual({ name: 'unknown' })
     expect(parseRoute('/r/AB12/extra', '')).toEqual({ name: 'unknown' })
     expect(parseRoute('/l/animals/wild/more', '')).toEqual({ name: 'unknown' })
+    expect(parseRoute('/guide/anything', '')).toEqual({ name: 'unknown' })
     expect(parseRoute('/nonsense', '')).toEqual({ name: 'unknown' })
   })
 
   it('builds the links it parses', () => {
+    expect(parseRoute(guidePath, '')).toEqual({ name: 'guide' })
     expect(parseRoute(lessonPath('animals'), '')).toEqual({ name: 'lesson', lessonId: 'animals' })
     expect(parseRoute(lessonPath('animals', 'wild'), '')).toEqual({
       name: 'lesson', lessonId: 'animals', choice: 'wild',

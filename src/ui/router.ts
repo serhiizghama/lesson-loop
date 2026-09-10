@@ -11,6 +11,12 @@ import { useCallback, useEffect, useState } from 'react'
 export type Route =
   | { name: 'home' }
   /**
+   * The teacher's guide: a page to read, not a lesson to play. Its fragment names a
+   * section and is left to the browser, which is why nothing is carried here — only
+   * `/t/…` reads the fragment, and it reads a key (design D6).
+   */
+  | { name: 'guide' }
+  /**
    * A lesson opened from the home screen: solo, offline, no room. `choice` is the size
    * the teacher picked — a part's id, or `all` — and is absent when the address names
    * only the topic, which offers its sizes instead of starting one (design D5).
@@ -25,6 +31,7 @@ export function parseRoute(pathname: string, hash: string): Route {
   if (parts.length === 0) return { name: 'home' }
 
   const [head, tail, size] = parts
+  if (parts.length === 1 && head === 'guide') return { name: 'guide' }
   // The third segment belongs to `l` alone: a room's address is its code and nothing else.
   if (parts.length === 3 && head === 'l' && tail !== undefined && size !== undefined) {
     return { name: 'lesson', lessonId: tail, choice: size }
@@ -38,6 +45,7 @@ export function parseRoute(pathname: string, hash: string): Route {
 }
 
 export const homePath = '/'
+export const guidePath = '/guide'
 export const lessonPath = (lessonId: string, choice?: string): string =>
   choice === undefined ? `/l/${lessonId}` : `/l/${lessonId}/${choice}`
 export const studentPath = (code: string): string => `/r/${code}`

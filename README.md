@@ -300,6 +300,48 @@ Validation runs on load and in CI, and names the exact place:
 blocks.6.buckets.2.key: no selected item has habitat = "ocean"
 ```
 
+## The teacher's guide
+
+`/guide` is the app's explanation of itself, written for the teacher. This README is the
+other document: it explains how the app is built, and its reader is whoever builds it. The
+guide never mentions a file format, a server or a command — a test fails if it does.
+
+It is offered in one place: the teacher's panel inside a room, as a link that opens a
+second tab, so reading it never takes a live lesson off her screen. Not on the home
+screen, not in a solo lesson, and never anywhere the student can see. Its own address is
+what she keeps for reading it before a lesson.
+
+**Three tests hold it to the app** (`src/ui/guide.test.tsx`), because documentation nobody
+is forced to update stops being true within two changes:
+
+- every playable type in `blockViews` has a row in the guide's exercise table — **a new
+  block type cannot reach `main` without a line describing it**;
+- every picture the guide names exists under `public/guide/`;
+- the guide's text contains none of the words of its construction.
+
+### Re-taking the screenshots
+
+Eight pictures, all the same window scaled to 1000 px wide, together under 600 KB. Nothing
+in the build makes them: run the app, take them again, and keep to this list.
+
+| File | What it shows | How to get there |
+|---|---|---|
+| `home.jpg` | the size choice | `/l/animals` — the topic's card open, no lesson started |
+| `exercise.jpg` | an exercise in play | `/l/animals/known`, two cards turned over |
+| `teacher.jpg` | the teacher's half | invite from that lesson, panel open, answer key showing |
+| `student.jpg` | the student's half | the room's `/r/<code>` in a second tab |
+| `locked.jpg` | the lock, from the child's side | press **Student can tap**, then shoot the student's tab |
+| `pencil.jpg` | drawing, with the tools | pencil down, a mark round one card |
+| `stars.jpg` | the closing screen | finish one exercise, then Next to the end |
+| `offline.jpg` | working without sync | stop `wrangler dev` and wait for the notice |
+
+Take them at the same window size, one after another, so the set looks like one set; then
+`sips -Z 1000 <file>` and check `du -ch public/guide` is still under 600 KB. The student
+link in a shot is rewritten to the published address rather than the development one —
+the teacher will never see `localhost`. Room codes need no care: a room is gone three
+hours later, and the app holds no name, no account and no student data to leak into a
+picture.
+
 ## The icon
 
 The mark — a gold loop with an arrow head, on the app's ink field — is what the tab, the
@@ -333,7 +375,8 @@ three together.
 - `src/scenes/` — the drawings a `hotspot` lesson can label, as inline SVG. Their names and
   coordinate spaces live in `src/shared/scenes.ts`, so the Worker can validate a lesson
   against them without importing a component.
-- `src/ui/` — the shell: routing, lesson picker, the star trail, navigation, teacher panel.
+- `src/ui/` — the shell: routing, lesson picker, the star trail, navigation, teacher panel,
+  and the teacher's guide.
 - `src/sound/` — the chime and the closing screen's notes, synthesised on the device with
   the Web Audio API: no audio file, no network, and silent when the lesson is quiet.
 - `src/net/` — the socket to a room, its reconnection, and opening a room.
