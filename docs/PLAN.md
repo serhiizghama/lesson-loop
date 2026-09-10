@@ -102,9 +102,11 @@ Two things the sketch did not anticipate and the shipped format has:
   still without a line of theme-specific code.
 
 The format was validated against real material: **both of her lessons must be expressible
-in this schema without a single line of lesson-specific code**, except `hotspot` (the body
-diagram), which is deferred to v0.2. If they cannot be expressed, the schema gets fixed —
-we do not write exceptions.
+in this schema without a single line of lesson-specific code**. The labelled body diagram
+was the last exception and is one no longer: `hotspot` expresses it, with the one narrow
+cost recorded as D-40 — the drawing itself is the app's, and a lesson that needs a new one
+needs a deploy. If a lesson cannot be expressed, the schema gets fixed — we do not write
+exceptions.
 
 ---
 
@@ -137,11 +139,28 @@ the child who is thinking, which the engine has promised not to do. `ask` and `s
 what let one type be both of her guessing exercises — a riddle asked by a tag with pictures
 to choose from, and the same thing reversed, a picture to name.
 
-**Backlog (v0.2+):** `hotspot` (label a diagram), `scramble` (build a sentence from
-shuffled words), `spell` (assemble a word from letters / missing letter), `memory`
-(pairs, alternating turns, teacher-vs-student score — ideal for two players), `reading` (a passage with line-by-line highlighting, "my turn / your turn",
-plus comprehension questions), `gapfill` (grammar for adults), `wheel` (a wheel of
-conversation topics), `bingo`.
+**v0.2 — three more, for the body diagram and for what nothing else asked:**
+
+| Type | Mechanic | Synchronised state |
+|---|---|---|
+| `hotspot` | tap a word → tap the place on a drawing it names | `{ order, selected, placed, wrong }` |
+| `memory` | cards face down → turn two up → pair or turn back | `{ order, up, matched, tries }` |
+| `scramble` | a sentence's words, shuffled → tap them in order | `{ order, index, placed, wrong }` |
+
+`hotspot` finally expresses her labelled body diagram, and is the one block type that needs
+the app to carry something — the drawing (D-40). `memory` is the first exercise whose answer
+is not on the screen when it is asked for, and `scramble` the first that asks a child to
+build English rather than choose it.
+
+**`memory` arrives without the turns the backlog imagined.** That entry read "pairs,
+alternating turns, teacher-vs-student score"; the exercise ships cooperative, counting tries
+and scoring nobody, because an action does not carry who sent it and a turn the app draws
+but cannot enforce is undone by a reload (D-41).
+
+**Backlog (v0.2+):** `spell` (assemble a word from letters / missing letter), `reading` (a
+passage with line-by-line highlighting, "my turn / your turn", plus comprehension
+questions), `gapfill` (grammar for adults), `wheel` (a wheel of conversation topics),
+`bingo`.
 
 ---
 
@@ -272,13 +291,14 @@ Audio: `speechSynthesis`, `lang='en-US'`, `rate≈0.85` — same as in her origi
 lesson-loop/
 ├─ src/
 │  ├─ blocks/        # one React view per exercise type
+│  ├─ scenes/        # the drawings a `hotspot` lesson labels, as inline SVG
 │  ├─ shared/        # types, validation, reducer, block logic, room core, protocol
 │  ├─ speech/        # recorded clips, falling back to speechSynthesis
 │  ├─ sound/         # the chime and the closing notes, synthesised with Web Audio
 │  ├─ net/           # socket client, reconnect, solo fallback
 │  └─ ui/            # shell, lesson player, teacher panel, routing
 ├─ public/           # the app's mark and its web manifest, copied verbatim into dist/
-├─ lessons/          # animals.json, body-parts.json, ...
+├─ lessons/          # animals-1.json, animals-2.json, body-parts.json, ...
 ├─ worker/           # index.ts + Room (Durable Object) — thin adapters over src/shared
 ├─ openspec/         # the specs, and the changes that produced them
 ├─ docs/
@@ -341,8 +361,14 @@ not play: `phrases`, `quiz` and `describe` are what it needed, and the eight sha
 drawn as exact SVG rather than borrowed from an emoji font that has no oval (D-38). Two of
 her exercises are deliberately absent (D-39).
 
-What remains of v0.2 is `hotspot`, `memory` and `scramble`, re-cutting the remaining four
-lessons to five words each, and tablet polish.
+`add-hotspot-memory-scramble` delivers **the last three block types**: Body Parts gains
+*Label the Body* and *Build It*, Animals part two gains *Memory*, and `lesson-format` loses
+the body-diagram exception it had carried since v0.1. The drawing is the app's, as two
+panels rather than her single figure, because nine parts on one figure cannot be spaced far
+enough apart for a child's finger once the stage is scaled down (D-40).
+
+What remains of v0.2 is re-cutting the remaining four lessons to five words each, and tablet
+polish.
 
 **v0.3** — a teacher account and a lesson editor. This is where a real backend, auth and
 storage appear. Deliberately kept out of the MVP.
@@ -418,3 +444,6 @@ technical decisions `Dn`, without the hyphen; the two sequences are separate.
 | D-37 | **A later part carries the whole vocabulary and teaches only its own half.** What is capped is what a lesson introduces, not what it contains. This is not bookkeeping: all five wild animals live in the jungle, so "Where do they live?" over part two alone is one bucket and no question at all. Sorting, listening and matching are revision by nature — they need a spread — so they belong to the part that has one. Re-tagging the animals to fit the exercise was rejected: the fact is the thing being taught | 2026-09-09 |
 | D-38 | **Shapes are written as exact SVG, not taken from the emoji font**, extending D-30 from hues to geometry. The font has no oval — the teacher's own page labels a green circle "oval" — and the geometric character for a rectangle renders as an outline, a filled box or nothing at all depending on the device. A shapes lesson that shows a circle for "oval" teaches the opposite of what it says. Colours come from the palette the colour lesson already uses, so a child meets the same red twice | 2026-09-09 |
 | D-39 | **Two of her exercises are deferred, by name.** *Repeat After Me* has the teacher award a star for a spoken attempt: nothing in the product scores a person rather than a tap, and adding that changes what a room is. *Draw the shape* is a prompted, self-marked drawing, which is a block built on the ink (D-32) rather than a use of it. Naming them in the spec is deliberate — they are absent rather than approximated, and nothing in the format half-implements either | 2026-09-09 |
+| D-40 | **A diagram is drawn by the app and placed by the lesson.** `hotspot` is the one block type that needs something a lesson file cannot carry, so the app holds a small catalogue of named scenes and the lesson says which word sits in which rectangle of one. A lesson labelling a drawing that already exists is data alone; a lesson needing a new drawing needs a deploy — the one deliberate exception to D-3, and drawn as narrowly as it can be: a scene is artwork and a coordinate space, and never decides what is asked or what is right, so two lessons can label one figure with different words. The drawing itself went into the app rather than into the lesson because a lesson file half of which is `<path d="…">` is no longer something a non-programmer reads. The body scene is **two panels** — a large head beside a small whole figure — rather than the teacher's single figure: the stage is laid out at a fixed width and scaled down (D-35), so two places a child must tell apart need about 110 px between their centres in that layout, and six of them stacked down one figure would want 660 px of the 510 the stage has. Her page is the specification for what the exercise asks, not for how it is drawn | 2026-09-10 |
+| D-41 | **Memory is cooperative: no turns, no score per side** — a deliberate departure from the backlog entry that named the type ("pairs, alternating turns, teacher-vs-student score"). An action does not carry who sent it, so a turn would be a rule the app draws and cannot enforce, in an app whose three other rules about who may act — the lock, the pacing and the pen — are all enforced by the room precisely because a browser rule aimed at a child is undone by a reload (D-9, D-21, D-33). Enforcing it would mean putting identity into the reducer for one exercise. The two play the board together; the exercise counts tries and ranks nobody. A miss stays face up until the next tap rather than being cleared by a timer, because the model has no clock and two clients have two of them. Turn-taking may return as its own change once a real lesson shows the pair actually take turns — but it should arrive with a way to mean it | 2026-09-10 |
+| D-42 | **A new block type ships used by a real lesson in the same change.** A type nobody teaches with is untested where it counts: the fixture proves it reduces, and only a lesson proves it is worth playing. So `hotspot` and `scramble` landed in Body Parts and `memory` in Animals part two, in this change, rather than as an engine feature waiting for content. The corollary is that a block's `speak` templates are chosen from lines the lesson already says wherever possible, so a new exercise does not silently drop the whole lesson back to the device voice (D52) | 2026-09-10 |

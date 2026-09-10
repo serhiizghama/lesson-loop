@@ -63,6 +63,27 @@ export function testLesson(): Lesson {
         ],
         sentence: 'The {en} lives on the {tag:habitat}.',
       },
+      {
+        id: 'label', type: 'hotspot', title: 'Label it', items: { select: 'ids', ids: ['dog', 'cat', 'eyes'] },
+        scene: 'body',
+        // Three places far enough apart to be told apart, in the same fractions a real
+        // lesson uses. What they name is nonsense — the logic does not care what a
+        // vocabulary word means, only that the lesson put it somewhere.
+        spots: {
+          dog: [0.10, 0.05, 0.20, 0.10],
+          cat: [0.42, 0.40, 0.12, 0.14],
+          eyes: [0.75, 0.80, 0.16, 0.12],
+        },
+        speak: '{this} {be} my {en}.',
+      },
+      {
+        id: 'faces', type: 'memory', title: 'Find the pairs', items: { select: 'all' },
+        left: 'emoji', right: 'en', count: 3, speak: 'The {en} says {tag:sound}!',
+      },
+      {
+        id: 'build', type: 'scramble', title: 'Build it', items: { select: 'all' },
+        template: '{this} {be} my {en}.',
+      },
       { id: 'done', type: 'finish', title: 'Great job!', message: 'You did it!' },
     ],
   }

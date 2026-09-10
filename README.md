@@ -220,6 +220,9 @@ Every block takes `id`, `title`, an optional `hint`, and an `items` selector —
 | `phrases` | Taps 🔊 on a model sentence, then says it | `lines` (literal sentences) |
 | `quiz` | Sees something and taps the item it names | `ask`, `show` (faces), `count`, `speak` |
 | `describe` | Answers two questions about one item | `questions` (two: label + face), `sentence` |
+| `hotspot` | Taps a word, then the place on a drawing it names | `scene`, `spots`, `speak` |
+| `memory` | Turns cards face up two at a time to find pairs | `left`, `right` (faces), `count`, `speak` |
+| `scramble` | Builds a sentence from its words, shuffled | `template` |
 | `finish` | The closing screen | `message` |
 
 A **face** is one way of showing an item: `emoji`, `en`, `l1`, `example`, or `tag:<name>`.
@@ -233,6 +236,21 @@ by `habitat`; "move like this animal" is `tpr` with the prompt `{tag:move}`. `qu
 same idea for guessing: `ask: "tag:thing"` with `show: "emoji"` is a riddle — *"a plate 🍽️"*
 → tap the circle — and `ask: "emoji"` with `show: "en"` is the same exercise the other way
 round, naming the shape you can see.
+
+`hotspot` is the one block that needs something the lesson cannot supply: the **drawing**.
+A lesson names a `scene` the app carries — `body` is the only one so far — and gives each of
+its words a place on it, as `[x, y, width, height]` in fractions of the drawing:
+
+```json
+{ "type": "hotspot", "scene": "body", "spots": { "nose": [0.31, 0.55, 0.10, 0.14] } }
+```
+
+So a lesson labelling a drawing that already exists is data alone, like every other lesson;
+a lesson that needs a drawing nobody has made yet needs that drawing added to `src/scenes/`
+and a deploy. That is the one deliberate exception to "a new lesson requires no new code",
+and it is drawn narrowly: the scene is artwork and a coordinate space, and never decides
+which words are asked for or what counts as right. Two lessons can label the same figure
+with different words.
 
 `phrases` is the one block whose content is literal text rather than vocabulary. The model
 sentences a child says *around* the words — "Is it a square?", "Yes, it is." — are facts
@@ -281,6 +299,9 @@ three together.
   core. No React, no DOM: it runs unchanged in the browser and inside the Cloudflare
   Worker, and a test enforces that.
 - `src/blocks/` — one React view per exercise type.
+- `src/scenes/` — the drawings a `hotspot` lesson can label, as inline SVG. Their names and
+  coordinate spaces live in `src/shared/scenes.ts`, so the Worker can validate a lesson
+  against them without importing a component.
 - `src/ui/` — the shell: routing, lesson picker, the star trail, navigation, teacher panel.
 - `src/sound/` — the chime and the closing screen's notes, synthesised on the device with
   the Web Audio API: no audio file, no network, and silent when the lesson is quiet.

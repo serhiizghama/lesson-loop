@@ -4,9 +4,11 @@ import { validateLesson, resolveItems } from '../../src/shared/validate'
 import { applyAction, blockStateOf } from '../../src/shared/reducer'
 import type { Action, Block, Lesson, LessonState } from '../../src/shared/types'
 import type {
-  CardsState, DescribeState, ListenState, MatchState, QuizState, SortState, TprState,
+  CardsState, DescribeState, HotspotState, ListenState, MatchState, MemoryState, QuizState,
+  ScrambleState, SortState, TprState,
 } from '../../src/shared/types'
 import { faceValue } from '../../src/shared/text'
+import { cardId, cardItem, sentenceWords } from '../../src/shared/blocks'
 
 const dir = join(process.cwd(), 'lessons')
 
@@ -88,6 +90,38 @@ export function complete(lesson: Lesson, state: LessonState, block: Block): Less
         const b = faceValue(item, second.face)
         if (a !== null) act({ t: 'pick', block: block.id, side: 'a', target: a })
         if (b !== null) act({ t: 'pick', block: block.id, side: 'b', target: b })
+      }
+      break
+    }
+    case 'hotspot':
+      for (const id of current<HotspotState>().order) {
+        act({ t: 'pick', block: block.id, side: 'a', target: id })
+        act({ t: 'pick', block: block.id, side: 'b', target: id })
+      }
+      break
+    case 'memory': {
+      const seen: string[] = []
+      for (const card of current<MemoryState>().order) {
+        const id = cardItem(card)
+        if (!seen.includes(id)) seen.push(id)
+      }
+      for (const id of seen) {
+        act({ t: 'tap', block: block.id, target: cardId(id, 'a') })
+        act({ t: 'tap', block: block.id, target: cardId(id, 'b') })
+      }
+      break
+    }
+    case 'scramble': {
+      const items = new Map(resolveItems(lesson, block.items).map((i) => [i.id, i]))
+      for (let i = 0; i < current<ScrambleState>().order.length; i++) {
+        const scramble = current<ScrambleState>()
+        const target = scramble.order[scramble.index]
+        const item = target === undefined ? undefined : items.get(target)
+        if (item === undefined || target === undefined) continue
+        for (const word of sentenceWords(block, item)) {
+          act({ t: 'pick', block: block.id, side: 'a', target: word })
+        }
+        act({ t: 'tap', block: block.id, target })
       }
       break
     }

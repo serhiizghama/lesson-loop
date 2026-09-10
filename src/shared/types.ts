@@ -6,6 +6,8 @@
 
 // ── Lesson content ───────────────────────────────────────────────────────────
 
+import type { SceneId } from './scenes'
+
 export type Audience = 'kids' | 'teens' | 'adults'
 
 /** A face is one way of showing an item: its picture, its word, its gloss, a tag. */
@@ -41,6 +43,12 @@ export type SentenceLevel = {
 }
 
 export type Bucket = { key: string; label: string; emoji: string }
+
+/**
+ * Where one item belongs on a scene: `[x, y, width, height]` as fractions of the drawing,
+ * so a place survives every viewport and every screen size (design D126).
+ */
+export type Spot = [x: number, y: number, width: number, height: number]
 
 /**
  * One of the two things a description asks about an item: the question as the learner
@@ -110,6 +118,39 @@ export type Block =
       /** The sentence both answers add up to, shown when the item is finished. */
       sentence: string
     })
+  /**
+   * A drawing the app carries, labelled by the lesson. `scene` names the artwork and
+   * `spots` places each selected item on it as `[x, y, width, height]` in fractions of the
+   * drawing — so the drawing decides nothing about what is asked, and two lessons can
+   * label one figure with different words (design D126).
+   */
+  | (BlockBase & {
+      type: 'hotspot'
+      items: ItemRef
+      scene: SceneId
+      spots: Record<string, Spot>
+      /** Spoken when a word is placed correctly; the plain English word without it. */
+      speak?: string
+    })
+  /**
+   * Pairs face down. The two faces are declared exactly as `match` declares them, because
+   * it is the same pairing with the answer hidden — and, for the same reason as `match`,
+   * `speak` belongs to the closing of a pair rather than to a card.
+   */
+  | (BlockBase & {
+      type: 'memory'
+      items: ItemRef
+      left: Face
+      right: Face
+      count?: number
+      speak?: string
+    })
+  /**
+   * One sentence per item, offered as its own words shuffled. Declared as a template like
+   * every other sentence in the format: the block says `{this} {be} my {en}.` once and the
+   * engine renders it for each word of the lesson (design D131).
+   */
+  | (BlockBase & { type: 'scramble'; items: ItemRef; template: string })
   | (BlockBase & { type: 'finish'; message: string })
 
 export type BlockType = Block['type']
@@ -178,6 +219,41 @@ export type DescribeState = {
   /** The question last answered wrongly, cleared by the next action. */
   wrong: Side | null
 }
+/**
+ * `order` is the bank of words still to place, shuffled; `placed` the items already on the
+ * drawing. Deliberately the shape `sort` uses, because it is the same interaction with a
+ * picture in place of buckets (design D127).
+ */
+export type HotspotState = {
+  order: string[]
+  selected: string | null
+  placed: string[]
+  /** Last refused placement, cleared by the next action. Both screens see the mistake. */
+  wrong: { item: string; spot: string } | null
+}
+/**
+ * `order` is the board, each item appearing twice as `<itemId>#a` and `<itemId>#b`, so a
+ * card has a stable id and its item is recoverable by splitting. `up` holds at most two.
+ */
+export type MemoryState = {
+  order: string[]
+  up: string[]
+  matched: string[]
+  /** Attempts made, counted for the learner's interest and never scored (design D129). */
+  tries: number
+}
+export type ScrambleState = {
+  order: string[]
+  /** Index into `order` of the item whose sentence is being built. */
+  index: number
+  /**
+   * How many words of that sentence are down. A count rather than a list because the
+   * sentence is only ever built in order, so the words placed are always its first `n`.
+   */
+  placed: number
+  /** The word last refused, cleared by the next action. Both screens see the mistake. */
+  wrong: string | null
+}
 export type FinishState = { seen: boolean }
 
 export type BlockStateMap = {
@@ -190,6 +266,9 @@ export type BlockStateMap = {
   phrases: PhrasesState
   quiz: QuizState
   describe: DescribeState
+  hotspot: HotspotState
+  memory: MemoryState
+  scramble: ScrambleState
   finish: FinishState
 }
 
@@ -215,12 +294,15 @@ export type Action =
   | { t: 'reset'; block: string }
   /**
    * cards: flip · listen: answer · tpr: advance past `target` · sentence: choose item ·
-   * phrases: play the phrase at index `target` · quiz: answer with item `target`
+   * phrases: play the phrase at index `target` · quiz: answer with item `target` ·
+   * memory: turn up card `target` · scramble: advance past the item `target`
    */
   | { t: 'tap'; block: string; target: string }
   /**
    * match: side a/b of the pair · sort: 'a' an item, 'b' a bucket key ·
-   * describe: 'a' the first question, 'b' the second, `target` the value chosen
+   * describe: 'a' the first question, 'b' the second, `target` the value chosen ·
+   * hotspot: 'a' a word from the bank, 'b' a place on the drawing ·
+   * scramble: 'a' the word `target`, which must be the next one in the sentence
    */
   | { t: 'pick'; block: string; side: Side; target: string }
   | { t: 'level'; block: string; level: number }

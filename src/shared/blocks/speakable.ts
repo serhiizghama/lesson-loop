@@ -5,6 +5,8 @@ import { cardsSpeech } from './cards'
 import { matchPairSpeech } from './match'
 import { quizSpeech } from './quiz'
 import { describeSentence } from './describe'
+import { hotspotSpeech } from './hotspot'
+import { memoryPairSpeech } from './memory'
 
 /**
  * Every line a lesson can ever speak, derived from its data alone (spec: every line a
@@ -67,6 +69,28 @@ function linesOf(lesson: Lesson, block: Block): Array<string | null> {
     case 'describe':
       // DescribeView speaks the combined sentence, and only once both answers are in.
       return resolveItems(lesson, block.items).map((item) => describeSentence(block, item))
+
+    case 'hotspot':
+      // HotspotView speaks the word as it is picked up, and the block's line as it lands.
+      return resolveItems(lesson, block.items).flatMap((item) => [
+        item.en,
+        hotspotSpeech(block, item),
+      ])
+
+    case 'memory':
+      // MemoryView speaks each face as its card turns up, and the pair line when one closes.
+      return resolveItems(lesson, block.items).flatMap((item) => [
+        faceSpeech(item, block.left),
+        faceSpeech(item, block.right),
+        memoryPairSpeech(block, item),
+      ])
+
+    case 'scramble':
+      // ScrambleView speaks the whole sentence when its last word lands, and no word of it
+      // on its own (design D132) — which is what keeps this one line per item.
+      return resolveItems(lesson, block.items).map((item) =>
+        renderTemplate(block.template, item),
+      )
 
     case 'finish':
       // Nothing is spoken on the closing slide.

@@ -584,3 +584,201 @@
   justify-content: center;
   gap: 0.5rem;
 }
+
+/* ── Hotspot ──────────────────────────────────────────────────────────────── */
+
+/*
+ * The drawing and the bank of words, side by side at the stage's reference width. Laid out
+ * in pixels rather than in fractions of the window on purpose (design D103): the stage is
+ * always this wide and then scaled, so both screens put every place in the same spot — and
+ * a mark drawn over the nose is a mark over the nose on the other screen too.
+ */
+.hotspot {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.hotspotScene {
+  position: relative;
+  flex: 0 0 41rem;
+  max-width: 41rem;
+}
+
+.hotspotDrawing {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* What the learner sees: exactly the rectangle the lesson declared. */
+.hotspotOutline {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px dashed var(--accent);
+  border-radius: var(--radius);
+  background: rgb(76 95 215 / 8%);
+  pointer-events: none;
+}
+
+.hotspotOutlinePlaced {
+  border-style: solid;
+  border-color: var(--correct);
+  background: var(--correct-soft);
+}
+
+.hotspotOutlineWrong {
+  border-color: var(--wrong);
+  background: var(--wrong-soft);
+  animation: shake 320ms ease;
+}
+
+.hotspotLabel {
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/*
+ * What accepts the tap: the same place, grown around its centre to a fingertip. Invisible,
+ * because growing what is drawn would put the nose in the wrong place (design D128).
+ */
+.hotspotTarget {
+  position: absolute;
+  background: none;
+  box-shadow: none;
+}
+
+.hotspotTarget:focus-visible {
+  outline: 3px solid var(--accent);
+  border-radius: var(--radius);
+}
+
+.hotspotBank {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+/* ── Memory ───────────────────────────────────────────────────────────────── */
+
+.memory {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/*
+ * Six columns at the stage's reference width, which lays a six-pair board out as two even
+ * rows. Fixed rather than fitted for the same reason the card grid is.
+ */
+.memoryBoard {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.75rem;
+}
+
+.memoryCard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 7rem;
+  padding: 0.5rem;
+  text-align: center;
+  background: var(--accent);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: transform 120ms ease, background 120ms ease;
+}
+
+.memoryCard:active {
+  transform: scale(0.97);
+}
+
+.memoryCardUp {
+  background: var(--card);
+}
+
+.memoryCardMatched {
+  background: var(--correct-soft);
+  box-shadow: none;
+  opacity: 0.65;
+}
+
+.memoryCardPicture {
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.memoryCardWord {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.memoryBack {
+  color: var(--card);
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+/* ── Scramble ─────────────────────────────────────────────────────────────── */
+
+.scramble {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.scramblePrompt {
+  font-size: 4.5rem;
+  line-height: 1;
+}
+
+.scrambleLine {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.scrambleLineWhole {
+  background: var(--correct-soft);
+}
+
+.scrambleBlank {
+  color: var(--ink-soft);
+}
+
+.scrambleChips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.scrambleNext {
+  min-height: var(--tap);
+  padding: 0.5rem 1.5rem;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--card);
+  font-size: 1.05rem;
+  font-weight: 700;
+  box-shadow: var(--shadow);
+}

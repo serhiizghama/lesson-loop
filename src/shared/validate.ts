@@ -1,6 +1,7 @@
 import { z } from 'zod'
-import type { Face, Item, ItemRef, Lesson } from './types'
-import { faceValue, tagOfFace, tagsUsedByTemplate } from './text'
+import type { Face, Item, ItemRef, Lesson, Spot } from './types'
+import { SCENE_IDS, SCENES } from './scenes'
+import { faceValue, renderTemplate, tagOfFace, tagsUsedByTemplate } from './text'
 
 const FIXED_FACES = ['emoji', 'en', 'l1', 'example'] as const
 
@@ -33,6 +34,9 @@ const itemRefSchema = z.discriminatedUnion('select', [
 const blockBase = { id: idSchema, title: z.string().min(1), hint: z.string().min(1).optional() }
 
 const questionSchema = z.object({ label: z.string().min(1), face: faceSchema })
+
+/** A place on a drawing: x, y, width, height as fractions of it (design D126). */
+const spotSchema = z.tuple([z.number(), z.number(), z.number(), z.number()])
 
 const blockSchema = z.discriminatedUnion('type', [
   z.object({
@@ -96,6 +100,29 @@ const blockSchema = z.discriminatedUnion('type', [
     items: itemRefSchema,
     questions: z.tuple([questionSchema, questionSchema]),
     sentence: z.string().min(1),
+  }),
+  z.object({
+    ...blockBase,
+    type: z.literal('hotspot'),
+    items: itemRefSchema,
+    scene: z.enum(SCENE_IDS),
+    spots: z.record(idSchema, spotSchema),
+    speak: z.string().min(1).optional(),
+  }),
+  z.object({
+    ...blockBase,
+    type: z.literal('memory'),
+    items: itemRefSchema,
+    left: faceSchema,
+    right: faceSchema,
+    count: z.number().int().min(2).optional(),
+    speak: z.string().min(1).optional(),
+  }),
+  z.object({
+    ...blockBase,
+    type: z.literal('scramble'),
+    items: itemRefSchema,
+    template: z.string().min(1),
   }),
   z.object({ ...blockBase, type: z.literal('finish'), message: z.string().min(1) }),
 ])
@@ -258,6 +285,70 @@ function crossCheck(lesson: Lesson): string[] {
         if (block.speak !== undefined) requireTemplateTags(block.speak, 'speak')
         break
       }
+      case 'hotspot': {
+        for (const item of items) {
+          const spot = block.spots[item.id]
+          if (spot === undefined) {
+            errors.push(
+              `${at}.spots: block "${block.id}" selects "${item.id}" but gives it no place ` +
+                `on the drawing`,
+            )
+            continue
+          }
+          const [x, y, w, h] = spot
+          if (w <= 0 || h <= 0) {
+            errors.push(
+              `${at}.spots.${item.id}: block "${block.id}" gives "${item.id}" a place with ` +
+                `no width or height`,
+            )
+          } else if (x < 0 || y < 0 || x + w > 1 || y + h > 1) {
+            errors.push(
+              `${at}.spots.${item.id}: block "${block.id}" puts "${item.id}" outside the drawing`,
+            )
+          }
+        }
+        // Two words on one place cannot both be placed, so one of them could never be
+        // answered — and nothing else in the format would catch it (design D126).
+        for (const [ai, a] of items.entries()) {
+          for (const b of items.slice(ai + 1)) {
+            const one = block.spots[a.id]
+            const two = block.spots[b.id]
+            if (one === undefined || two === undefined) continue
+            if (tooClose(one, two, block.scene)) {
+              errors.push(
+                `${at}.spots: block "${block.id}" puts "${a.id}" and "${b.id}" in the same ` +
+                  `place on the drawing, so one of them could never be placed`,
+              )
+            }
+          }
+        }
+        if (block.speak !== undefined) requireTemplateTags(block.speak, 'speak')
+        break
+      }
+      case 'memory': {
+        requireFace(block.left, 'left')
+        requireFace(block.right, 'right')
+        if (block.count !== undefined && block.count > items.length) {
+          errors.push(
+            `${at}.count: block "${block.id}" asks for ${block.count} pairs but selects ${items.length} items`,
+          )
+        }
+        if (block.speak !== undefined) requireTemplateTags(block.speak, 'speak')
+        break
+      }
+      case 'scramble': {
+        requireTemplateTags(block.template, 'template')
+        for (const item of items) {
+          const words = renderTemplate(block.template, item).split(' ').filter((w) => w.length > 0)
+          if (words.length < 2) {
+            errors.push(
+              `${at}.template: block "${block.id}" renders to "${words.join(' ')}" for ` +
+                `"${item.id}" — a one-word sentence is nothing to assemble`,
+            )
+          }
+        }
+        break
+      }
       case 'describe': {
         for (const [qi, question] of block.questions.entries()) {
           requireFace(question.face, `questions.${qi}.face`)
@@ -282,6 +373,20 @@ function crossCheck(lesson: Lesson): string[] {
   }
   return errors
 }
+
+/**
+ * Whether two places would land under one finger. Uses the same separation the views rely
+ * on to tell enlarged targets apart (design D128), measured in the scene's own space.
+ */
+function tooClose(a: Spot, b: Spot, scene: keyof typeof SCENES): boolean {
+  const size = SCENES[scene]
+  const dx = (a[0] + a[2] / 2 - (b[0] + b[2] / 2)) * size.width
+  const dy = (a[1] + a[3] / 2 - (b[1] + b[3] / 2)) * size.height
+  return Math.hypot(dx, dy) < MIN_APART
+}
+
+/** How far apart two places must be, in a scene's own coordinates (design D128). */
+const MIN_APART = 110
 
 function faceMissing(item: Item, face: Face, lesson: Lesson): boolean {
   if (face === 'emoji') return item.emoji.length === 0

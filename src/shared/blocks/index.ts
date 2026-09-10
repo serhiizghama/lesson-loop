@@ -9,6 +9,9 @@ import { tprLogic } from './tpr'
 import { phrasesLogic } from './phrases'
 import { quizLogic } from './quiz'
 import { describeLogic } from './describe'
+import { hotspotLogic } from './hotspot'
+import { memoryLogic } from './memory'
+import { scrambleLogic } from './scramble'
 import { finishLogic } from './finish'
 
 /**
@@ -25,6 +28,9 @@ export const blockLogic: { [T in BlockType]: BlockLogic<T> } = {
   phrases: phrasesLogic,
   quiz: quizLogic,
   describe: describeLogic,
+  hotspot: hotspotLogic,
+  memory: memoryLogic,
+  scramble: scrambleLogic,
   finish: finishLogic,
 }
 
@@ -36,4 +42,9 @@ export { tprCurrent } from './tpr'
 export { phraseAt } from './phrases'
 export { quizChoices, quizSpeech, quizTarget, DEFAULT_QUIZ_CHOICES } from './quiz'
 export { currentItem, describeChoices, describeSentence } from './describe'
+export { hotspotSpeech, spotInWords } from './hotspot'
+export { cardFace, cardId, cardItem, memoryPairSpeech } from './memory'
+export {
+  scrambleChips, scramblePlaced, scrambleTarget, scrambleUsed, sentenceWords,
+} from './scramble'
 export { speakableLines } from './speakable'

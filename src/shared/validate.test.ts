@@ -312,3 +312,120 @@ describe('the three exercises added for Shapes', () => {
     expect(errorsOf({ ...describe_, sentence: 'The {en} says {tag:move}.' })).toContain('"dog"')
   })
 })
+
+describe('the three exercises added for the body diagram', () => {
+  function withBlock(block: unknown): unknown {
+    const lesson = structuredClone(base()) as unknown as { blocks: unknown[] }
+    lesson.blocks.push(block)
+    return lesson
+  }
+
+  function errorsOf(block: unknown): string {
+    const result = validateLesson(withBlock(block))
+    expect(result.ok).toBe(false)
+    return result.ok ? '' : result.errors.join('\n')
+  }
+
+  function accepts(block: unknown): boolean {
+    return validateLesson(withBlock(block)).ok
+  }
+
+  /** Three places on the body scene, far enough apart to be told apart under a finger. */
+  const hotspot = {
+    id: 'label', type: 'hotspot', title: 'Label it', items: { select: 'all' },
+    scene: 'body',
+    spots: {
+      dog: [0.10, 0.05, 0.20, 0.10],
+      cat: [0.42, 0.40, 0.12, 0.14],
+      lion: [0.75, 0.80, 0.16, 0.12],
+    },
+  }
+  const memory = {
+    id: 'faces', type: 'memory', title: 'Find the pairs', items: { select: 'all' },
+    left: 'emoji', right: 'en',
+  }
+  const scramble = {
+    id: 'build', type: 'scramble', title: 'Build it', items: { select: 'all' },
+    template: '{this} {be} {article} {en}.',
+  }
+
+  it('accepts all three when they are well formed', () => {
+    expect(accepts(hotspot)).toBe(true)
+    expect(accepts(memory)).toBe(true)
+    expect(accepts(scramble)).toBe(true)
+  })
+
+  // ── hotspot ────────────────────────────────────────────────────────────────
+
+  it('rejects a scene the app does not carry', () => {
+    const errors = errorsOf({ ...hotspot, scene: 'kitchen' })
+    expect(errors).toContain('scene')
+  })
+
+  it('rejects a selected item with no place on the drawing', () => {
+    const { lion: _lion, ...rest } = hotspot.spots
+    const errors = errorsOf({ ...hotspot, spots: rest })
+    expect(errors).toContain('"label"')
+    expect(errors).toContain('"lion"')
+  })
+
+  it('rejects a place that falls outside the drawing', () => {
+    const errors = errorsOf({
+      ...hotspot,
+      spots: { ...hotspot.spots, lion: [0.9, 0.8, 0.2, 0.12] },
+    })
+    expect(errors).toContain('"label"')
+    expect(errors).toContain('outside the drawing')
+    expect(errors).toContain('"lion"')
+  })
+
+  it('rejects a place with no width or height', () => {
+    const errors = errorsOf({
+      ...hotspot,
+      spots: { ...hotspot.spots, cat: [0.42, 0.40, 0, 0.14] },
+    })
+    expect(errors).toContain('no width or height')
+  })
+
+  it('rejects two words given the same place, which one could never be placed', () => {
+    const errors = errorsOf({
+      ...hotspot,
+      spots: { ...hotspot.spots, cat: [0.10, 0.05, 0.20, 0.10] },
+    })
+    expect(errors).toContain('"label"')
+    expect(errors).toContain('same place')
+    expect(errors).toContain('"cat"')
+  })
+
+  it('rejects a placement line naming a tag an item does not carry', () => {
+    expect(errorsOf({ ...hotspot, speak: 'This is my {tag:move}.' })).toContain('"dog"')
+  })
+
+  // ── memory ─────────────────────────────────────────────────────────────────
+
+  it('rejects a memory face a selected item cannot render', () => {
+    const errors = errorsOf({ ...memory, right: 'example' })
+    expect(errors).toContain('"faces"')
+    expect(errors).toContain('"dog"')
+  })
+
+  it('rejects more pairs than there are words', () => {
+    expect(errorsOf({ ...memory, count: 4 })).toContain('asks for 4 pairs')
+  })
+
+  it('rejects a pair line naming a tag an item does not carry', () => {
+    expect(errorsOf({ ...memory, speak: 'The {en} says {tag:move}!' })).toContain('"dog"')
+  })
+
+  // ── scramble ───────────────────────────────────────────────────────────────
+
+  it('rejects a template naming a tag an item does not carry', () => {
+    expect(errorsOf({ ...scramble, template: 'The {en} says {tag:move}.' })).toContain('"dog"')
+  })
+
+  it('rejects a template that renders to one word, which is nothing to assemble', () => {
+    const errors = errorsOf({ ...scramble, template: '{en}' })
+    expect(errors).toContain('"build"')
+    expect(errors).toContain('nothing to assemble')
+  })
+})

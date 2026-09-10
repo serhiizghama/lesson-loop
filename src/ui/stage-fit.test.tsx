@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
 import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { LessonPlayer } from './LessonPlayer'
 import { STAGE_REFERENCE_PX } from './stage'
@@ -88,9 +90,11 @@ afterEach(() => {
   Reflect.deleteProperty(HTMLElement.prototype, 'offsetHeight')
 })
 
-function render(): HTMLElement {
+function render(slide = 0): HTMLElement {
   act(() => {
-    root.render(<LessonPlayer lesson={lesson} store={store(testState())} onExit={() => {}} />)
+    root.render(
+      <LessonPlayer lesson={lesson} store={store({ ...testState(), slide })} onExit={() => {}} />,
+    )
   })
   const wrapper = container.querySelector<HTMLElement>('[data-scaled="true"]')
   if (wrapper === null) throw new Error('the stage was never marked scaled')
@@ -131,5 +135,50 @@ describe('the player scales the stage to the space it has (design D103)', () => 
     })
     // No marker, so the stylesheet's fluid layout — what the stage did before D103 — stands.
     expect(container.querySelector('[data-scaled="true"]')).toBeNull()
+  })
+})
+
+/**
+ * The three exercises added with the body diagram lay out inside the same fixed box as
+ * every other one: a place on the drawing, a card on the board and a chip in a sentence
+ * must name the same thing on both screens, which is only true while the stage is laid
+ * out at its reference width and merely scaled (design D103, D128).
+ */
+describe('a diagram, a board and a scrambled sentence lay out at the reference width', () => {
+  const slidesOf = (types: string[]) =>
+    lesson.blocks.flatMap((block, at) => (types.includes(block.type) ? [[block.type, at]] : []))
+
+  it.each(slidesOf(['hotspot', 'memory', 'scramble']))(
+    '%s is laid out at the reference width and scaled from there',
+    (_type, slide) => {
+      measureAs(380, 900)
+      const wrapper = render(slide as number)
+      expect(wrapper.style.getPropertyValue('--stage-reference')).toBe(`${STAGE_REFERENCE_PX}px`)
+      expect(Number(wrapper.style.getPropertyValue('--stage-scale'))).toBeCloseTo(
+        380 / STAGE_REFERENCE_PX,
+      )
+    },
+  )
+
+  it('gives the exercise the same box whatever the window is', () => {
+    const [, slide] = slidesOf(['hotspot'])[0] as [string, number]
+    measureAs(1280, 900)
+    expect(render(slide).style.getPropertyValue('--stage-scale')).toBe('1')
+    measureAs(380, 900)
+    expect(render(slide).style.getPropertyValue('--stage-reference')).toBe(`${STAGE_REFERENCE_PX}px`)
+  })
+
+  it('carries no viewport unit and no breakpoint into the three new block styles', () => {
+    // A block that reflowed with the window would put the third card in a different place
+    // on the two screens, and the mark drawn over it somewhere else again.
+    //
+    // Scoped to the styles added here on purpose: six of the older blocks still size a
+    // font with `clamp(…, Nvw, …)`, which predates the fixed stage (design D103) and is
+    // left alone rather than restyled from inside this change.
+    const css = readFileSync(join(process.cwd(), 'src/blocks/blocks.module.css'), 'utf8')
+    const added = css.slice(css.indexOf('/* ── Hotspot'))
+    expect(added.length).toBeGreaterThan(0)
+    expect(added).not.toMatch(/@media/)
+    expect(added).not.toMatch(/\b\d+(\.\d+)?v[wh]\b/)
   })
 })
