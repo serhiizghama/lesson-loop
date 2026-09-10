@@ -149,13 +149,13 @@ is pushed, not when the file is saved.
 
 ### Which build am I looking at?
 
-The home screen carries one quiet line at the bottom: `lesson-loop@0.1.16 · 2026-09-04 18:29`.
+The home screen carries one quiet line at the bottom: `lesson-loop@0.2.30 · 2026-09-10 14:50`.
 It is there so that "it stopped working" can be answered — a tab left open since the
 morning shows an older version than a freshly opened one, and that is usually the whole
 story.
 
-**Nothing bumps the version.** `package.json` keeps the major and minor (`0.1.0`), and the
-build appends how many commits the history carries, so `0.1.16` is the sixteenth commit.
+**Nothing bumps the version.** `package.json` keeps the major and minor (`0.2.0`), and the
+build appends how many commits the history carries, so `0.2.30` is the thirtieth commit.
 No script edits a file, no job commits back to the repository, and no tag is created — the
 number is derived when `npm run build` runs and baked into the bundle. To raise the minor,
 edit `package.json`; the rest counts itself.
