@@ -158,13 +158,11 @@ item, never decided by the engine.
 Of those four lessons, the exercises that practise the frame — meeting the words with
 their syllables, the sentence and its longer form, listening for a word, assembling the
 sentence, the clue riddles, choosing which pattern a place takes, asking and answering
-(*Do you like…?*, *Is this your…?*, *Do you want to go…?*) and the hidden-item guessing
-game — SHALL be playable as exercises. The remaining dialogues — the role-plays, choosing
-between two things and the talk questions — SHALL be carried as their model sentences,
-which the learner hears and says, without the interaction the original wrapped around
-them. The remaining exercises SHALL be absent by name: the picture hunt, the three-times
-speaking meter, the spinning wheel, the silly voices, the blurred guess, the free sentence
-combiner, and the survey and family album.
+(*Do you like…?*, *Is this your…?*, *Do you want to go…?*), the hidden-item guessing game,
+the blurred guess, the role-plays, the talk questions, choosing between two things and the
+sentence combiner — SHALL be playable as exercises. The remaining exercises SHALL be
+absent by name: the picture hunt, the three-times speaking meter, the spinning wheel, the
+silly voices, and the survey and family album.
 Each needs a mechanic the engine does not have, and nothing in the format half-implements
 any of them.
 
@@ -221,13 +219,19 @@ any of them.
 
 #### Scenario: A dialogue is carried as its sentences
 - **WHEN** a role-play, this-or-that or talk-time exercise of these lessons is played
-- **THEN** its lines are model phrases the learner can hear on a tap, and no role swap or
-  question levels are shown
+- **THEN** it is played as an exercise of its own: a role-play shows its two roles and
+  lets them swap, a choice between two things shows both pictures, and the talk questions
+  climb their levels
+
+#### Scenario: The blurred guess and the sentence combiner are played
+- **WHEN** any of the four topics is played at its whole size
+- **THEN** it contains a blurred-picture exercise and a sentence-combining exercise over
+  its words
 
 #### Scenario: The new lessons' deferred exercises are absent
 - **WHEN** any size of the four new topics is played
-- **THEN** none of the picture hunt, speaking meter, wheel, silly voices, blurred guess,
-  free combiner, survey or album appears in any form
+- **THEN** none of the picture hunt, speaking meter, wheel, silly voices, survey or album
+  appears in any form
 
 ### Requirement: A lesson teaches one sitting's worth of vocabulary
 
@@ -460,3 +464,73 @@ played when any of these does not hold, at any size the topic offers.
 #### Scenario: More rounds than items
 - **WHEN** a secret game declares three rounds and a size of the topic gives it two items
 - **THEN** the file is reported as invalid, naming the block and the size
+
+### Requirement: A blurred-picture exercise declares the line its reveal says
+
+A blurred-picture exercise SHALL declare the line shown and spoken when an item is
+revealed, as a sentence template. A lesson SHALL be rejected before it is played when the
+template reads a tag that a selected item lacks.
+
+#### Scenario: A reveal line reading a missing tag
+- **WHEN** the reveal line reads a tag one selected item does not carry
+- **THEN** the file is reported as invalid, naming the block, the item and the tag
+
+### Requirement: A role-play declares its two roles and its lines
+
+A role-play SHALL declare exactly two role names and at least two lines. Each line SHALL
+name the role that says it (the first or the second) and SHALL be a sentence template. A
+lesson SHALL be rejected before it is played when a line names neither role, or reads a
+tag that a selected item lacks.
+
+#### Scenario: A line with no speaker
+- **WHEN** a role-play line names a third role
+- **THEN** the file is reported as invalid, naming the block and the line
+
+### Requirement: A talk exercise declares its questions by level
+
+A talk exercise SHALL declare at least two levels, each with a label and at least one
+question written as literal text — like model phrases, talk questions are about the
+learner, not about any one item.
+
+#### Scenario: A single level
+- **WHEN** a talk exercise declares one level
+- **THEN** the file is reported as invalid, because there is nothing harder to move to
+
+### Requirement: A preference exercise declares its sentence and rounds
+
+A preference exercise SHALL declare its sentence as a template that MAY name the item not
+chosen with `{other}` (its English word), and how many rounds it plays. `{other}` SHALL be
+accepted in this template only. A preference exercise SHALL select at least two items, and
+its rounds SHALL NOT exceed the number of different pairs its selection can make. A lesson
+SHALL be rejected before it is played when any of these does not hold, at any size the
+topic offers.
+
+#### Scenario: `{other}` elsewhere
+- **WHEN** a sentence exercise's level uses `{other}`
+- **THEN** the file is reported as invalid, naming the block and the placeholder
+
+#### Scenario: More rounds than pairs
+- **WHEN** a preference exercise over two items declares two rounds
+- **THEN** the file is reported as invalid, because two items make one pair
+
+### Requirement: A sentence-combining exercise declares its rows and its template
+
+A sentence-combining exercise SHALL declare at least one row, each with an id, a label and
+at least one option, and a template that names each row as `{row:<id>}` and the chosen
+item through the usual placeholders.
+
+- An option SHALL be literal text. It MAY carry a mood, `good` or `bad`, and MAY name the
+  items it belongs to.
+- A lesson SHALL be rejected before it is played when:
+  - the template names a row the block does not declare, or a declared row is never named;
+  - an option names an item that is not selected;
+  - a selected item has no option in some row;
+  - *Surprise me* could not find, for some item, options whose moods agree.
+
+#### Scenario: A row the template forgets
+- **WHEN** a block declares a row `why` and its template never names `{row:why}`
+- **THEN** the file is reported as invalid, naming the block and the row
+
+#### Scenario: A place with nothing to do
+- **WHEN** every option of a row belongs to other places than home
+- **THEN** the file is reported as invalid, naming the block, the row and home

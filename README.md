@@ -16,6 +16,10 @@ have. A line without a clip — a lesson added but not yet recorded — is spoke
 browser instead, so a new lesson works the moment its JSON exists. After editing a
 lesson, `npm run audio` records whatever is new.
 
+One exercise is never recorded on purpose: the sentences a `combine` block builds. Its
+rows multiply into hundreds of sentences per lesson, so they are left to the device's own
+voice, by the teacher's choice. Everything else in the same lesson is still recorded.
+
 **Every word is drawn.** Vocabulary is shown as a picture rather than an emoji: one flat
 illustration per item, 512×512 and about 35 KB, committed under `public/pics`. An item
 with no picture falls back to its emoji, so a lesson plays the moment its JSON exists and
@@ -243,10 +247,17 @@ block may also carry `"only": ["<part id>"]`.
 | `scramble` | Builds a sentence from its words, shuffled | `template` |
 | `yesno` | Sees a picture and a question, taps Yes or No, hears the full reply | `question`, `yes`, `no` (templates), `check` |
 | `secret` | Asks about one tile after another until the hidden item is found | `guess`, `found` (templates), `rounds` |
+| `reveal` | Guesses a blurred picture, peeks, reveals it and hears its sentence | `speak` (template) |
+| `dialogue` | Plays one role of a short dialogue, a line at a time; roles can swap | `roles` (two), `lines` (`role` 0/1 + template) |
+| `talk` | Answers talk questions, climbing from easy to harder | `levels` (label + literal lines) |
+| `prefer` | Picks one of two pictures: *I prefer grapes to pears.* | `sentence` (template with `{other}`), `rounds` |
+| `combine` | Builds a longer sentence from rows of choices | `rows`, `template` (with `{row:<id>}`) |
 | `finish` | The closing screen | `message` |
 
 A **face** is one way of showing an item: `emoji`, `en`, `l1`, `example`, or `tag:<name>`.
 A **template** fills `{en}`, `{article}`, `{it}`, `{be}`, `{this}`, `{l1}` and `{tag:<name>}`.
+Two placeholders belong to one block each: `{other}` is the item *not* chosen in a `prefer`
+round, and `{row:<id>}` is the option chosen in a `combine` row.
 `speak` is a template too: the line a block says out loud about one item. Without it a
 card speaks the English word and a pair says nothing beyond the tile that was tapped.
 

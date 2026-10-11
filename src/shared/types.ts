@@ -195,7 +195,54 @@ export type Block =
       /** Rendered for the secret. */
       found: string
     })
+  /**
+   * One picture at a time, blurred; peek makes it clearer, reveal shows it and says
+   * `speak`. Nothing is wrong: the guess is said aloud and judged by the teacher (design D151).
+   */
+  | (BlockBase & { type: 'reveal'; items: ItemRef; speak: string })
+  /**
+   * A role-play: two named roles and, per item, an ordered dialogue of templates, each
+   * line said by one role. Swapping roles relabels who plays which, nothing more (design D152).
+   */
+  | (BlockBase & {
+      type: 'dialogue'
+      items: ItemRef
+      roles: [string, string]
+      lines: DialogueLine[]
+    })
+  /**
+   * Talk questions in levels from easiest to hardest, as literal text — like model
+   * phrases, they are about the learner, not about an item (design D153).
+   */
+  | (BlockBase & { type: 'talk'; levels: TalkLevel[] })
+  /**
+   * Two items a round; the learner picks one and the sentence is rendered for it, with
+   * `{other}` naming the one not chosen (design D154).
+   */
+  | (BlockBase & { type: 'prefer'; items: ItemRef; sentence: string; rounds: number })
+  /**
+   * Rows of choices — the selected items as one of them — joined by a template naming each
+   * option row as `{row:<id>}`. Its sentences are spoken by the device's voice, not
+   * recorded (design D155).
+   */
+  | (BlockBase & { type: 'combine'; items: ItemRef; rows: CombineRow[]; template: string })
   | (BlockBase & { type: 'finish'; message: string })
+
+/** One line of a role-play: which of the two roles says it, and what, as a template. */
+export type DialogueLine = { role: 0 | 1; text: string }
+export type TalkLevel = { label: string; lines: string[] }
+export type CombineMood = 'good' | 'bad'
+export type CombineOption = {
+  text: string
+  /** Two chosen options with different moods make a sentence worth questioning. */
+  mood?: CombineMood
+  /** The items this option belongs to; absent means every item. */
+  for?: string[]
+}
+/** A row of options, or the one row whose choices are the block's items. */
+export type CombineRow =
+  | { id: string; label: string; options: CombineOption[] }
+  | { items: true; label: string }
 
 export type BlockType = Block['type']
 export type BlockOf<T extends BlockType> = Extract<Block, { type: T }>
@@ -341,6 +388,45 @@ export type SecretState = {
   /** Whether this round's secret has been revealed. */
   found: boolean
 }
+export type RevealState = {
+  order: string[]
+  index: number
+  /** 0 blurred, 1 peeked, 2 revealed. */
+  stage: 0 | 1 | 2
+}
+export type DialogueState = {
+  order: string[]
+  index: number
+  /** How many of the current item's lines are shown. */
+  shown: number
+  /** Whether the student plays the first role rather than the teacher. */
+  swapped: boolean
+}
+/**
+ * Each level's questions in an order fixed at `init`, and how far each has been asked;
+ * `reduce` has no seed to shuffle with (design D153).
+ */
+export type TalkState = {
+  orders: number[][]
+  cursors: number[]
+  level: number
+  /** The question on screen as `<level>:<index>`, or null before the first. */
+  current: string | null
+  /** Whether a question of the last level has been asked. */
+  top: boolean
+}
+export type PreferState = {
+  pairs: Array<[string, string]>
+  index: number
+  chosen: string | null
+}
+export type CombineState = {
+  item: string | null
+  /** Option index chosen in each option row, by row id. */
+  picks: Record<string, number>
+  /** Items a whole sentence has been heard for. */
+  heard: string[]
+}
 export type FinishState = { seen: boolean }
 
 export type BlockStateMap = {
@@ -358,6 +444,11 @@ export type BlockStateMap = {
   scramble: ScrambleState
   yesno: YesNoState
   secret: SecretState
+  reveal: RevealState
+  dialogue: DialogueState
+  talk: TalkState
+  prefer: PreferState
+  combine: CombineState
   finish: FinishState
 }
 

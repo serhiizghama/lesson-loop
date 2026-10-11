@@ -180,6 +180,36 @@ export const EXERCISES: readonly {
     child: 'Asks about one picture after another until the hidden one is found.',
     teacher: 'Your key names the secret. Make them say the whole question before every tap.',
   },
+  {
+    type: 'reveal',
+    name: 'Guess and say',
+    child: 'Sees a blurred picture, guesses out loud, peeks, then reveals it and hears the sentence.',
+    teacher: 'Nothing on screen is wrong here — you decide whether the guess was right. Your key names each picture.',
+  },
+  {
+    type: 'dialogue',
+    name: 'Role-play',
+    child: 'Plays one role of a short dialogue, a line at a time.',
+    teacher: 'The labels say who plays which role. Swap roles only changes the labels — either of you can tap.',
+  },
+  {
+    type: 'talk',
+    name: 'Talk time',
+    child: 'Answers a question in a full sentence, then a harder one.',
+    teacher: 'Press Harder when an answer came easily. Your key lists every question by level.',
+  },
+  {
+    type: 'prefer',
+    name: 'This or that',
+    child: 'Picks one of two pictures and says which they prefer.',
+    teacher: 'There is no right answer. Ask "why?" and help them finish with "because…".',
+  },
+  {
+    type: 'combine',
+    name: 'Say more',
+    child: 'Builds a longer sentence by choosing from each row, then hears it.',
+    teacher: 'If the parts disagree it asks "Does that make sense?" — talk about it. This sentence is read by the device’s own voice.',
+  },
 ]
 
 /**

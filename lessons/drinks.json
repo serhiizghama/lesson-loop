@@ -34,12 +34,12 @@
     {
       "id": "vocab", "type": "cards", "title": "🔊 Meet the Drinks!",
       "hint": "Tap a card to hear it. Clap the syllables, then say it: whisper, normal, loud!",
-      "items": { "select": "all" }, "front": "emoji", "back": ["en", "tag:syl", "l1"]
+      "items": { "select": "all"  }, "front": "emoji", "back": ["en", "tag:syl", "l1"]
     },
     {
       "id": "say", "type": "sentence", "title": "💬 I Like…",
       "hint": "Choose a drink. Then grow your sentence, one step at a time.",
-      "items": { "select": "all" },
+      "items": { "select": "all"  },
       "levels": [
         { "label": "One word", "template": "{en}" },
         { "label": "I like…", "template": "I like {en}." },
@@ -47,56 +47,104 @@
       ]
     },
     {
+      "id": "more", "type": "combine", "title": "🚀 Say More!",
+      "hint": "Build a bigger sentence: feeling + drink + because. Then say it in your own voice!",
+      "items": { "select": "all" },
+      "rows": [
+        { "id": "feel", "label": "1️⃣ How do you feel?", "options": [
+          { "text": "I like", "mood": "good" },
+          { "text": "I really like", "mood": "good" },
+          { "text": "I love", "mood": "good" },
+          { "text": "I don't like", "mood": "bad" },
+          { "text": "I don't really like", "mood": "bad" }
+        ] },
+        { "items": true, "label": "2️⃣ Which drink?" },
+        { "id": "why", "label": "3️⃣ Why? Because…", "options": [
+          { "text": "it is tasty", "mood": "good" },
+          { "text": "it is sweet", "mood": "good" },
+          { "text": "it is refreshing", "mood": "good" },
+          { "text": "it is healthy", "mood": "good" },
+          { "text": "it is delicious", "mood": "good" },
+          { "text": "it is warm", "mood": "good" },
+          { "text": "it is cold", "mood": "good" },
+          { "text": "it is creamy", "mood": "good" },
+          { "text": "it is boring", "mood": "bad" },
+          { "text": "it is too sweet", "mood": "bad" },
+          { "text": "it is too hot", "mood": "bad" },
+          { "text": "it is too bitter", "mood": "bad" },
+          { "text": "it is too sour", "mood": "bad" }
+        ] }
+      ],
+      "template": "{row:feel} {en} because {row:why}."
+    },
+    {
       "id": "ask", "type": "yesno", "title": "❓ Ask & Answer",
       "hint": "Say your answer first, then tap Yes or No!",
-      "items": { "select": "all" },
+      "items": { "select": "all"  },
       "question": "Do you like {en}?",
       "yes": "Yes, I do. I like {en}.",
       "no": "No, I don't. I don't like {en}."
     },
     {
+      "id": "guess", "type": "reveal", "title": "🙈 Guess & Say",
+      "hint": "What is hiding? Guess out loud first, then peek, then reveal!",
+      "items": { "select": "all" }, "speak": "I like {en}."
+    },
+    {
       "id": "hear", "type": "listen", "title": "👂 Listen & Pop!",
       "hint": "Listen, then tap the drink you heard.",
-      "items": { "select": "all" }, "choices": 4
+      "items": { "select": "all"  }, "choices": 4
     },
     {
       "id": "build", "type": "scramble", "title": "🧩 Build the Sentence",
       "hint": "Tap the words in order: I → like → drink.",
-      "items": { "select": "all" }, "template": "I like {en}."
+      "items": { "select": "all"  }, "template": "I like {en}."
     },
     {
-      "id": "cafe", "type": "phrases", "title": "🛒 The Drinks Café",
+      "id": "cafe", "type": "dialogue", "title": "🛒 The Drinks Café",
       "hint": "One is the shopkeeper, one is the customer. Then swap!",
+      "items": { "select": "all" }, "roles": ["🛒 Shopkeeper", "🧑 Customer"],
       "lines": [
-        "What do you like?",
-        "I like juice.",
-        "Why do you like it?",
-        "Because it is sweet."
+        { "role": 0, "text": "What do you like?" },
+        { "role": 1, "text": "I like {en}." },
+        { "role": 0, "text": "Why do you like it?" },
+        { "role": 1, "text": "Because it is {tag:why}." }
       ]
     },
     {
-      "id": "prefer", "type": "phrases", "title": "⚖️ This or That?",
-      "hint": "Which do you prefer? Finish the sentence with your own reason!",
-      "lines": [
-        "Which do you prefer?",
-        "I prefer milk to juice because it is creamy.",
-        "I prefer tea to water because it is warm."
-      ]
+      "id": "prefer", "type": "prefer", "title": "⚖️ This or That?",
+      "hint": "Which do you prefer? Then finish it: because…",
+      "items": { "select": "all"  }, "rounds": 3,
+      "sentence": "I prefer {en} to {other}."
     },
     {
-      "id": "talk", "type": "phrases", "title": "🎤 Talk Time",
-      "hint": "Ask, then answer in a full sentence. Swap roles each time.",
-      "lines": [
-        "What drink do you like?",
-        "What's your favourite drink?",
-        "Do you like milk?",
-        "What do you drink in the morning?"
+      "id": "talk", "type": "talk", "title": "🎤 Talk Time",
+      "hint": "Ask, then answer in a full sentence. Press Harder when it was easy!",
+      "levels": [
+        { "label": "Level 1", "lines": [
+          "What drink do you like?",
+          "What's your favourite drink?",
+          "Do you like milk?",
+          "What do you drink in the morning?"
+        ] },
+        { "label": "Level 2", "lines": [
+          "Why do you like it?",
+          "Do you like it hot or cold?",
+          "When do you usually drink it?",
+          "Do you drink it every day?"
+        ] },
+        { "label": "Level 3", "lines": [
+          "What drink don't you like? Why not?",
+          "What is the best drink on a hot day? Why?",
+          "What do people drink in your country?",
+          "If you could only drink one thing for a week, what would you choose and why?"
+        ] }
       ]
     },
     {
       "id": "secret", "type": "secret", "title": "🎁 Guess My Secret Drink",
       "hint": "Ask \"Do you like…?\" out loud before every tap. Find the secret drink!",
-      "items": { "select": "all" }, "rounds": 2,
+      "items": { "select": "all"  }, "rounds": 2,
       "guess": "Do you like {en}? No, I don't.",
       "found": "Yes, I do! I like {en}."
     },

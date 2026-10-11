@@ -38,12 +38,12 @@
     {
       "id": "vocab", "type": "cards", "title": "🔊 Meet the Fruit!",
       "hint": "Tap a card to hear it. Clap the syllables, then say it: whisper, normal, loud!",
-      "items": { "select": "new" }, "front": "emoji", "back": ["en", "tag:syl", "l1"]
+      "items": { "select": "new"  }, "front": "emoji", "back": ["en", "tag:syl", "l1"]
     },
     {
       "id": "say", "type": "sentence", "title": "💬 I Like…",
       "hint": "Choose a fruit. Then grow your sentence, one step at a time.",
-      "items": { "select": "new" },
+      "items": { "select": "new"  },
       "levels": [
         { "label": "One word", "template": "{en}" },
         { "label": "I like…", "template": "I like {en}." },
@@ -51,67 +51,101 @@
       ]
     },
     {
+      "id": "more", "type": "combine", "title": "🚀 Say More!",
+      "hint": "Build a bigger sentence: feeling + fruit + because. Then say it in your own voice!",
+      "only": ["all"],
+      "items": { "select": "all" },
+      "rows": [
+        { "id": "feel", "label": "1️⃣ How do you feel?", "options": [
+          { "text": "I like", "mood": "good" },
+          { "text": "I really like", "mood": "good" },
+          { "text": "I love", "mood": "good" },
+          { "text": "I don't like", "mood": "bad" },
+          { "text": "I don't really like", "mood": "bad" }
+        ] },
+        { "items": true, "label": "2️⃣ Which fruit?" },
+        { "id": "why", "label": "3️⃣ Why? Because…", "options": [
+          { "text": "they are sweet", "mood": "good" },
+          { "text": "they are juicy", "mood": "good" },
+          { "text": "they are crunchy", "mood": "good" },
+          { "text": "they are fresh", "mood": "good" },
+          { "text": "they are healthy", "mood": "good" },
+          { "text": "they are refreshing", "mood": "good" },
+          { "text": "they are delicious", "mood": "good" },
+          { "text": "they are sour", "mood": "bad" },
+          { "text": "they are too sweet", "mood": "bad" },
+          { "text": "they are too soft", "mood": "bad" },
+          { "text": "they are too sticky", "mood": "bad" },
+          { "text": "they are too messy", "mood": "bad" }
+        ] }
+      ],
+      "template": "{row:feel} {en} because {row:why}."
+    },
+    {
       "id": "ask", "type": "yesno", "title": "❓ Ask & Answer",
       "hint": "Say your answer first, then tap Yes or No!",
       "only": ["all"],
-      "items": { "select": "all" },
+      "items": { "select": "all"  },
       "question": "Do you like {en}?",
       "yes": "Yes, I do. I like {en}.",
       "no": "No, I don't. I don't like {en}."
     },
     {
+      "id": "guess", "type": "reveal", "title": "🙈 Guess & Say",
+      "hint": "What is hiding? Guess out loud first, then peek, then reveal!",
+      "items": { "select": "new" }, "speak": "I like {en}."
+    },
+    {
       "id": "hear", "type": "listen", "title": "👂 Listen & Pop!",
       "hint": "Listen, then tap the fruit you heard.",
-      "items": { "select": "all" }, "choices": 2
+      "items": { "select": "all"  }, "choices": 2
     },
     {
       "id": "build", "type": "scramble", "title": "🧩 Build the Sentence",
       "hint": "Tap the words in order: I → like → fruit.",
-      "items": { "select": "new" }, "template": "I like {en}."
+      "items": { "select": "new"  }, "template": "I like {en}."
     },
     {
-      "id": "stand", "type": "phrases", "title": "🛒 The Fruit Stand",
+      "id": "stand", "type": "dialogue", "title": "🛒 The Fruit Stand",
       "hint": "One is the shopkeeper, one is the customer. Then swap!",
-      "only": ["a"],
+      "items": { "select": "new" }, "roles": ["🛒 Shopkeeper", "🧑 Customer"],
       "lines": [
-        "What do you like?",
-        "I like oranges.",
-        "I like pears.",
-        "Why do you like them?",
-        "Because they are juicy."
+        { "role": 0, "text": "What do you like?" },
+        { "role": 1, "text": "I like {en}." },
+        { "role": 0, "text": "Why do you like them?" },
+        { "role": 1, "text": "Because they are {tag:why}." }
       ]
     },
     {
-      "id": "stand-more", "type": "phrases", "title": "🛒 The Fruit Stand",
-      "hint": "One is the shopkeeper, one is the customer. Then swap!",
-      "only": ["b"],
-      "lines": [
-        "What do you like?",
-        "I like grapes.",
-        "I like watermelons.",
-        "Why do you like them?",
-        "Because they are sweet."
-      ]
-    },
-    {
-      "id": "prefer", "type": "phrases", "title": "⚖️ This or That?",
-      "hint": "Which do you prefer? Finish the sentence with your own reason!",
+      "id": "prefer", "type": "prefer", "title": "⚖️ This or That?",
+      "hint": "Which do you prefer? Then finish it: because…",
       "only": ["all"],
-      "lines": [
-        "Which do you prefer?",
-        "I prefer grapes to pears because they are sweeter.",
-        "I prefer watermelons to oranges because they are more refreshing."
-      ]
+      "items": { "select": "all"  }, "rounds": 3,
+      "sentence": "I prefer {en} to {other}."
     },
     {
-      "id": "talk", "type": "phrases", "title": "🎤 Talk Time",
-      "hint": "Ask, then answer in a full sentence. Swap roles each time.",
+      "id": "talk", "type": "talk", "title": "🎤 Talk Time",
+      "hint": "Ask, then answer in a full sentence. Press Harder when it was easy!",
       "only": ["all"],
-      "lines": [
-        "What fruit do you like?",
-        "What's your favourite fruit?",
-        "What colour is your favourite fruit?",
-        "Do you like fruit salad?"
+      "levels": [
+        { "label": "Level 1", "lines": [
+          "What fruit do you like?",
+          "What's your favourite fruit?",
+          "What colour is your favourite fruit?",
+          "Do you like fruit salad?"
+        ] },
+        { "label": "Level 2", "lines": [
+          "Why do you like it?",
+          "How does it taste?",
+          "When do you usually eat it?",
+          "Do you eat it fresh or as juice?"
+        ] },
+        { "label": "Level 3", "lines": [
+          "Which fruit don't you like? Why not?",
+          "Which fruit is best on a hot day? Why?",
+          "What fruit grows in your country?",
+          "If you could eat only one fruit for a year, which one and why?"
+        ] }
       ]
     },
     { "id": "done", "type": "finish", "title": "🎉 Great job!", "message": "Great job! Now you can talk about fruit!" }

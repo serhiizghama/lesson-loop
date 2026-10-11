@@ -1,8 +1,9 @@
 import { z } from 'zod'
-import type { Face, Item, ItemRef, Lesson, Spot } from './types'
+import type { Block, Face, Item, ItemRef, Lesson, Spot } from './types'
 import { WHOLE, choicesOf, narrow } from './narrow'
 import { SCENE_IDS, SCENES } from './scenes'
-import { faceValue, renderTemplate, tagOfFace, tagsUsedByTemplate } from './text'
+import { faceValue, renderTemplate, rowsUsedByTemplate, tagOfFace, tagsUsedByTemplate, usesOther } from './text'
+import { agreeingPicks, offeredFor, optionRows } from './combine-rows'
 
 const FIXED_FACES = ['emoji', 'en', 'l1', 'example'] as const
 
@@ -173,6 +174,57 @@ const blockSchema = z.discriminatedUnion('type', [
     guess: z.string().min(1),
     found: z.string().min(1),
   }),
+  z.object({ ...blockBase, type: z.literal('reveal'), items: itemRefSchema, speak: z.string().min(1) }),
+  z.object({
+    ...blockBase,
+    type: z.literal('dialogue'),
+    items: itemRefSchema,
+    roles: z.tuple([z.string().min(1), z.string().min(1)]),
+    lines: z
+      .array(z.object({ role: z.union([z.literal(0), z.literal(1)]), text: z.string().min(1) }))
+      .min(2),
+  }),
+  z.object({
+    ...blockBase,
+    type: z.literal('talk'),
+    // Two at least: one level has nothing harder to move to.
+    levels: z
+      .array(z.object({ label: z.string().min(1), lines: z.array(z.string().min(1)).min(1) }))
+      .min(2),
+  }),
+  z.object({
+    ...blockBase,
+    type: z.literal('prefer'),
+    items: itemRefSchema,
+    sentence: z.string().min(1),
+    rounds: z.number().int().min(1),
+  }),
+  z.object({
+    ...blockBase,
+    type: z.literal('combine'),
+    items: itemRefSchema,
+    rows: z
+      .array(
+        z.union([
+          z.object({
+            id: idSchema,
+            label: z.string().min(1),
+            options: z
+              .array(
+                z.object({
+                  text: z.string().min(1),
+                  mood: z.enum(['good', 'bad']).optional(),
+                  for: z.array(idSchema).min(1).optional(),
+                }),
+              )
+              .min(1),
+          }),
+          z.object({ items: z.literal(true), label: z.string().min(1) }),
+        ]),
+      )
+      .min(2),
+    template: z.string().min(1),
+  }),
   z.object({ ...blockBase, type: z.literal('finish'), message: z.string().min(1) }),
 ])
 
@@ -240,9 +292,20 @@ function crossCheck(lesson: Lesson): string[] {
     if (seenBlocks.has(block.id)) errors.push(`${at}.id: duplicate block id "${block.id}"`)
     seenBlocks.add(block.id)
 
-    // Neither works on vocabulary: the closing slide has none, and a phrase list carries
-    // its own literal text (design D119).
-    if (block.type === 'finish' || block.type === 'phrases') continue
+    // `{other}` names the second item of a preference, and no other template has one to
+    // name (design D154).
+    for (const [field, template] of templatesOf(block)) {
+      if (usesOther(template)) {
+        errors.push(
+          `${at}.${field}: block "${block.id}" uses {other}, which only a preference's ` +
+            `sentence can name`,
+        )
+      }
+    }
+
+    // None works on vocabulary: the closing slide has none, and a phrase list and talk
+    // questions carry their own literal text (design D119, D153).
+    if (block.type === 'finish' || block.type === 'phrases' || block.type === 'talk') continue
 
     for (const id of missingIds(lesson, block.items)) {
       errors.push(`${at}.items: block "${block.id}" refers to unknown item "${id}"`)
@@ -455,6 +518,72 @@ function crossCheck(lesson: Lesson): string[] {
         }
         break
       }
+      case 'reveal':
+        requireTemplateTags(block.speak, 'speak')
+        break
+      case 'dialogue':
+        for (const [li, line] of block.lines.entries()) requireTemplateTags(line.text, `lines.${li}.text`)
+        break
+      case 'prefer': {
+        requireTemplateTags(block.sentence, 'sentence')
+        const pairs = (items.length * (items.length - 1)) / 2
+        if (items.length < 2) {
+          errors.push(`${at}.items: block "${block.id}" selects ${items.length} item — a choice needs two`)
+        } else if (block.rounds > pairs) {
+          errors.push(
+            `${at}.rounds: block "${block.id}" plays ${block.rounds} rounds but its ` +
+              `${items.length} items make only ${pairs} different pairs`,
+          )
+        }
+        break
+      }
+      case 'combine': {
+        requireTemplateTags(block.template, 'template')
+        const itemRows = block.rows.filter((row) => !('id' in row))
+        if (itemRows.length !== 1) {
+          errors.push(
+            `${at}.rows: block "${block.id}" has ${itemRows.length} rows of items — it needs ` +
+              `exactly one`,
+          )
+        }
+        const declared = optionRows(block.rows).map((row) => row.id)
+        const named = rowsUsedByTemplate(block.template)
+        for (const id of named.filter((n) => !declared.includes(n))) {
+          errors.push(`${at}.template: block "${block.id}" names row "${id}", which it does not declare`)
+        }
+        for (const id of declared.filter((d) => !named.includes(d))) {
+          errors.push(`${at}.rows: block "${block.id}" declares row "${id}", which its template never names`)
+        }
+        const selected = new Set(items.map((it) => it.id))
+        for (const row of optionRows(block.rows)) {
+          for (const [oi, option] of row.options.entries()) {
+            for (const id of option.for ?? []) {
+              if (!selected.has(id)) {
+                errors.push(
+                  `${at}.rows: block "${block.id}" row "${row.id}" option ${oi} belongs to ` +
+                    `"${id}", which the block does not select`,
+                )
+              }
+            }
+          }
+          for (const item of items) {
+            if (!row.options.some((option) => offeredFor(option, item.id))) {
+              errors.push(
+                `${at}.rows: block "${block.id}" row "${row.id}" offers nothing for "${item.id}"`,
+              )
+            }
+          }
+        }
+        for (const item of items) {
+          if (agreeingPicks(block.rows, item.id) === null) {
+            errors.push(
+              `${at}.rows: block "${block.id}" has no choices for "${item.id}" whose moods ` +
+                `agree, so "Surprise me" could not build one`,
+            )
+          }
+        }
+        break
+      }
       case 'secret': {
         requireTemplateTags(block.guess, 'guess')
         requireTemplateTags(block.found, 'found')
@@ -475,6 +604,43 @@ function crossCheck(lesson: Lesson): string[] {
     }
   }
   return errors
+}
+
+/** Every template a block declares, by the field it sits in. */
+function templatesOf(block: Block): Array<[string, string]> {
+  switch (block.type) {
+    case 'cards':
+    case 'match':
+    case 'quiz':
+    case 'hotspot':
+    case 'memory':
+      return block.speak === undefined ? [] : [['speak', block.speak]]
+    case 'sentence':
+      return block.levels.map((level, i) => [`levels.${i}.template`, level.template])
+    case 'tpr':
+      return [['prompt', block.prompt]]
+    case 'describe':
+      return [['sentence', block.sentence]]
+    case 'scramble':
+      return [['template', block.template]]
+    case 'yesno':
+      return [['question', block.question], ['yes', block.yes], ['no', block.no]]
+    case 'secret':
+      return [['guess', block.guess], ['found', block.found]]
+    case 'reveal':
+      return [['speak', block.speak]]
+    case 'dialogue':
+      return block.lines.map((line, i) => [`lines.${i}.text`, line.text])
+    case 'combine':
+      return [['template', block.template]]
+    case 'prefer':
+    case 'sort':
+    case 'listen':
+    case 'phrases':
+    case 'talk':
+    case 'finish':
+      return []
+  }
 }
 
 /**

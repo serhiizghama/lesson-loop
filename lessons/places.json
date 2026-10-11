@@ -46,12 +46,12 @@
     {
       "id": "vocab", "type": "cards", "title": "🔊 Meet the Places!",
       "hint": "Tap a card to hear it and see the Japanese word.",
-      "items": { "select": "all" }, "front": "emoji", "back": ["en", "l1"]
+      "items": { "select": "all"  }, "front": "emoji", "back": ["en", "l1"]
     },
     {
       "id": "say", "type": "sentence", "title": "💬 Let's Go!",
       "hint": "Choose a place. Then grow your sentence, one step at a time.",
-      "items": { "select": "all" },
+      "items": { "select": "all"  },
       "levels": [
         { "label": "One word", "template": "{en}" },
         { "label": "Let's go…", "template": "Let's go {tag:go}." },
@@ -59,40 +59,75 @@
       ]
     },
     {
+      "id": "more", "type": "combine", "title": "🚀 Make a Plan With a Friend!",
+      "hint": "A: Let's go… We can… B: answers. Build it, then act it out together!",
+      "items": { "select": "all" },
+      "rows": [
+        { "items": true, "label": "1️⃣ Where?" },
+        { "id": "can", "label": "2️⃣ What can we do there?", "options": [
+          { "text": "play on the swings", "for": ["park"] },
+          { "text": "run and jump", "for": ["park"] },
+          { "text": "have a picnic", "for": ["park"] },
+          { "text": "fly a kite", "for": ["park"] },
+          { "text": "meet our friends", "for": ["school"] },
+          { "text": "learn English", "for": ["school"] },
+          { "text": "play in the gym", "for": ["school"] },
+          { "text": "read books in the library", "for": ["school"] },
+          { "text": "rest and relax", "for": ["home"] },
+          { "text": "watch TV", "for": ["home"] },
+          { "text": "eat dinner", "for": ["home"] },
+          { "text": "play with our toys", "for": ["home"] },
+          { "text": "see elephants", "for": ["zoo"] },
+          { "text": "see zebras", "for": ["zoo"] },
+          { "text": "take photos of animals", "for": ["zoo"] },
+          { "text": "feed the animals", "for": ["zoo"] }
+        ] },
+        { "id": "reply", "label": "3️⃣ What does your friend say?", "options": [
+          { "text": "Great idea!" },
+          { "text": "OK, let's go!" },
+          { "text": "Sorry, I can't." },
+          { "text": "Maybe later." }
+        ] }
+      ],
+      "template": "Let's go {tag:go}! We can {row:can}. {row:reply}"
+    },
+    {
       "id": "want", "type": "yesno", "title": "❓ Do You Want To Go…?",
       "hint": "Say your answer first, then tap Yes or No!",
-      "items": { "select": "all" },
+      "items": { "select": "all"  },
       "question": "Do you want to go {tag:go}?",
       "yes": "Yes, I do. Let's go {tag:go}.",
       "no": "No, I don't."
     },
     {
+      "id": "guess", "type": "reveal", "title": "🙈 Guess & Say",
+      "hint": "What is hiding? Guess out loud first, then peek, then reveal!",
+      "items": { "select": "all" }, "speak": "Let's go {tag:go}."
+    },
+    {
       "id": "hear", "type": "listen", "title": "👂 Listen & Pop!",
       "hint": "Listen, then tap the place you heard.",
-      "items": { "select": "all" }, "choices": 4
+      "items": { "select": "all"  }, "choices": 4
     },
     {
       "id": "build", "type": "scramble", "title": "🧩 Build the Sentence",
       "hint": "Careful: to the park, to school, home! Tap the words in order.",
-      "items": { "select": "all" }, "template": "Let's go {tag:go}."
+      "items": { "select": "all"  }, "template": "Let's go {tag:go}."
     },
     {
-      "id": "plan", "type": "phrases", "title": "🧭 Plan Our Day",
-      "hint": "One asks, one plans, one answers. Then swap!",
+      "id": "plan", "type": "dialogue", "title": "🧭 Plan Our Day",
+      "hint": "One asks, one plans. Then swap!",
+      "items": { "select": "all" }, "roles": ["🗣️ Asker", "🧭 Planner"],
       "lines": [
-        "Where shall we go?",
-        "Let's go to the zoo!",
-        "We can feed the animals.",
-        "Great idea!",
-        "OK, let's go!",
-        "Sorry, I can't.",
-        "Maybe later."
+        { "role": 0, "text": "Where shall we go?" },
+        { "role": 1, "text": "Let's go {tag:go}!" },
+        { "role": 0, "text": "Great idea!" }
       ]
     },
     {
       "id": "pattern", "type": "sort", "title": "🗂️ Which Pattern?",
       "hint": "Some places need \"to the\", some need \"to\", and one needs nothing! Tap a place, then its pattern.",
-      "items": { "select": "all" }, "by": "pattern",
+      "items": { "select": "all"  }, "by": "pattern",
       "buckets": [
         { "key": "the", "label": "Let's go to the…", "emoji": "1️⃣" },
         { "key": "to", "label": "Let's go to…", "emoji": "2️⃣" },
@@ -102,23 +137,37 @@
     {
       "id": "clues", "type": "quiz", "title": "🕵️ Clue Detective",
       "hint": "Read the clue. Which place is it? Tap it, then say \"Let's go…\"",
-      "items": { "select": "all" }, "ask": "tag:clue", "show": "emoji", "count": 4,
+      "items": { "select": "all"  }, "ask": "tag:clue", "show": "emoji", "count": 4,
       "speak": "Let's go {tag:go}."
     },
     {
-      "id": "talk", "type": "phrases", "title": "🎤 Talk Time",
-      "hint": "Ask, then answer in a full sentence. Swap roles each time.",
-      "lines": [
-        "Where do you want to go today?",
-        "Do you like the park?",
-        "What do you do at the park?",
-        "Do you go to school every day?"
+      "id": "talk", "type": "talk", "title": "🎤 Talk Time",
+      "hint": "Ask, then answer in a full sentence. Press Harder when it was easy!",
+      "levels": [
+        { "label": "Level 1", "lines": [
+          "Where do you want to go today?",
+          "Do you like the park?",
+          "What do you do at the park?",
+          "Do you go to school every day?"
+        ] },
+        { "label": "Level 2", "lines": [
+          "What do you do at school? Tell me three things.",
+          "What do you like to do at home?",
+          "Which animal do you want to see at the zoo? Why?",
+          "When do you go to the park? Who do you go with?"
+        ] },
+        { "label": "Level 3", "lines": [
+          "Where is the best place to go on the weekend? Why?",
+          "If you could go anywhere today, where would you go and why?",
+          "Tell me about your favourite place in your city.",
+          "What can people do at a zoo? Do you think zoos are good for animals?"
+        ] }
       ]
     },
     {
       "id": "secret", "type": "secret", "title": "🎁 Guess My Secret Place",
       "hint": "Ask \"Is it…?\" out loud before every tap. Find the secret place!",
-      "items": { "select": "all" }, "rounds": 2,
+      "items": { "select": "all"  }, "rounds": 2,
       "guess": "Is it {tag:np}? No, it isn't.",
       "found": "Yes, it is! Let's go {tag:go}."
     },

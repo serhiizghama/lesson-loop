@@ -14,6 +14,11 @@ import { MemoryView } from './MemoryView'
 import { ScrambleView } from './ScrambleView'
 import { YesNoView } from './YesNoView'
 import { SecretView } from './SecretView'
+import { RevealView } from './RevealView'
+import { DialogueView } from './DialogueView'
+import { TalkView } from './TalkView'
+import { PreferView } from './PreferView'
+import { CombineView } from './CombineView'
 import { FinishView } from './FinishView'
 
 /** Views are registered exactly like the logic: a missing type is a compile error. */
@@ -32,6 +37,11 @@ export const blockViews: { [T in BlockType]: BlockView<T> } = {
   scramble: ScrambleView,
   yesno: YesNoView,
   secret: SecretView,
+  reveal: RevealView,
+  dialogue: DialogueView,
+  talk: TalkView,
+  prefer: PreferView,
+  combine: CombineView,
   finish: FinishView,
 }
 

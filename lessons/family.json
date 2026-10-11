@@ -50,12 +50,12 @@
     {
       "id": "vocab", "type": "cards", "title": "🔊 Meet the Family!",
       "hint": "Tap a card to hear it. Clap the syllables, then say it: whisper, normal, loud!",
-      "items": { "select": "new" }, "front": "emoji", "back": ["en", "tag:syl", "l1"]
+      "items": { "select": "new"  }, "front": "emoji", "back": ["en", "tag:syl", "l1"]
     },
     {
       "id": "say", "type": "sentence", "title": "💬 This Is My…",
       "hint": "Choose a person. Then grow your sentence, one step at a time.",
-      "items": { "select": "new" },
+      "items": { "select": "new"  },
       "levels": [
         { "label": "One word", "template": "{en}" },
         { "label": "This is my…", "template": "This is my {en}." },
@@ -63,68 +63,111 @@
       ]
     },
     {
+      "id": "more", "type": "combine", "title": "🚀 Say More About Your Family!",
+      "hint": "Build a longer text: This is my… He/She is… He/She likes… Then say it!",
+      "items": { "select": "new" },
+      "rows": [
+        { "items": true, "label": "1️⃣ Who?" },
+        { "id": "adj", "label": "2️⃣ What is he or she like?", "options": [
+          { "text": "kind" },
+          { "text": "funny" },
+          { "text": "strong" },
+          { "text": "tall" },
+          { "text": "young" },
+          { "text": "busy" },
+          { "text": "smart" },
+          { "text": "friendly" },
+          { "text": "caring" },
+          { "text": "quiet" }
+        ] },
+        { "id": "hobby", "label": "3️⃣ What does he or she like?", "options": [
+          { "text": "gardening" },
+          { "text": "cooking" },
+          { "text": "playing soccer" },
+          { "text": "reading" },
+          { "text": "dancing" },
+          { "text": "doing tai chi" },
+          { "text": "walking" },
+          { "text": "listening to music" },
+          { "text": "playing games" },
+          { "text": "drawing" }
+        ] }
+      ],
+      "template": "This is my {en}. {tag:he} is {row:adj}. {tag:he} likes {row:hobby}."
+    },
+    {
       "id": "yours", "type": "yesno", "title": "❓ Is This Your…?",
       "hint": "Look at the picture. Say your answer first, then tap Yes or No!",
-      "items": { "select": "new" }, "check": true,
+      "items": { "select": "new"  }, "check": true,
       "question": "Is this your {en}?",
       "yes": "Yes, it is. This is my {en}.",
       "no": "No, it isn't. This is my {en}."
     },
     {
+      "id": "guess", "type": "reveal", "title": "🙈 Guess & Say",
+      "hint": "What is hiding? Guess out loud first, then peek, then reveal!",
+      "items": { "select": "new" }, "speak": "This is my {en}."
+    },
+    {
       "id": "hear", "type": "listen", "title": "👂 Listen & Pop!",
       "hint": "Listen, then tap the person you heard.",
-      "items": { "select": "all" }, "choices": 4
+      "items": { "select": "all"  }, "choices": 4
     },
     {
       "id": "build", "type": "scramble", "title": "🧩 Build the Sentence",
       "hint": "Tap the words in order: This → is → my → family.",
-      "items": { "select": "new" }, "template": "This is my {en}."
+      "items": { "select": "new"  }, "template": "This is my {en}."
     },
     {
-      "id": "photo", "type": "phrases", "title": "📸 The Family Photo",
+      "id": "photo", "type": "dialogue", "title": "📸 The Family Photo",
       "hint": "One asks, one answers. Then \"Tell me more!\" — and swap!",
-      "only": ["home"],
+      "items": { "select": "new" }, "roles": ["🗣️ Asker", "🙋 Answerer"],
       "lines": [
-        "Who is this?",
-        "This is my dad.",
-        "Tell me more!",
-        "He is tall. He likes reading."
-      ]
-    },
-    {
-      "id": "photo-more", "type": "phrases", "title": "📸 The Family Photo",
-      "hint": "One asks, one answers. Then \"Tell me more!\" — and swap!",
-      "only": ["grand"],
-      "lines": [
-        "Who is this?",
-        "This is my grandpa.",
-        "Tell me more!",
-        "He is strong. He likes doing tai chi."
+        { "role": 0, "text": "Who is this?" },
+        { "role": 1, "text": "This is my {en}." },
+        { "role": 0, "text": "Tell me more!" },
+        { "role": 1, "text": "{tag:he} is {tag:adj}." }
       ]
     },
     {
       "id": "clues", "type": "quiz", "title": "🕵️ Clue Detective",
       "hint": "Read the clue. Who is it? Tap the person, then say \"This is my…\"",
-      "items": { "select": "all" }, "ask": "tag:clue", "show": "emoji", "count": 4,
+      "items": { "select": "all"  }, "ask": "tag:clue", "show": "emoji", "count": 4,
       "speak": "This is my {en}."
     },
     {
       "id": "secret", "type": "secret", "title": "🎁 Guess My Secret Person",
       "hint": "Ask \"Is it your…?\" out loud before every tap. Find the secret person!",
-      "items": { "select": "all" }, "rounds": 2,
+      "items": { "select": "all"  }, "rounds": 2,
       "guess": "Is it your {en}? No, it isn't.",
       "found": "Yes, it is! This is my {en}."
     },
     {
-      "id": "talk", "type": "phrases", "title": "🎤 Talk Time",
-      "hint": "Ask, then answer in a full sentence. Swap roles each time.",
+      "id": "talk", "type": "talk", "title": "🎤 Talk Time",
+      "hint": "Ask, then answer in a full sentence. Press Harder when it was easy!",
       "only": ["grand"],
-      "lines": [
-        "Who is in your family?",
-        "Do you have a brother or a sister?",
-        "Do you have a grandma or a grandpa?",
-        "Who is this in your family photo?",
-        "Do you live with your mom and dad?"
+      "levels": [
+        { "label": "Level 1", "lines": [
+          "Who is in your family?",
+          "Do you have a brother or a sister?",
+          "Do you have a grandma or a grandpa?",
+          "Who is this in your family photo?",
+          "Do you live with your mom and dad?"
+        ] },
+        { "label": "Level 2", "lines": [
+          "What is your grandma like?",
+          "How old is your brother or sister?",
+          "What does your grandpa like doing?",
+          "Where does your grandma live?",
+          "What is your mom like?",
+          "What does your dad do?"
+        ] },
+        { "label": "Level 3", "lines": [
+          "Who are you most like in your family? Why?",
+          "What do you do with your grandparents?",
+          "Tell me about a special day with your family.",
+          "If your family could travel anywhere, where would you go and why?"
+        ] }
       ]
     },
     { "id": "done", "type": "finish", "title": "🎉 Great job!", "message": "Great job! Now you can talk about your family!" }

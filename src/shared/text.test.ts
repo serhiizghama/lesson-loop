@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { articleFor, faceSpeech, faceValue, renderTemplate, tagsUsedByTemplate } from './text'
+import { articleFor, faceSpeech, faceValue, fillRows, renderTemplate, rowsUsedByTemplate, tagsUsedByTemplate, usesOther } from './text'
 import type { Item } from './types'
 
 const dog: Item = { id: 'dog', en: 'dog', emoji: '🐶', l1: { word: '犬' }, tags: { move: 'Run!' } }
@@ -96,5 +96,38 @@ describe('what a face says out loud', () => {
 
   it('stays silent on a face the item cannot show', () => {
     expect(faceSpeech(elephant, 'tag:move')).toBeNull()
+  })
+})
+
+describe('the two placeholders a second choice adds', () => {
+  const grapes: Item = { id: 'grape', en: 'grapes', emoji: '🍇', plural: true, tags: { why: 'sweet' } }
+  const pears: Item = { id: 'pear', en: 'pears', emoji: '🍐', plural: true }
+
+  it('names the item not chosen with {other}', () => {
+    expect(renderTemplate('I prefer {en} to {other}.', grapes, pears)).toBe('I prefer grapes to pears.')
+  })
+
+  it('leaves {other} empty, and the sentence tidy, when no second item is given', () => {
+    expect(renderTemplate('I prefer {en} to {other}.', grapes)).toBe('I prefer grapes to.')
+  })
+
+  it('fills each {row:…} with the text chosen for it, then the item placeholders', () => {
+    const filled = fillRows('{row:feel} {en} because {row:why}.', { feel: 'I really like', why: 'they are juicy' })
+    expect(renderTemplate(filled, grapes)).toBe('I really like grapes because they are juicy.')
+  })
+
+  it('leaves a row with no choice in place, so a half-built sentence shows the gap', () => {
+    expect(fillRows('{row:feel} {en}.', {})).toBe('{row:feel} {en}.')
+  })
+
+  it('keeps the punctuation tight after a row that ends a sentence', () => {
+    const filled = fillRows("Let's go home! We can {row:can} .", { can: 'watch TV' })
+    expect(renderTemplate(filled, grapes)).toBe("Let's go home! We can watch TV.")
+  })
+
+  it('lists the rows a template names, once each, in order', () => {
+    expect(rowsUsedByTemplate('{row:a} {en} {row:b} and {row:a}')).toEqual(['a', 'b'])
+    expect(usesOther('I prefer {en} to {other}.')).toBe(true)
+    expect(usesOther('I like {en}.')).toBe(false)
   })
 })

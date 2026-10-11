@@ -6,10 +6,11 @@ import { applyAction, blockStateOf } from '../../src/shared/reducer'
 import type { Action, Block, Lesson, LessonState } from '../../src/shared/types'
 import type {
   CardsState, DescribeState, HotspotState, ListenState, MatchState, MemoryState, QuizState,
-  ScrambleState, SecretState, SortState, TprState, YesNoState,
+  ScrambleState, SecretState, SortState, TprState, YesNoState, RevealState, DialogueState,
+  PreferState,
 } from '../../src/shared/types'
 import { faceValue } from '../../src/shared/text'
-import { cardId, cardItem, sentenceWords } from '../../src/shared/blocks'
+import { agreeingPicks, cardId, cardItem, sentenceWords } from '../../src/shared/blocks'
 
 const dir = join(process.cwd(), 'lessons')
 
@@ -158,6 +159,46 @@ export function complete(lesson: Lesson, state: LessonState, block: Block): Less
         if (target === undefined) continue
         act({ t: 'tap', block: block.id, target })
         act({ t: 'tap', block: block.id, target })
+      }
+      break
+    case 'reveal':
+      for (let i = 0; i < current<RevealState>().order.length; i++) {
+        const reveal = current<RevealState>()
+        const shown = reveal.order[reveal.index]
+        if (shown === undefined) continue
+        act({ t: 'tap', block: block.id, target: 'reveal' })
+        act({ t: 'tap', block: block.id, target: shown })
+      }
+      break
+    case 'dialogue':
+      for (let i = 0; i < current<DialogueState>().order.length; i++) {
+        const shown = current<DialogueState>().order[current<DialogueState>().index]
+        if (shown === undefined) continue
+        for (let l = 0; l < block.lines.length; l++) act({ t: 'tap', block: block.id, target: 'line' })
+        act({ t: 'tap', block: block.id, target: shown })
+      }
+      break
+    case 'talk':
+      act({ t: 'tap', block: block.id, target: 'new' })
+      for (let l = 1; l < block.levels.length; l++) act({ t: 'tap', block: block.id, target: 'harder' })
+      break
+    case 'prefer':
+      for (let round = 0; round < block.rounds; round++) {
+        const prefer = current<PreferState>()
+        const pick = prefer.pairs[prefer.index]?.[0]
+        if (pick === undefined) continue
+        act({ t: 'tap', block: block.id, target: pick })
+        act({ t: 'tap', block: block.id, target: pick })
+      }
+      break
+    case 'combine':
+      // The first agreeing set for every item, then heard — the finder validation uses.
+      for (const item of resolveItems(lesson, block.items)) {
+        act({ t: 'tap', block: block.id, target: item.id })
+        for (const [row, index] of Object.entries(agreeingPicks(block.rows, item.id) ?? {})) {
+          act({ t: 'tap', block: block.id, target: `row:${row}:${index}` })
+        }
+        act({ t: 'tap', block: block.id, target: 'hear' })
       }
       break
     case 'finish':

@@ -7,6 +7,9 @@ import { quizSpeech } from './quiz'
 import { describeSentence } from './describe'
 import { yesnoQuestion, yesnoReply } from './yesno'
 import { secretFoundLine, secretGuessLine } from './secret'
+import { revealLine } from './reveal'
+import { dialogueLine } from './dialogue'
+import { preferSentence } from './prefer'
 import { hotspotSpeech } from './hotspot'
 import { memoryPairSpeech } from './memory'
 
@@ -112,6 +115,35 @@ function linesOf(lesson: Lesson, block: Block): Array<string | null> {
         secretGuessLine(block, item),
         secretFoundLine(block, item),
       ])
+
+    case 'reveal':
+      // RevealView volunteers the line as a picture is revealed.
+      return resolveItems(lesson, block.items).map((item) => revealLine(block, item))
+
+    case 'dialogue':
+      // DialogueView volunteers each line as it appears, and replays it from its 🔊.
+      return resolveItems(lesson, block.items).flatMap((item) =>
+        block.lines.map((_line, at) => dialogueLine(block, item, at)),
+      )
+
+    case 'talk':
+      // TalkView volunteers a question as it is asked, and replays it from its 🔊.
+      return block.levels.flatMap((level) => level.lines)
+
+    case 'prefer': {
+      // PreferView volunteers the sentence once a choice is made: every ordered pair.
+      const items = resolveItems(lesson, block.items)
+      return items.flatMap((chosen) =>
+        items.filter((other) => other.id !== chosen.id).map((other) => preferSentence(block, chosen, other)),
+      )
+    }
+
+    case 'combine':
+      // THE ONE NAMED EXCEPTION (spec, speech: every line is known before the lesson runs).
+      // A combiner's sentences run to hundreds per lesson and are spoken by the device's
+      // voice, at the teacher's choice — so they are deliberately not collected here and
+      // never recorded. No other type may return nothing while it speaks (design D155).
+      return []
 
     case 'finish':
       // Nothing is spoken on the closing slide.

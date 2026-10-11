@@ -93,6 +93,29 @@ export function testLesson(): Lesson {
         id: 'hide', type: 'secret', title: 'Guess my secret', items: { select: 'all' },
         rounds: 2, guess: "Is it the {en}? No, it isn't.", found: 'Yes, it is! It is the {en}.',
       },
+      { id: 'peek', type: 'reveal', title: 'Guess & say', items: { select: 'all' }, speak: '{this} {be} my {en}.' },
+      {
+        id: 'shop', type: 'dialogue', title: 'The shop', items: { select: 'ids', ids: ['dog', 'cat'] },
+        roles: ['Shopkeeper', 'Customer'],
+        lines: [{ role: 0, text: 'What do you like?' }, { role: 1, text: 'I like the {en}.' }],
+      },
+      {
+        id: 'chat', type: 'talk', title: 'Talk time',
+        levels: [{ label: 'Easy', lines: ['Do you like animals?', 'Do you have a pet?'] }, { label: 'Harder', lines: ['Why?'] }],
+      },
+      {
+        id: 'pick', type: 'prefer', title: 'This or that', items: { select: 'ids', ids: ['dog', 'cat', 'lion'] },
+        sentence: 'I prefer the {en} to the {other}.', rounds: 2,
+      },
+      {
+        id: 'more', type: 'combine', title: 'Say more', items: { select: 'ids', ids: ['dog', 'cat'] },
+        rows: [
+          { id: 'feel', label: 'How do you feel?', options: [{ text: 'I like', mood: 'good' }, { text: "I don't like", mood: 'bad' }] },
+          { items: true, label: 'Which one?' },
+          { id: 'why', label: 'Why?', options: [{ text: 'it is cute', mood: 'good' }, { text: 'it is loud', mood: 'bad' }] },
+        ],
+        template: '{row:feel} the {en} because {row:why}.',
+      },
       { id: 'done', type: 'finish', title: 'Great job!', message: 'You did it!' },
     ],
   }

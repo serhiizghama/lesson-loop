@@ -83,8 +83,11 @@ describe('no block type is left silently unspoken', () => {
   })
 
   it('produces lines for every type that speaks', () => {
-    // `finish` is the only type with nothing to say; every other type must yield lines.
-    for (const type of types.filter((t) => t !== 'finish')) {
+    // `finish` has nothing to say, and `combine` is the one named exception whose sentences
+    // are left to the device's voice (spec, speech). Every other type must yield lines —
+    // adding a type here is a decision, not a fix.
+    const RECORDLESS: BlockType[] = ['finish', 'combine']
+    for (const type of types.filter((t) => !RECORDLESS.includes(t))) {
       const block = lesson.blocks.find((b) => b.type === type) as Block
       expect(speakableLines({ ...lesson, blocks: [block] }).length, type).toBeGreaterThan(0)
     }

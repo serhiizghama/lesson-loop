@@ -411,6 +411,20 @@ replaces the phrases stand-ins for Ask & Answer, Is this your…? and Do you wan
 `only: ["all"]` puts a block in the whole topic only, so Fruit Talk's second part is again
 exactly her 2B. Decisions D-55…D-57.
 
+**Phases 2b and 2c — `add-conversation-blocks`.** Her conversation games, five block
+types at once:
+- `reveal` (Guess & Say, a blurred picture);
+- `dialogue` (the role-plays, with roles that swap);
+- `talk` (Talk Time, climbing three levels);
+- `prefer` (This or That, with a new `{other}` placeholder);
+- `combine` (Say More: rows of chips joined into a sentence that asks "Does that make
+  sense?" when its parts disagree).
+
+They replace the last phrases stand-ins in the four topics. With this, every exercise of
+her six pages plays, except the five absent by name (D-52): the picture hunt, the
+three-times speaking meter, the wheel, the silly voices, and the survey / family album.
+Decisions D-58…D-61.
+
 **Phase 2 — the mechanics her dialogues need**, not yet planned, ranked by how many of her
 lessons each serves against its cost: `ask` (a yes/no question with an optional right
 answer — four lessons), `secret` (Guess My Secret — three), `reveal` (the blurred guess —
@@ -512,3 +526,7 @@ technical decisions `Dn`, without the hyphen; the two sequences are separate.
 | D-55 | **Lesson 21's follow-up to "No, I don't" is not built.** On her page a *No* to "Do you want to go to the park?" opens a second choice — "Where do you want to go?" — and the child taps another place. Here the reply is just "No, I don't.", and the follow-up is the teacher's to ask. Building it would make one exercise two, for one lesson, and the question it asks is exactly the kind a live teacher asks better | 2026-10-11 |
 | D-56 | **Finding a secret earns the exercise's star, never more.** Her page gives two stars for a first-try find and shows "found in N tries". A star in this app belongs to an exercise and is earned by finishing it (D-28); a bonus for luck would be the first score in the product, and guessing well on the first try is luck. Nothing counts tries on screen either | 2026-10-11 |
 | D-57 | **The secret travels in the room's state, and only the screen keeps it.** Both devices hold the whole state, so the student's device holds the secret too; a child with developer tools could find it. The promise is that nothing *on the student's screen* gives it away — same gift every round, tiles in a fixed order — and that is enforced by a test. Hiding state per participant would mean a second state shape on the wire for one game | 2026-10-11 |
+| D-58 | **A combiner's sentences are spoken by the device's voice, not recorded — the one exception to "every line is prepared".** Her Say More multiplies into hundreds of sentences per lesson (240 for Fruit alone). The teacher was offered all three ways — record every combination, speak each chip separately, or leave them to the browser — and chose the browser: the voice differs by device, but the sentence is always written out, so a silent device still shows what to say. The exception is written into the speech spec and into the test that refuses a speaking block with no lines, so a new block cannot slip into it unnoticed | 2026-10-11 |
+| D-59 | **A role-play's swap changes the labels, not the rules.** "Shopkeeper — Teacher / Customer — Student" becomes the other way round, and either person can still tap. An action carries no sender, and a rule about who may tap would be one the app draws and cannot enforce — the reasoning of D-41, applied again | 2026-10-11 |
+| D-60 | **"I prefer grapes to pears" ends at a full stop.** Her page says "…because" and the voice stops mid-sentence, leaving the child to finish it. Here the recorded sentence is whole, and the "because…" is in the hint and the teacher's mouth: a recording that trails off sounds like a broken recording, not an invitation | 2026-10-11 |
+| D-61 | **Combiner chips carry no Japanese gloss, and the lesson-21 dialogue has one voice.** Her family and places pages put a gloss under every chip and read the A/B dialogue at two pitches. A gloss under each of sixteen options doubles the rows' height on a tablet-sized stage, and the topic's cards already carry the glosses; recordings and the device voice have one voice each. Both can come back if she asks | 2026-10-11 |

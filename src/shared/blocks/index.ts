@@ -14,6 +14,11 @@ import { memoryLogic } from './memory'
 import { scrambleLogic } from './scramble'
 import { yesnoLogic } from './yesno'
 import { secretLogic } from './secret'
+import { revealLogic } from './reveal'
+import { dialogueLogic } from './dialogue'
+import { talkLogic } from './talk'
+import { preferLogic } from './prefer'
+import { combineLogic } from './combine'
 import { finishLogic } from './finish'
 
 /**
@@ -35,6 +40,11 @@ export const blockLogic: { [T in BlockType]: BlockLogic<T> } = {
   scramble: scrambleLogic,
   yesno: yesnoLogic,
   secret: secretLogic,
+  reveal: revealLogic,
+  dialogue: dialogueLogic,
+  talk: talkLogic,
+  prefer: preferLogic,
+  combine: combineLogic,
   finish: finishLogic,
 }
 
@@ -54,4 +64,11 @@ export {
 export { trueAnswer, yesnoCurrent, yesnoQuestion, yesnoReply } from './yesno'
 export type { YesNoAnswer } from './yesno'
 export { secretFoundLine, secretGuessLine, secretTarget, secretTiles } from './secret'
+export { revealLine } from './reveal'
+export { dialogueLine, roleHolder } from './dialogue'
+export { talkQuestion } from './talk'
+export { preferPair, preferSentence } from './prefer'
+export {
+  agreeingPicks, combineClashes, combineSentence, isBuilt, offeredFor, optionRows,
+} from './combine'
 export { speakableLines } from './speakable'

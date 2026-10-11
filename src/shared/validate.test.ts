@@ -733,3 +733,110 @@ describe('a block for the whole topic only', () => {
     expect(result.errors.join('\n')).toContain('"all"')
   })
 })
+
+describe('the five conversation exercises', () => {
+  const reveal = {
+    id: 'peek', type: 'reveal' as const, title: 'Guess & Say', items: { select: 'all' as const },
+    speak: 'It is a {en}.',
+  }
+  const dialogue = {
+    id: 'shop', type: 'dialogue' as const, title: 'The shop', items: { select: 'all' as const },
+    roles: ['Shopkeeper', 'Customer'] as [string, string],
+    lines: [{ role: 0 as const, text: 'What do you like?' }, { role: 1 as const, text: 'I like the {en}.' }],
+  }
+  const talk = {
+    id: 'chat', type: 'talk' as const, title: 'Talk time',
+    levels: [{ label: 'Easy', lines: ['Do you like animals?'] }, { label: 'Harder', lines: ['Why?'] }],
+  }
+  const prefer = {
+    id: 'pick', type: 'prefer' as const, title: 'This or that', items: { select: 'all' as const },
+    sentence: 'I prefer the {en} to the {other}.', rounds: 3,
+  }
+  const combine = {
+    id: 'more', type: 'combine' as const, title: 'Say more', items: { select: 'all' as const },
+    rows: [
+      { id: 'feel', label: 'How do you feel?', options: [{ text: 'I like', mood: 'good' as const }, { text: "I don't like", mood: 'bad' as const }] },
+      { items: true as const, label: 'Which?' },
+      { id: 'why', label: 'Why?', options: [{ text: 'it is cute', mood: 'good' as const }, { text: 'it is scary', mood: 'bad' as const }] },
+    ],
+    template: '{row:feel} the {en} because {row:why}.',
+  }
+
+  function errorsOf(block: Lesson['blocks'][number]): string {
+    const result = validateLesson(broken((l) => l.blocks.push(block)))
+    expect(result.ok).toBe(false)
+    return result.ok ? '' : result.errors.join('\n')
+  }
+
+  it('accepts all five when they are well formed', () => {
+    const result = validateLesson(broken((l) => l.blocks.push(reveal, dialogue, talk, prefer, combine)))
+    if (!result.ok) throw new Error(result.errors.join('\n'))
+  })
+
+  it('rejects a reveal line naming a tag an item does not carry', () => {
+    const errors = errorsOf({ ...reveal, speak: 'It says {tag:move}.' })
+    expect(errors).toContain('blocks.1.speak:')
+    expect(errors).toContain('"dog"')
+  })
+
+  it('rejects a role-play line said by a third role', () => {
+    const lines = [...dialogue.lines, { role: 2, text: 'Hello!' }] as unknown as typeof dialogue.lines
+    expect(validateLesson(broken((l) => l.blocks.push({ ...dialogue, lines }))).ok).toBe(false)
+  })
+
+  it('rejects a role-play with one line, or a line naming a missing tag', () => {
+    expect(validateLesson(broken((l) => l.blocks.push({ ...dialogue, lines: [dialogue.lines[0]!] }))).ok).toBe(false)
+    expect(errorsOf({ ...dialogue, lines: [...dialogue.lines, { role: 0, text: '{tag:move}!' }] })).toContain('lines.2.text:')
+  })
+
+  it('rejects talk with a single level', () => {
+    expect(validateLesson(broken((l) => l.blocks.push({ ...talk, levels: [talk.levels[0]!] }))).ok).toBe(false)
+  })
+
+  it('rejects {other} anywhere but a preference', () => {
+    const errors = errorsOf({ ...reveal, speak: 'Not the {other}.' })
+    expect(errors).toContain('uses {other}')
+    expect(errors).toContain('"peek"')
+  })
+
+  it('rejects more preference rounds than the selection has pairs', () => {
+    const errors = errorsOf({ ...prefer, items: { select: 'ids', ids: ['dog', 'cat'] }, rounds: 2 })
+    expect(errors).toContain('only 1 different pairs')
+  })
+
+  it('rejects a preference over one item', () => {
+    expect(errorsOf({ ...prefer, items: { select: 'ids', ids: ['dog'] }, rounds: 1 })).toContain('a choice needs two')
+  })
+
+  it('rejects a row the template forgets, and a row it names but nobody declared', () => {
+    expect(errorsOf({ ...combine, template: '{row:feel} the {en}.' })).toContain('declares row "why", which its template never names')
+    expect(errorsOf({ ...combine, template: '{row:feel} the {en} because {row:why} {row:who}.' })).toContain('names row "who"')
+  })
+
+  it('rejects a combiner with no row of items, or two', () => {
+    const noItems = { ...combine, rows: combine.rows.filter((r) => !('items' in r)) }
+    expect(errorsOf(noItems)).toContain('0 rows of items')
+    const twoItems = { ...combine, rows: [...combine.rows, { items: true as const, label: 'Again' }] }
+    expect(errorsOf(twoItems)).toContain('2 rows of items')
+  })
+
+  it('rejects an option belonging to an item the block does not select', () => {
+    const rows = [combine.rows[0]!, combine.rows[1]!, { id: 'why', label: 'Why?', options: [{ text: 'it purrs', for: ['tiger'] }, { text: 'it is cute' }] }]
+    expect(errorsOf({ ...combine, rows })).toContain('belongs to "tiger"')
+  })
+
+  it('names the item a row offers nothing for', () => {
+    const rows = [combine.rows[0]!, combine.rows[1]!, { id: 'why', label: 'Why?', options: [{ text: 'it purrs', for: ['cat'] }] }]
+    const errors = errorsOf({ ...combine, rows })
+    expect(errors).toContain('row "why" offers nothing for "dog"')
+  })
+
+  it('rejects a combiner whose moods can never agree for an item', () => {
+    const rows = [
+      { id: 'feel', label: 'Feel', options: [{ text: 'I love', mood: 'good' as const }] },
+      combine.rows[1]!,
+      { id: 'why', label: 'Why', options: [{ text: 'it is scary', mood: 'bad' as const }] },
+    ]
+    expect(errorsOf({ ...combine, rows })).toContain('whose moods agree')
+  })
+})

@@ -36,12 +36,14 @@ const TAG_PLACEHOLDER = /\{tag:([A-Za-z0-9_-]+)\}/g
 
 /**
  * Fills a sentence or prompt template for one item.
- * Placeholders: {en} {article} {it} {be} {this} {l1} {tag:name}
+ * Placeholders: {en} {article} {it} {be} {this} {l1} {tag:name}, and {other} — the English
+ * word of a second item, which only a preference passes (design D154).
  */
-export function renderTemplate(template: string, item: Item): string {
+export function renderTemplate(template: string, item: Item, other?: Item): string {
   const plural = item.plural === true
   const filled = template
     .replace(TAG_PLACEHOLDER, (_m, tag: string) => item.tags?.[tag] ?? '')
+    .replaceAll('{other}', other?.en ?? '')
     .replaceAll('{en}', item.en)
     .replaceAll('{article}', articleFor(item))
     .replaceAll('{it}', plural ? 'They' : 'It')
@@ -53,6 +55,27 @@ export function renderTemplate(template: string, item: Item): string {
     .replace(/\s+/g, ' ')
     .replace(/\s+([.!?,])/g, '$1')
     .trim()
+}
+
+const ROW_PLACEHOLDER = /\{row:([A-Za-z0-9_-]+)\}/g
+
+/**
+ * Replaces each `{row:<id>}` with the text chosen for that row, leaving a row with no
+ * choice untouched so a half-built sentence shows where it is waiting (design D155). Item
+ * placeholders are left for `renderTemplate`.
+ */
+export function fillRows(template: string, chosen: Record<string, string>): string {
+  return template.replace(ROW_PLACEHOLDER, (whole, id: string) => chosen[id] ?? whole)
+}
+
+/** Every row a combining template names, in order of first use. */
+export function rowsUsedByTemplate(template: string): string[] {
+  return [...new Set([...template.matchAll(ROW_PLACEHOLDER)].map((m) => m[1] as string))]
+}
+
+/** Whether a template names the second item of a preference. */
+export function usesOther(template: string): boolean {
+  return template.includes('{other}')
 }
 
 /** Every tag name a template reads, so a lesson can be validated against it. */
