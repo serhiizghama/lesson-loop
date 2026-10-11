@@ -1,0 +1,121 @@
+{
+  "id": "fruit",
+  "title": "Fruit Talk",
+  "emoji": "🍇",
+  "audience": "kids",
+  "l1": "ja",
+  "parts": [
+    { "id": "a", "title": "Fruit 1 · Oranges & Pears", "emoji": "🍊", "items": ["orange", "pear"] },
+    { "id": "b", "title": "Fruit 2 · Grapes & Watermelons", "emoji": "🍉", "items": ["grape", "watermelon"] }
+  ],
+  "items": [
+    {
+      "id": "orange", "en": "oranges", "emoji": "🍊", "plural": true,
+      "l1": { "word": "オレンジ", "romaji": "orenji" },
+      "example": "I like oranges.",
+      "tags": { "syl": "or · an · ges", "why": "juicy" }
+    },
+    {
+      "id": "pear", "en": "pears", "emoji": "🍐", "plural": true,
+      "l1": { "word": "なし", "romaji": "nashi" },
+      "example": "I like pears.",
+      "tags": { "syl": "pears", "why": "crunchy" }
+    },
+    {
+      "id": "grape", "en": "grapes", "emoji": "🍇", "plural": true,
+      "l1": { "word": "ぶどう", "romaji": "budou" },
+      "example": "I like grapes.",
+      "tags": { "syl": "grapes", "why": "sweet" }
+    },
+    {
+      "id": "watermelon", "en": "watermelons", "emoji": "🍉", "plural": true,
+      "l1": { "word": "スイカ", "romaji": "suika" },
+      "example": "I like watermelons.",
+      "tags": { "syl": "wa · ter · mel · ons", "why": "refreshing" }
+    }
+  ],
+  "blocks": [
+    {
+      "id": "vocab", "type": "cards", "title": "🔊 Meet the Fruit!",
+      "hint": "Tap a card to hear it. Clap the syllables, then say it: whisper, normal, loud!",
+      "items": { "select": "new" }, "front": "emoji", "back": ["en", "tag:syl", "l1"]
+    },
+    {
+      "id": "say", "type": "sentence", "title": "💬 I Like…",
+      "hint": "Choose a fruit. Then grow your sentence, one step at a time.",
+      "items": { "select": "new" },
+      "levels": [
+        { "label": "One word", "template": "{en}" },
+        { "label": "I like…", "template": "I like {en}." },
+        { "label": "Because…", "template": "I like {en}. {it} {be} {tag:why}." }
+      ]
+    },
+    {
+      "id": "ask", "type": "phrases", "title": "❓ Ask & Answer",
+      "hint": "Tap 🔊 to hear the question and the answers. Then give your own answer!",
+      "only": ["b"],
+      "lines": [
+        "Do you like oranges?",
+        "Yes, I do. I like oranges.",
+        "Do you like watermelons?",
+        "No, I don't. I don't like watermelons."
+      ]
+    },
+    {
+      "id": "hear", "type": "listen", "title": "👂 Listen & Pop!",
+      "hint": "Listen, then tap the fruit you heard.",
+      "items": { "select": "all" }, "choices": 2
+    },
+    {
+      "id": "build", "type": "scramble", "title": "🧩 Build the Sentence",
+      "hint": "Tap the words in order: I → like → fruit.",
+      "items": { "select": "new" }, "template": "I like {en}."
+    },
+    {
+      "id": "stand", "type": "phrases", "title": "🛒 The Fruit Stand",
+      "hint": "One is the shopkeeper, one is the customer. Then swap!",
+      "only": ["a"],
+      "lines": [
+        "What do you like?",
+        "I like oranges.",
+        "I like pears.",
+        "Why do you like them?",
+        "Because they are juicy."
+      ]
+    },
+    {
+      "id": "stand-more", "type": "phrases", "title": "🛒 The Fruit Stand",
+      "hint": "One is the shopkeeper, one is the customer. Then swap!",
+      "only": ["b"],
+      "lines": [
+        "What do you like?",
+        "I like grapes.",
+        "I like watermelons.",
+        "Why do you like them?",
+        "Because they are sweet."
+      ]
+    },
+    {
+      "id": "prefer", "type": "phrases", "title": "⚖️ This or That?",
+      "hint": "Which do you prefer? Finish the sentence with your own reason!",
+      "only": ["b"],
+      "lines": [
+        "Which do you prefer?",
+        "I prefer grapes to pears because they are sweeter.",
+        "I prefer watermelons to oranges because they are more refreshing."
+      ]
+    },
+    {
+      "id": "talk", "type": "phrases", "title": "🎤 Talk Time",
+      "hint": "Ask, then answer in a full sentence. Swap roles each time.",
+      "only": ["b"],
+      "lines": [
+        "What fruit do you like?",
+        "What's your favourite fruit?",
+        "What colour is your favourite fruit?",
+        "Do you like fruit salad?"
+      ]
+    },
+    { "id": "done", "type": "finish", "title": "🎉 Great job!", "message": "Great job! Now you can talk about fruit!" }
+  ]
+}

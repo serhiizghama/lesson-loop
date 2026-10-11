@@ -22,7 +22,11 @@ with no picture falls back to its emoji, so a lesson plays the moment its JSON e
 is illustrated afterwards — `npm run pictures` draws whatever is missing. Two lessons opt
 out on purpose: colours are exact SVG swatches rather than drawings, because "red" has to
 be red, and numbers keep their keycap emoji, because a drawn four that reads as a nine is
-a wrong answer rather than a style problem.
+a wrong answer rather than a style problem. Four topics — fruit, drinks, family and places —
+are not drawn either: their words are plain enough that an openly licensed set already
+has them, so their pictures are Microsoft Fluent Emoji rendered onto the same square (see
+`THIRD_PARTY_NOTICES.md`). Do not delete one to have it redrawn — the script would draw it
+in the house style, and it would no longer match its topic.
 
 ## Rooms: two links, two halves of the same lesson
 
@@ -203,6 +207,18 @@ tell it:
 - `"plural": true` → *They are **eyes**.* instead of *It is a eyes.*
 - `"article": "an"` → *It is **an** hour.* (the vowel-letter rule gets this wrong)
 - `"article": "none"` → *It is hair.* for uncountable nouns
+
+Anything else a sentence needs from a word, the word carries as a tag, and the template
+reads it with `{tag:<name>}`. This is how a lesson built on one sentence frame handles the
+words that do not fit it the same way — no grammar rule in the engine, no new placeholder:
+
+- `"go": "to the park"` / `"to school"` / `"home"` → *Let's go {tag:go}.* reads *Let's go
+  home.*, with no "to", because the phrase is written on the word
+- `"he": "He"` / `"She"` → *This is my {en}. {tag:he} is {tag:adj}.* reads *This is my
+  grandma. She is caring.*
+
+`{it}`, `{this}` and a tag's value are capitalised as written, so put them where a sentence
+starts.
 
 ### Exercise blocks
 

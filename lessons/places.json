@@ -1,0 +1,124 @@
+{
+  "id": "places",
+  "title": "Let's Go!",
+  "emoji": "🧭",
+  "audience": "kids",
+  "l1": "ja",
+  "items": [
+    {
+      "id": "park", "en": "park", "emoji": "🌳",
+      "l1": { "word": "公園", "romaji": "kouen" },
+      "example": "Let's go to the park.",
+      "tags": {
+        "go": "to the park", "pattern": "the", "can": "have a picnic",
+        "clue": "You can play on the swings here."
+      }
+    },
+    {
+      "id": "school", "en": "school", "emoji": "🏫",
+      "l1": { "word": "学校", "romaji": "gakkou" },
+      "example": "Let's go to school.",
+      "tags": {
+        "go": "to school", "pattern": "to", "can": "learn English",
+        "clue": "You study and meet your friends here."
+      }
+    },
+    {
+      "id": "home", "en": "home", "emoji": "🏠",
+      "l1": { "word": "家", "romaji": "ie" },
+      "example": "Let's go home.",
+      "tags": {
+        "go": "home", "pattern": "none", "can": "watch TV",
+        "clue": "You sleep here. Mom and Dad are here."
+      }
+    },
+    {
+      "id": "zoo", "en": "zoo", "emoji": "🦒",
+      "l1": { "word": "動物園", "romaji": "doubutsuen" },
+      "example": "Let's go to the zoo.",
+      "tags": {
+        "go": "to the zoo", "pattern": "the", "can": "feed the animals",
+        "clue": "You can see elephants and zebras here."
+      }
+    }
+  ],
+  "blocks": [
+    {
+      "id": "vocab", "type": "cards", "title": "🔊 Meet the Places!",
+      "hint": "Tap a card to hear it and see the Japanese word.",
+      "items": { "select": "all" }, "front": "emoji", "back": ["en", "l1"]
+    },
+    {
+      "id": "say", "type": "sentence", "title": "💬 Let's Go!",
+      "hint": "Choose a place. Then grow your sentence, one step at a time.",
+      "items": { "select": "all" },
+      "levels": [
+        { "label": "One word", "template": "{en}" },
+        { "label": "Let's go…", "template": "Let's go {tag:go}." },
+        { "label": "We can…", "template": "Let's go {tag:go}! We can {tag:can}." }
+      ]
+    },
+    {
+      "id": "want", "type": "phrases", "title": "❓ Do You Want To Go…?",
+      "hint": "Tap 🔊 to hear the question and the answers, then say them out loud.",
+      "lines": [
+        "Do you want to go to the park?",
+        "Yes, I do. Let's go to the park.",
+        "Do you want to go to the zoo?",
+        "No, I don't.",
+        "Do you want to go to school?",
+        "Do you want to go home?"
+      ]
+    },
+    {
+      "id": "hear", "type": "listen", "title": "👂 Listen & Pop!",
+      "hint": "Listen, then tap the place you heard.",
+      "items": { "select": "all" }, "choices": 4
+    },
+    {
+      "id": "build", "type": "scramble", "title": "🧩 Build the Sentence",
+      "hint": "Careful: to the park, to school, home! Tap the words in order.",
+      "items": { "select": "all" }, "template": "Let's go {tag:go}."
+    },
+    {
+      "id": "plan", "type": "phrases", "title": "🧭 Plan Our Day",
+      "hint": "One asks, one plans, one answers. Then swap!",
+      "lines": [
+        "Where shall we go?",
+        "Let's go to the zoo!",
+        "We can feed the animals.",
+        "Great idea!",
+        "OK, let's go!",
+        "Sorry, I can't.",
+        "Maybe later."
+      ]
+    },
+    {
+      "id": "pattern", "type": "sort", "title": "🗂️ Which Pattern?",
+      "hint": "Some places need \"to the\", some need \"to\", and one needs nothing! Tap a place, then its pattern.",
+      "items": { "select": "all" }, "by": "pattern",
+      "buckets": [
+        { "key": "the", "label": "Let's go to the…", "emoji": "1️⃣" },
+        { "key": "to", "label": "Let's go to…", "emoji": "2️⃣" },
+        { "key": "none", "label": "Let's go…", "emoji": "3️⃣" }
+      ]
+    },
+    {
+      "id": "clues", "type": "quiz", "title": "🕵️ Clue Detective",
+      "hint": "Read the clue. Which place is it? Tap it, then say \"Let's go…\"",
+      "items": { "select": "all" }, "ask": "tag:clue", "show": "emoji", "count": 4,
+      "speak": "Let's go {tag:go}."
+    },
+    {
+      "id": "talk", "type": "phrases", "title": "🎤 Talk Time",
+      "hint": "Ask, then answer in a full sentence. Swap roles each time.",
+      "lines": [
+        "Where do you want to go today?",
+        "Do you like the park?",
+        "What do you do at the park?",
+        "Do you go to school every day?"
+      ]
+    },
+    { "id": "done", "type": "finish", "title": "🎉 Great job!", "message": "Great job! Now you can say where to go!" }
+  ]
+}

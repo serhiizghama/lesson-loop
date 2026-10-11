@@ -131,6 +131,40 @@ const SUBJECTS: Record<string, Recipe> = {
   'food/water': { subject: 'one tall glass of clear water' },
   'food/cake': { subject: 'one slice of birthday cake with pink icing and a lit candle' },
   'food/ice-cream': { subject: 'one ice cream cone with two scoops' },
+
+  // ── fruit, drinks, family, places ────────────────────────────────────────
+  // These four topics are NOT drawn. Their pictures are Microsoft Fluent Emoji (MIT —
+  // see THIRD_PARTY_NOTICES.md), rendered onto the same 512 white square, because a word
+  // this plain does not need a generated drawing. The recipes below exist only because
+  // every item needs one; deleting one of these pictures would make this script draw a
+  // replacement in the house style, which would not match the rest of its topic.
+  //
+  // Fruit shows several pieces, because the word on the card is plural: one orange under
+  // "oranges" teaches the wrong number.
+  'fruit/orange': { subject: 'three round oranges in a small group, one with a green leaf' },
+  'fruit/pear': { subject: 'two green pears side by side' },
+  'fruit/grape': { subject: 'one bunch of purple grapes with a green leaf' },
+  'fruit/watermelon': { subject: 'two triangle slices of watermelon with red flesh, black seeds and a green rind' },
+
+  // ── drinks ────────────────────────────────────────────────────────────────
+  'drinks/milk': { subject: 'one tall glass of white milk' },
+  'drinks/water': { subject: 'one tall glass of clear water' },
+  'drinks/juice': { subject: 'one small orange juice box with a bendy straw and a plain label with no writing' },
+  'drinks/tea': { subject: 'one small green Japanese tea cup with no handle, full of green tea, with a little steam' },
+
+  // ── family ────────────────────────────────────────────────────────────────
+  'family/mom': { subject: 'one smiling young mother with light skin and shoulder-length dark brown hair, wearing an apron, head and shoulders' },
+  'family/dad': { subject: 'one smiling tall father with light skin and short dark brown hair, wearing a shirt and tie, head and shoulders' },
+  'family/brother': { subject: 'one smiling boy of about eight with light skin and short dark brown hair, wearing a football shirt and holding a soccer ball, head and shoulders' },
+  'family/sister': { subject: 'one smiling girl of about seven with light skin and long brown hair, head and shoulders' },
+  'family/grandma': { subject: 'one smiling grandmother with light skin, grey hair in a bun and round glasses, head and shoulders' },
+  'family/grandpa': { subject: 'one smiling grandfather with light skin and short grey hair, wearing a cosy cardigan, head and shoulders' },
+
+  // ── places ────────────────────────────────────────────────────────────────
+  'places/park': { subject: 'a small park as an isolated vignette: one green tree, one bench and one swing on a patch of grass' },
+  'places/school': { subject: 'a small school building as an isolated vignette, with a clock above the door and no sign' },
+  'places/home': { subject: 'a small cosy house as an isolated vignette, with a red roof, a door and two windows' },
+  'places/zoo': { subject: 'a zoo entrance as an isolated vignette: a plain arched gate with no sign, and a giraffe looking over it' },
 }
 
 /**

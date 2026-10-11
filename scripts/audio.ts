@@ -22,6 +22,7 @@ import { mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync }
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { speakableLines } from '../src/shared/blocks'
+import { narrow } from '../src/shared/narrow'
 import type { Lesson } from '../src/shared/types'
 
 const LESSONS = 'lessons'
@@ -119,7 +120,10 @@ function main(): void {
   const all = new Map<string, string>()
   console.log()
   for (const { file, lesson } of lessons()) {
-    const lines = speakableLines(lesson)
+    // A topic file is not itself playable: a block may select the words a sitting teaches,
+    // which only narrowing resolves. The whole-topic size carries every block and every
+    // word (D-45), so its lines are the union of every size's.
+    const lines = speakableLines(narrow(lesson))
     for (const line of lines) all.set(line, clipId(line, VOICE))
     console.log(`  ${file.padEnd(20)} ${String(lines.length).padStart(4)} lines`)
   }

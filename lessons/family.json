@@ -1,0 +1,139 @@
+{
+  "id": "family",
+  "title": "My Family",
+  "emoji": "👨‍👩‍👧‍👦",
+  "audience": "kids",
+  "l1": "ja",
+  "parts": [
+    { "id": "home", "title": "Family 1 · At Home", "emoji": "🏠", "items": ["mom", "dad", "brother", "sister"] },
+    { "id": "grand", "title": "Family 2 · Grandma & Grandpa", "emoji": "👵", "items": ["grandma", "grandpa"] }
+  ],
+  "items": [
+    {
+      "id": "mom", "en": "mom", "emoji": "👩",
+      "l1": { "word": "お母さん", "romaji": "okaasan" },
+      "example": "This is my mom.",
+      "tags": { "syl": "mom", "he": "She", "adj": "kind", "clue": "She cooks dinner for the family." }
+    },
+    {
+      "id": "dad", "en": "dad", "emoji": "👨",
+      "l1": { "word": "お父さん", "romaji": "otousan" },
+      "example": "This is my dad.",
+      "tags": { "syl": "dad", "he": "He", "adj": "tall", "clue": "He goes to work every day." }
+    },
+    {
+      "id": "brother", "en": "brother", "emoji": "👦",
+      "l1": { "word": "兄／弟", "romaji": "ani / otouto" },
+      "example": "This is my brother.",
+      "tags": { "syl": "bro · ther", "he": "He", "adj": "funny", "clue": "He is a boy. He plays soccer with a ball." }
+    },
+    {
+      "id": "sister", "en": "sister", "emoji": "👧",
+      "l1": { "word": "姉／妹", "romaji": "ane / imouto" },
+      "example": "This is my sister.",
+      "tags": { "syl": "sis · ter", "he": "She", "adj": "smart", "clue": "She is a girl. She likes drawing." }
+    },
+    {
+      "id": "grandma", "en": "grandma", "emoji": "👵",
+      "l1": { "word": "おばあちゃん", "romaji": "obaachan" },
+      "example": "This is my grandma.",
+      "tags": { "syl": "grand · ma", "he": "She", "adj": "caring", "clue": "She waters the flowers." }
+    },
+    {
+      "id": "grandpa", "en": "grandpa", "emoji": "👴",
+      "l1": { "word": "おじいちゃん", "romaji": "ojiichan" },
+      "example": "This is my grandpa.",
+      "tags": { "syl": "grand · pa", "he": "He", "adj": "strong", "clue": "He does tai chi in the park." }
+    }
+  ],
+  "blocks": [
+    {
+      "id": "vocab", "type": "cards", "title": "🔊 Meet the Family!",
+      "hint": "Tap a card to hear it. Clap the syllables, then say it: whisper, normal, loud!",
+      "items": { "select": "new" }, "front": "emoji", "back": ["en", "tag:syl", "l1"]
+    },
+    {
+      "id": "say", "type": "sentence", "title": "💬 This Is My…",
+      "hint": "Choose a person. Then grow your sentence, one step at a time.",
+      "items": { "select": "new" },
+      "levels": [
+        { "label": "One word", "template": "{en}" },
+        { "label": "This is my…", "template": "This is my {en}." },
+        { "label": "He / She is…", "template": "This is my {en}. {tag:he} is {tag:adj}." }
+      ]
+    },
+    {
+      "id": "yours", "type": "phrases", "title": "❓ Is This Your…?",
+      "hint": "Tap 🔊 to hear the question and the answers, then say them out loud.",
+      "only": ["home"],
+      "lines": [
+        "Is this your mom?",
+        "Yes, it is. This is my mom.",
+        "Is this your brother?",
+        "No, it isn't. This is my sister."
+      ]
+    },
+    {
+      "id": "yours-more", "type": "phrases", "title": "❓ Is This Your…?",
+      "hint": "Tap 🔊 to hear the question and the answers, then say them out loud.",
+      "only": ["grand"],
+      "lines": [
+        "Is this your grandma?",
+        "Yes, it is. This is my grandma.",
+        "Is this your grandpa?",
+        "No, it isn't. This is my dad."
+      ]
+    },
+    {
+      "id": "hear", "type": "listen", "title": "👂 Listen & Pop!",
+      "hint": "Listen, then tap the person you heard.",
+      "items": { "select": "all" }, "choices": 4
+    },
+    {
+      "id": "build", "type": "scramble", "title": "🧩 Build the Sentence",
+      "hint": "Tap the words in order: This → is → my → family.",
+      "items": { "select": "new" }, "template": "This is my {en}."
+    },
+    {
+      "id": "photo", "type": "phrases", "title": "📸 The Family Photo",
+      "hint": "One asks, one answers. Then \"Tell me more!\" — and swap!",
+      "only": ["home"],
+      "lines": [
+        "Who is this?",
+        "This is my dad.",
+        "Tell me more!",
+        "He is tall. He likes reading."
+      ]
+    },
+    {
+      "id": "photo-more", "type": "phrases", "title": "📸 The Family Photo",
+      "hint": "One asks, one answers. Then \"Tell me more!\" — and swap!",
+      "only": ["grand"],
+      "lines": [
+        "Who is this?",
+        "This is my grandpa.",
+        "Tell me more!",
+        "He is strong. He likes doing tai chi."
+      ]
+    },
+    {
+      "id": "clues", "type": "quiz", "title": "🕵️ Clue Detective",
+      "hint": "Read the clue. Who is it? Tap the person, then say \"This is my…\"",
+      "items": { "select": "all" }, "ask": "tag:clue", "show": "emoji", "count": 4,
+      "speak": "This is my {en}."
+    },
+    {
+      "id": "talk", "type": "phrases", "title": "🎤 Talk Time",
+      "hint": "Ask, then answer in a full sentence. Swap roles each time.",
+      "only": ["grand"],
+      "lines": [
+        "Who is in your family?",
+        "Do you have a brother or a sister?",
+        "Do you have a grandma or a grandpa?",
+        "Who is this in your family photo?",
+        "Do you live with your mom and dad?"
+      ]
+    },
+    { "id": "done", "type": "finish", "title": "🎉 Great job!", "message": "Great job! Now you can talk about your family!" }
+  ]
+}

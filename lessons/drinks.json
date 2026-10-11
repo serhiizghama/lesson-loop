@@ -1,0 +1,100 @@
+{
+  "id": "drinks",
+  "title": "Drink Talk",
+  "emoji": "🧃",
+  "audience": "kids",
+  "l1": "ja",
+  "items": [
+    {
+      "id": "milk", "en": "milk", "emoji": "🥛", "article": "none",
+      "l1": { "word": "ミルク", "romaji": "miruku" },
+      "example": "I like milk.",
+      "tags": { "syl": "milk", "why": "creamy" }
+    },
+    {
+      "id": "juice", "en": "juice", "emoji": "🧃", "article": "none",
+      "l1": { "word": "ジュース", "romaji": "juusu" },
+      "example": "I like juice.",
+      "tags": { "syl": "juice", "why": "sweet" }
+    },
+    {
+      "id": "water", "en": "water", "emoji": "💧", "article": "none",
+      "l1": { "word": "水", "romaji": "mizu" },
+      "example": "I like water.",
+      "tags": { "syl": "wa · ter", "why": "refreshing" }
+    },
+    {
+      "id": "tea", "en": "tea", "emoji": "🍵", "article": "none",
+      "l1": { "word": "お茶", "romaji": "ocha" },
+      "example": "I like tea.",
+      "tags": { "syl": "tea", "why": "warm" }
+    }
+  ],
+  "blocks": [
+    {
+      "id": "vocab", "type": "cards", "title": "🔊 Meet the Drinks!",
+      "hint": "Tap a card to hear it. Clap the syllables, then say it: whisper, normal, loud!",
+      "items": { "select": "all" }, "front": "emoji", "back": ["en", "tag:syl", "l1"]
+    },
+    {
+      "id": "say", "type": "sentence", "title": "💬 I Like…",
+      "hint": "Choose a drink. Then grow your sentence, one step at a time.",
+      "items": { "select": "all" },
+      "levels": [
+        { "label": "One word", "template": "{en}" },
+        { "label": "I like…", "template": "I like {en}." },
+        { "label": "Because…", "template": "I like {en}. {it} {be} {tag:why}." }
+      ]
+    },
+    {
+      "id": "ask", "type": "phrases", "title": "❓ Ask & Answer",
+      "hint": "Tap 🔊 to hear the question and the answers. Then give your own answer!",
+      "lines": [
+        "Do you like milk?",
+        "Yes, I do. I like milk.",
+        "Do you like tea?",
+        "No, I don't. I don't like tea."
+      ]
+    },
+    {
+      "id": "hear", "type": "listen", "title": "👂 Listen & Pop!",
+      "hint": "Listen, then tap the drink you heard.",
+      "items": { "select": "all" }, "choices": 4
+    },
+    {
+      "id": "build", "type": "scramble", "title": "🧩 Build the Sentence",
+      "hint": "Tap the words in order: I → like → drink.",
+      "items": { "select": "all" }, "template": "I like {en}."
+    },
+    {
+      "id": "cafe", "type": "phrases", "title": "🛒 The Drinks Café",
+      "hint": "One is the shopkeeper, one is the customer. Then swap!",
+      "lines": [
+        "What do you like?",
+        "I like juice.",
+        "Why do you like it?",
+        "Because it is sweet."
+      ]
+    },
+    {
+      "id": "prefer", "type": "phrases", "title": "⚖️ This or That?",
+      "hint": "Which do you prefer? Finish the sentence with your own reason!",
+      "lines": [
+        "Which do you prefer?",
+        "I prefer milk to juice because it is creamy.",
+        "I prefer tea to water because it is warm."
+      ]
+    },
+    {
+      "id": "talk", "type": "phrases", "title": "🎤 Talk Time",
+      "hint": "Ask, then answer in a full sentence. Swap roles each time.",
+      "lines": [
+        "What drink do you like?",
+        "What's your favourite drink?",
+        "Do you like milk?",
+        "What do you drink in the morning?"
+      ]
+    },
+    { "id": "done", "type": "finish", "title": "🎉 Great job!", "message": "Great job! Now you can talk about drinks!" }
+  ]
+}
