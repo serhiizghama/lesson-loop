@@ -10,7 +10,7 @@
       "l1": { "word": "公園", "romaji": "kouen" },
       "example": "Let's go to the park.",
       "tags": {
-        "go": "to the park", "pattern": "the", "can": "have a picnic",
+        "go": "to the park", "np": "the park", "pattern": "the", "can": "have a picnic",
         "clue": "You can play on the swings here."
       }
     },
@@ -19,7 +19,7 @@
       "l1": { "word": "学校", "romaji": "gakkou" },
       "example": "Let's go to school.",
       "tags": {
-        "go": "to school", "pattern": "to", "can": "learn English",
+        "go": "to school", "np": "school", "pattern": "to", "can": "learn English",
         "clue": "You study and meet your friends here."
       }
     },
@@ -28,7 +28,7 @@
       "l1": { "word": "家", "romaji": "ie" },
       "example": "Let's go home.",
       "tags": {
-        "go": "home", "pattern": "none", "can": "watch TV",
+        "go": "home", "np": "home", "pattern": "none", "can": "watch TV",
         "clue": "You sleep here. Mom and Dad are here."
       }
     },
@@ -37,7 +37,7 @@
       "l1": { "word": "動物園", "romaji": "doubutsuen" },
       "example": "Let's go to the zoo.",
       "tags": {
-        "go": "to the zoo", "pattern": "the", "can": "feed the animals",
+        "go": "to the zoo", "np": "the zoo", "pattern": "the", "can": "feed the animals",
         "clue": "You can see elephants and zebras here."
       }
     }
@@ -59,16 +59,12 @@
       ]
     },
     {
-      "id": "want", "type": "phrases", "title": "❓ Do You Want To Go…?",
-      "hint": "Tap 🔊 to hear the question and the answers, then say them out loud.",
-      "lines": [
-        "Do you want to go to the park?",
-        "Yes, I do. Let's go to the park.",
-        "Do you want to go to the zoo?",
-        "No, I don't.",
-        "Do you want to go to school?",
-        "Do you want to go home?"
-      ]
+      "id": "want", "type": "yesno", "title": "❓ Do You Want To Go…?",
+      "hint": "Say your answer first, then tap Yes or No!",
+      "items": { "select": "all" },
+      "question": "Do you want to go {tag:go}?",
+      "yes": "Yes, I do. Let's go {tag:go}.",
+      "no": "No, I don't."
     },
     {
       "id": "hear", "type": "listen", "title": "👂 Listen & Pop!",
@@ -118,6 +114,13 @@
         "What do you do at the park?",
         "Do you go to school every day?"
       ]
+    },
+    {
+      "id": "secret", "type": "secret", "title": "🎁 Guess My Secret Place",
+      "hint": "Ask \"Is it…?\" out loud before every tap. Find the secret place!",
+      "items": { "select": "all" }, "rounds": 2,
+      "guess": "Is it {tag:np}? No, it isn't.",
+      "found": "Yes, it is! Let's go {tag:go}."
     },
     { "id": "done", "type": "finish", "title": "🎉 Great job!", "message": "Great job! Now you can say where to go!" }
   ]

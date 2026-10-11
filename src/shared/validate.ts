@@ -156,6 +156,23 @@ const blockSchema = z.discriminatedUnion('type', [
     items: itemRefSchema,
     template: z.string().min(1),
   }),
+  z.object({
+    ...blockBase,
+    type: z.literal('yesno'),
+    items: itemRefSchema,
+    question: z.string().min(1),
+    yes: z.string().min(1),
+    no: z.string().min(1),
+    check: z.boolean().optional(),
+  }),
+  z.object({
+    ...blockBase,
+    type: z.literal('secret'),
+    items: itemRefSchema,
+    rounds: z.number().int().min(1),
+    guess: z.string().min(1),
+    found: z.string().min(1),
+  }),
   z.object({ ...blockBase, type: z.literal('finish'), message: z.string().min(1) }),
 ])
 
@@ -416,6 +433,45 @@ function crossCheck(lesson: Lesson): string[] {
         requireTemplateTags(block.sentence, 'sentence')
         break
       }
+      case 'yesno': {
+        requireTemplateTags(block.question, 'question')
+        requireTemplateTags(block.yes, 'yes')
+        requireTemplateTags(block.no, 'no')
+        // The answers travel as `tap` targets named "yes" and "no"; an item with either id
+        // would make "move on past this item" and "answer yes" the same action (design D146).
+        for (const item of items) {
+          if (item.id === 'yes' || item.id === 'no') {
+            errors.push(
+              `${at}.items: block "${block.id}" selects an item with id "${item.id}", which is ` +
+                `the name of an answer`,
+            )
+          }
+        }
+        if (block.check === true && items.length < 2) {
+          errors.push(
+            `${at}.check: block "${block.id}" checks its answers but selects ${items.length} ` +
+              `item — with nothing else to name, no question can be false`,
+          )
+        }
+        break
+      }
+      case 'secret': {
+        requireTemplateTags(block.guess, 'guess')
+        requireTemplateTags(block.found, 'found')
+        if (items.length < 2) {
+          errors.push(
+            `${at}.items: block "${block.id}" selects ${items.length} item — one tile is ` +
+              `nothing to guess`,
+          )
+        }
+        if (block.rounds > items.length) {
+          errors.push(
+            `${at}.rounds: block "${block.id}" plays ${block.rounds} rounds but selects ` +
+              `${items.length} items, and each round hides a different one`,
+          )
+        }
+        break
+      }
     }
   }
   return errors
@@ -459,6 +515,13 @@ function checkParts(lesson: Lesson): string[] {
     const at = `parts.${i}`
     if (partIds.has(part.id)) errors.push(`${at}.id: duplicate part id "${part.id}"`)
     partIds.add(part.id)
+    // The whole topic's own name — in its address and in a block's `only` (design D148).
+    if (part.id === WHOLE) {
+      errors.push(
+        `${at}.id: part "${part.id}" is named like the whole topic, which it can never be ` +
+          `chosen apart from`,
+      )
+    }
 
     if (part.items.length === 0) {
       errors.push(`${at}.items: part "${part.id}" names no items, so it is no sitting at all`)
@@ -480,6 +543,9 @@ function checkParts(lesson: Lesson): string[] {
 
   for (const [i, block] of lesson.blocks.entries()) {
     for (const id of block.only ?? []) {
+      // Naming the whole topic means "only when all of it is taught" — which a topic with
+      // no parts cannot be anything but, so there it is the same error as any other name.
+      if (id === WHOLE && parts.length > 0) continue
       if (!partIds.has(id)) {
         errors.push(
           `blocks.${i}.only: block "${block.id}" belongs to part "${id}", which the topic ` +

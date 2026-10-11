@@ -402,6 +402,15 @@ or that, talk time — are carried as model phrases, their language without thei
 (D-51), and eight of her exercises are absent by name (D-52). The pictures are Fluent Emoji
 rather than generated drawings (D-54).
 
+**Phase 2a — `add-yesno-and-secret`.** Two block types and one word of syntax. `yesno`
+(named `ask` in the list below until it was built — `ask` is already a field of `quiz`) is a
+picture with a question, answered Yes or No with a full reply; as a *check* it sometimes
+asks about the wrong person on purpose, so the child has to look before agreeing. It
+replaces the phrases stand-ins for Ask & Answer, Is this your…? and Do you want to go…?.
+`secret` is Guess My Secret, two rounds, in Drink Talk, My Family and Let's Go. And
+`only: ["all"]` puts a block in the whole topic only, so Fruit Talk's second part is again
+exactly her 2B. Decisions D-55…D-57.
+
 **Phase 2 — the mechanics her dialogues need**, not yet planned, ranked by how many of her
 lessons each serves against its cost: `ask` (a yes/no question with an optional right
 answer — four lessons), `secret` (Guess My Secret — three), `reveal` (the blurred guess —
@@ -500,3 +509,6 @@ technical decisions `Dn`, without the hyphen; the two sequences are separate.
 | D-52 | **Eight of her exercises are absent by name, as D-39 named two before them.** The picture hunt, the say-it-three-times meter (D-39 itself: nothing scores a person), the spinning wheel, the silly voices (recorded clips cannot change pitch without changing speed), the blurred guess, the free sentence combiner, the survey and family album (typed names are student data the app has promised not to hold) and the hidden-item guessing game. Each needs a mechanic the engine does not have, and none is approximated: an imitation teaches the teacher that the app half-does something, which is worse than not doing it | 2026-10-11 |
 | D-53 | **My Family is two parts of four and two: the family at home, then the grandparents.** Her page has no halves and six words is over the sitting. Four first, because those are the people a child lives with and four is enough for a four-choice listening round; two second, which carries all six and so revises rather than thinning out. A three-and-three split breaks up a pair — mother from father or brother from sister. This is ours, not hers, and it is the decision she is likeliest to change: changing it is two arrays | 2026-10-11 |
 | D-54 | **Four topics take their pictures from an openly licensed set rather than generating drawings.** A pear, a mom and a school are plain enough that Microsoft Fluent Emoji (MIT) already has them, and a generated drawing per word costs a paid call and a minute for nothing but house style. The cost is accepted with eyes open: these topics look softer and three-dimensional beside the flat drawn ones. Inside a topic the set is consistent — Drink Talk takes all four from Fluent rather than borrowing Food's two glasses. Searching the web for pictures was rejected outright: the app and its repository are public, and a picture shipped without a licence that allows that is not ours to ship | 2026-10-11 |
+| D-55 | **Lesson 21's follow-up to "No, I don't" is not built.** On her page a *No* to "Do you want to go to the park?" opens a second choice — "Where do you want to go?" — and the child taps another place. Here the reply is just "No, I don't.", and the follow-up is the teacher's to ask. Building it would make one exercise two, for one lesson, and the question it asks is exactly the kind a live teacher asks better | 2026-10-11 |
+| D-56 | **Finding a secret earns the exercise's star, never more.** Her page gives two stars for a first-try find and shows "found in N tries". A star in this app belongs to an exercise and is earned by finishing it (D-28); a bonus for luck would be the first score in the product, and guessing well on the first try is luck. Nothing counts tries on screen either | 2026-10-11 |
+| D-57 | **The secret travels in the room's state, and only the screen keeps it.** Both devices hold the whole state, so the student's device holds the secret too; a child with developer tools could find it. The promise is that nothing *on the student's screen* gives it away — same gift every round, tiles in a fixed order — and that is enforced by a test. Hiding state per participant would mean a second state shape on the wire for one game | 2026-10-11 |

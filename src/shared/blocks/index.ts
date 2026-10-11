@@ -12,6 +12,8 @@ import { describeLogic } from './describe'
 import { hotspotLogic } from './hotspot'
 import { memoryLogic } from './memory'
 import { scrambleLogic } from './scramble'
+import { yesnoLogic } from './yesno'
+import { secretLogic } from './secret'
 import { finishLogic } from './finish'
 
 /**
@@ -31,6 +33,8 @@ export const blockLogic: { [T in BlockType]: BlockLogic<T> } = {
   hotspot: hotspotLogic,
   memory: memoryLogic,
   scramble: scrambleLogic,
+  yesno: yesnoLogic,
+  secret: secretLogic,
   finish: finishLogic,
 }
 
@@ -47,4 +51,7 @@ export { cardFace, cardId, cardItem, memoryPairSpeech } from './memory'
 export {
   scrambleChips, scramblePlaced, scrambleTarget, scrambleUsed, sentenceWords,
 } from './scramble'
+export { trueAnswer, yesnoCurrent, yesnoQuestion, yesnoReply } from './yesno'
+export type { YesNoAnswer } from './yesno'
+export { secretFoundLine, secretGuessLine, secretTarget, secretTiles } from './secret'
 export { speakableLines } from './speakable'

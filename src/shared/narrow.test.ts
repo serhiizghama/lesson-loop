@@ -84,6 +84,15 @@ describe('narrow', () => {
     ])
   })
 
+  it('carries a block naming the whole topic only when the whole topic is chosen', () => {
+    const lesson = topic()
+    lesson.blocks.splice(4, 0, { id: 'chat', type: 'phrases', title: 'Talk time', only: [WHOLE], lines: ['Do you like dogs?'] })
+    expect(validateLesson(lesson).ok).toBe(true)
+    expect(blockIds(narrow(lesson, 'known'))).not.toContain('chat')
+    expect(blockIds(narrow(lesson, 'wild'))).not.toContain('chat')
+    expect(blockIds(narrow(lesson, WHOLE))).toEqual(['vocab', 'talk', 'talk-wild', 'homes', 'chat', 'done'])
+  })
+
   it('keeps a revision exercise out of the sitting with nothing to revise', () => {
     expect(blockIds(narrow(topic(), 'known'))).not.toContain('homes')
   })

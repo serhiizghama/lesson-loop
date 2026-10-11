@@ -47,14 +47,12 @@
       ]
     },
     {
-      "id": "ask", "type": "phrases", "title": "❓ Ask & Answer",
-      "hint": "Tap 🔊 to hear the question and the answers. Then give your own answer!",
-      "lines": [
-        "Do you like milk?",
-        "Yes, I do. I like milk.",
-        "Do you like tea?",
-        "No, I don't. I don't like tea."
-      ]
+      "id": "ask", "type": "yesno", "title": "❓ Ask & Answer",
+      "hint": "Say your answer first, then tap Yes or No!",
+      "items": { "select": "all" },
+      "question": "Do you like {en}?",
+      "yes": "Yes, I do. I like {en}.",
+      "no": "No, I don't. I don't like {en}."
     },
     {
       "id": "hear", "type": "listen", "title": "👂 Listen & Pop!",
@@ -94,6 +92,13 @@
         "Do you like milk?",
         "What do you drink in the morning?"
       ]
+    },
+    {
+      "id": "secret", "type": "secret", "title": "🎁 Guess My Secret Drink",
+      "hint": "Ask \"Do you like…?\" out loud before every tap. Find the secret drink!",
+      "items": { "select": "all" }, "rounds": 2,
+      "guess": "Do you like {en}? No, I don't.",
+      "found": "Yes, I do! I like {en}."
     },
     { "id": "done", "type": "finish", "title": "🎉 Great job!", "message": "Great job! Now you can talk about drinks!" }
   ]

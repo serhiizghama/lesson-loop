@@ -63,26 +63,12 @@
       ]
     },
     {
-      "id": "yours", "type": "phrases", "title": "❓ Is This Your…?",
-      "hint": "Tap 🔊 to hear the question and the answers, then say them out loud.",
-      "only": ["home"],
-      "lines": [
-        "Is this your mom?",
-        "Yes, it is. This is my mom.",
-        "Is this your brother?",
-        "No, it isn't. This is my sister."
-      ]
-    },
-    {
-      "id": "yours-more", "type": "phrases", "title": "❓ Is This Your…?",
-      "hint": "Tap 🔊 to hear the question and the answers, then say them out loud.",
-      "only": ["grand"],
-      "lines": [
-        "Is this your grandma?",
-        "Yes, it is. This is my grandma.",
-        "Is this your grandpa?",
-        "No, it isn't. This is my dad."
-      ]
+      "id": "yours", "type": "yesno", "title": "❓ Is This Your…?",
+      "hint": "Look at the picture. Say your answer first, then tap Yes or No!",
+      "items": { "select": "new" }, "check": true,
+      "question": "Is this your {en}?",
+      "yes": "Yes, it is. This is my {en}.",
+      "no": "No, it isn't. This is my {en}."
     },
     {
       "id": "hear", "type": "listen", "title": "👂 Listen & Pop!",
@@ -121,6 +107,13 @@
       "hint": "Read the clue. Who is it? Tap the person, then say \"This is my…\"",
       "items": { "select": "all" }, "ask": "tag:clue", "show": "emoji", "count": 4,
       "speak": "This is my {en}."
+    },
+    {
+      "id": "secret", "type": "secret", "title": "🎁 Guess My Secret Person",
+      "hint": "Ask \"Is it your…?\" out loud before every tap. Find the secret person!",
+      "items": { "select": "all" }, "rounds": 2,
+      "guess": "Is it your {en}? No, it isn't.",
+      "found": "Yes, it is! This is my {en}."
     },
     {
       "id": "talk", "type": "phrases", "title": "🎤 Talk Time",

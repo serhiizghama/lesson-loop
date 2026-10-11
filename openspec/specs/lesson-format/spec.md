@@ -157,13 +157,14 @@ item, never decided by the engine.
 
 Of those four lessons, the exercises that practise the frame — meeting the words with
 their syllables, the sentence and its longer form, listening for a word, assembling the
-sentence, the clue riddles and choosing which pattern a place takes — SHALL be playable as
-exercises. The exercises that are dialogues — asking and answering, the role-plays,
-choosing between two things and the talk questions — SHALL be carried as their model
-sentences, which the learner hears and says, without the interaction the original wrapped
-around them. The remaining exercises SHALL be absent by name: the picture hunt, the
-three-times speaking meter, the spinning wheel, the silly voices, the blurred guess, the
-free sentence combiner, the survey and family album, and the hidden-item guessing game.
+sentence, the clue riddles, choosing which pattern a place takes, asking and answering
+(*Do you like…?*, *Is this your…?*, *Do you want to go…?*) and the hidden-item guessing
+game — SHALL be playable as exercises. The remaining dialogues — the role-plays, choosing
+between two things and the talk questions — SHALL be carried as their model sentences,
+which the learner hears and says, without the interaction the original wrapped around
+them. The remaining exercises SHALL be absent by name: the picture hunt, the three-times
+speaking meter, the spinning wheel, the silly voices, the blurred guess, the free sentence
+combiner, and the survey and family album.
 Each needs a mechanic the engine does not have, and nothing in the format half-implements
 any of them.
 
@@ -208,16 +209,25 @@ any of them.
 - **THEN** the park and the zoo belong with *to the*, school with *to*, and home with
   neither, and a wrong placement is refused as in any sorting exercise
 
+#### Scenario: Asking and answering is played, not recited
+- **WHEN** an ask-and-answer or *Is this your…?* exercise of these lessons is played
+- **THEN** the learner sees a picture with a question about it and answers *Yes* or *No*,
+  and the full reply follows
+
+#### Scenario: The hidden-item game is played
+- **WHEN** Drink Talk, My Family or Let's Go is played
+- **THEN** it contains a secret game over its words, whose lines ask that lesson's own
+  question
+
 #### Scenario: A dialogue is carried as its sentences
-- **WHEN** an ask-and-answer, role-play, this-or-that or talk-time exercise of these
-  lessons is played
-- **THEN** its question and its answers are model phrases the learner can hear on a tap,
-  and no yes/no buttons, role swap or question levels are shown
+- **WHEN** a role-play, this-or-that or talk-time exercise of these lessons is played
+- **THEN** its lines are model phrases the learner can hear on a tap, and no role swap or
+  question levels are shown
 
 #### Scenario: The new lessons' deferred exercises are absent
 - **WHEN** any size of the four new topics is played
 - **THEN** none of the picture hunt, speaking meter, wheel, silly voices, blurred guess,
-  free combiner, survey, album or hidden-item guess appears in any form
+  free combiner, survey or album appears in any form
 
 ### Requirement: A lesson teaches one sitting's worth of vocabulary
 
@@ -413,3 +423,40 @@ nothing to assemble.
 #### Scenario: A sentence with nothing to assemble
 - **WHEN** a template renders to a single word for some item
 - **THEN** the lesson is rejected, and the message names the block and that item
+
+### Requirement: A yes/no question declares its question and both replies
+
+A yes/no exercise SHALL declare:
+
+- its question and its two replies, each as a sentence template;
+- whether the question has a right answer.
+
+In a check, the question SHALL be rendered for the item it names, and each reply for the
+item shown. A check SHALL select at least two items, because otherwise no question can be
+false. A lesson SHALL be rejected before it is played when any of these is missing or
+empty, or when a template reads a tag that a selected item does not carry.
+
+#### Scenario: A check over one word
+- **WHEN** a checked yes/no exercise selects a single item, at any size the topic offers
+- **THEN** the file is reported as invalid, naming the block and the size
+
+#### Scenario: A reply that reads a missing tag
+- **WHEN** a reply template reads a tag that one of the selected items lacks
+- **THEN** the file is reported as invalid, naming the block, the item and the tag
+
+### Requirement: A secret game declares its lines and how many rounds it plays
+
+A secret game SHALL declare:
+
+- the line spoken for a wrong guess, as a sentence template rendered for the guessed item;
+- the line spoken when the secret is found, rendered for the secret;
+- how many rounds it plays.
+
+The number of rounds SHALL be at least one and SHALL NOT exceed the number of selected
+items, since each round hides a different item. The game SHALL select at least two items,
+because a game with one tile has nothing to guess. A lesson SHALL be rejected before it is
+played when any of these does not hold, at any size the topic offers.
+
+#### Scenario: More rounds than items
+- **WHEN** a secret game declares three rounds and a size of the topic gives it two items
+- **THEN** the file is reported as invalid, naming the block and the size

@@ -165,6 +165,36 @@ export type Block =
    * engine renders it for each word of the lesson (design D131).
    */
   | (BlockBase & { type: 'scramble'; items: ItemRef; template: string })
+  /**
+   * A picture with a question about it, answered Yes or No, each answer with a reply of its
+   * own. Without `check` the question is an opinion and both answers count; with it the
+   * question names the item shown or another one, and only the true answer counts — the
+   * reply is always about the item shown (design D145, D146).
+   */
+  | (BlockBase & {
+      type: 'yesno'
+      items: ItemRef
+      /** Rendered for the item the question names. */
+      question: string
+      /** Rendered for the item shown. */
+      yes: string
+      /** Rendered for the item shown. */
+      no: string
+      check?: boolean
+    })
+  /**
+   * One item hidden, every item offered as a tile; a wrong tile says `guess` and is crossed
+   * out, the secret says `found`. Plays `rounds` rounds, a different secret each (design D147).
+   */
+  | (BlockBase & {
+      type: 'secret'
+      items: ItemRef
+      rounds: number
+      /** Rendered for the item guessed wrongly. */
+      guess: string
+      /** Rendered for the secret. */
+      found: string
+    })
   | (BlockBase & { type: 'finish'; message: string })
 
 export type BlockType = Block['type']
@@ -285,6 +315,32 @@ export type ScrambleState = {
   /** The word last refused, cleared by the next action. Both screens see the mistake. */
   wrong: string | null
 }
+/**
+ * `asked[i]` is the item the question at position `i` names — `order[i]` itself in an
+ * opinion, either it or another item in a check. Decided in `init`, because `reduce` has
+ * no seed and both screens must ask the same question (design D145).
+ */
+export type YesNoState = {
+  order: string[]
+  asked: string[]
+  index: number
+  /** The answer given to the item on screen, or null while it waits for one. */
+  answer: 'yes' | 'no' | null
+  /** The answer last refused, cleared by the next action. Both screens see the mistake. */
+  wrong: 'yes' | 'no' | null
+}
+/**
+ * Round `r` hides `order[r]`. The tiles are never laid out in this order — that would put
+ * the first secret first on the student's screen (design D147).
+ */
+export type SecretState = {
+  order: string[]
+  round: number
+  /** Items guessed wrongly this round. */
+  tried: string[]
+  /** Whether this round's secret has been revealed. */
+  found: boolean
+}
 export type FinishState = { seen: boolean }
 
 export type BlockStateMap = {
@@ -300,6 +356,8 @@ export type BlockStateMap = {
   hotspot: HotspotState
   memory: MemoryState
   scramble: ScrambleState
+  yesno: YesNoState
+  secret: SecretState
   finish: FinishState
 }
 

@@ -84,6 +84,15 @@ export function testLesson(): Lesson {
         id: 'build', type: 'scramble', title: 'Build it', items: { select: 'all' },
         template: '{this} {be} my {en}.',
       },
+      {
+        id: 'is', type: 'yesno', title: 'Is it a…?', items: { select: 'ids', ids: ['dog', 'cat', 'lion'] },
+        question: 'Is it a {en}?', yes: 'Yes, it is. It is a {en}.', no: "No, it isn't. It is a {en}.",
+        check: true,
+      },
+      {
+        id: 'hide', type: 'secret', title: 'Guess my secret', items: { select: 'all' },
+        rounds: 2, guess: "Is it the {en}? No, it isn't.", found: 'Yes, it is! It is the {en}.',
+      },
       { id: 'done', type: 'finish', title: 'Great job!', message: 'You did it!' },
     ],
   }

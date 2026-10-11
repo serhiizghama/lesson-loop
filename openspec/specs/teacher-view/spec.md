@@ -151,7 +151,8 @@ which, which bucket each item belongs in, which word is being asked, the sentenc
 level produces for the selected item, the phrases a phrase list contains and which of them
 have been heard, the item a quiz prompt names, both answers a description is asking for,
 where on a drawing each word belongs, where the two halves of a face-down pair are lying,
-and the sentence being assembled. An exercise with nothing to be right about SHALL show no
+the sentence being assembled, the true answer to a checked yes/no question with its reply,
+and the item a secret game is hiding. An exercise with nothing to be right about SHALL show no
 key rather than an empty one.
 
 The key SHALL keep the one uniform shape it already has — a title and rows of a label
@@ -199,6 +200,18 @@ coordinates.
 - **WHEN** a sentence-assembly exercise is on screen
 - **THEN** the teacher sees the sentence being built right now, in full, and which
   sentences are already done
+
+#### Scenario: The key for a yes/no question
+- **WHEN** a yes/no exercise is on screen
+- **THEN** the teacher sees, for each item, the question asked and — for a check — the true
+  answer with its reply, with the items already answered marked done and the one on screen
+  marked current
+
+#### Scenario: The key for a secret game
+- **WHEN** a secret game is on screen
+- **THEN** the teacher sees which item is hidden in each round, with the rounds already won
+  marked done and the round being played marked current, while the student's screen shows
+  nothing of it
 
 #### Scenario: An exercise with no answer
 - **WHEN** a physical-response exercise, which scores nothing, is on screen

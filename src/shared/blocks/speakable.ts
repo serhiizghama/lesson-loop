@@ -5,6 +5,8 @@ import { cardsSpeech } from './cards'
 import { matchPairSpeech } from './match'
 import { quizSpeech } from './quiz'
 import { describeSentence } from './describe'
+import { yesnoQuestion, yesnoReply } from './yesno'
+import { secretFoundLine, secretGuessLine } from './secret'
 import { hotspotSpeech } from './hotspot'
 import { memoryPairSpeech } from './memory'
 
@@ -91,6 +93,25 @@ function linesOf(lesson: Lesson, block: Block): Array<string | null> {
       return resolveItems(lesson, block.items).map((item) =>
         renderTemplate(block.template, item),
       )
+
+    case 'yesno': {
+      // YesNoView speaks the question from its control only, never on arrival, and the
+      // reply to whichever answer is given. A check's question may name any selected item over any
+      // picture, so every item's question and both replies are possible.
+      const items = resolveItems(lesson, block.items)
+      return items.flatMap((item) => [
+        yesnoQuestion(block, item),
+        yesnoReply(block, item, 'yes'),
+        yesnoReply(block, item, 'no'),
+      ])
+    }
+
+    case 'secret':
+      // SecretView speaks the guess line for a wrong tile and the found line for the secret.
+      return resolveItems(lesson, block.items).flatMap((item) => [
+        secretGuessLine(block, item),
+        secretFoundLine(block, item),
+      ])
 
     case 'finish':
       // Nothing is spoken on the closing slide.

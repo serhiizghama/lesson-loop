@@ -600,3 +600,136 @@ describe('the three exercises added for the body diagram', () => {
     expect(errors).toContain('nothing to assemble')
   })
 })
+
+describe('the two exercises added for the sentence lessons', () => {
+  const yesno = {
+    id: 'like', type: 'yesno' as const, title: 'Do you like…?', items: { select: 'all' as const },
+    question: 'Do you like {en}s?', yes: 'Yes, I do.', no: "No, I don't.",
+  }
+  const secret = {
+    id: 'hide', type: 'secret' as const, title: 'Guess my secret', items: { select: 'all' as const },
+    rounds: 2, guess: 'Is it a {en}? No, it isn\'t.', found: 'Yes, it is! It is a {en}.',
+  }
+
+  function errorsOf(block: Lesson['blocks'][number], mutate?: (l: Lesson) => void): string {
+    const lesson = broken((l) => {
+      l.blocks.push(block)
+      mutate?.(l)
+    })
+    const result = validateLesson(lesson)
+    expect(result.ok).toBe(false)
+    return result.ok ? '' : result.errors.join('\n')
+  }
+
+  it('accepts both when they are well formed', () => {
+    const result = validateLesson(broken((l) => l.blocks.push(yesno, { ...yesno, id: 'is', check: true }, secret)))
+    if (!result.ok) throw new Error(result.errors.join('\n'))
+  })
+
+  // ── yesno ──────────────────────────────────────────────────────────────────
+
+  it('rejects an empty question or reply', () => {
+    expect(validateLesson(broken((l) => l.blocks.push({ ...yesno, question: '' }))).ok).toBe(false)
+    expect(validateLesson(broken((l) => l.blocks.push({ ...yesno, no: '' }))).ok).toBe(false)
+  })
+
+  it('rejects a reply naming a tag an item does not carry, naming the item and the tag', () => {
+    const errors = errorsOf({ ...yesno, yes: 'Yes! It says {tag:move}.' })
+    expect(errors).toContain('blocks.1.yes:')
+    expect(errors).toContain('"move"')
+    expect(errors).toContain('"dog"')
+  })
+
+  it('rejects a check over one item, since no question could be false', () => {
+    const errors = errorsOf({ ...yesno, check: true, items: { select: 'ids', ids: ['dog'] } })
+    expect(errors).toContain('"like"')
+    expect(errors).toContain('no question can be false')
+  })
+
+  it('accepts an opinion over one item', () => {
+    const lesson = broken((l) => l.blocks.push({ ...yesno, items: { select: 'ids', ids: ['dog'] } }))
+    expect(validateLesson(lesson).ok).toBe(true)
+  })
+
+  it('rejects an item whose id is the name of an answer', () => {
+    const errors = errorsOf(yesno, (l) => {
+      l.items[0]!.id = 'yes'
+      ;(l.blocks[0] as { items: unknown }).items = { select: 'all' }
+    })
+    expect(errors).toContain('the name of an answer')
+  })
+
+  it('names the size a check fails at', () => {
+    const lesson = topic()
+    lesson.blocks.push({ ...yesno, check: true, items: { select: 'new' } })
+    const result = validateLesson(lesson)
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    const message = result.errors.join('\n')
+    expect(message).toContain('size "wild"')
+    expect(message).toContain('no question can be false')
+    expect(message).not.toContain('size "farm"')
+  })
+
+  // ── secret ─────────────────────────────────────────────────────────────────
+
+  it('rejects more rounds than items, since each round hides a different one', () => {
+    const errors = errorsOf({ ...secret, rounds: 4 })
+    expect(errors).toContain('"hide"')
+    expect(errors).toContain('plays 4 rounds but selects 3 items')
+  })
+
+  it('rejects no rounds at all', () => {
+    expect(validateLesson(broken((l) => l.blocks.push({ ...secret, rounds: 0 }))).ok).toBe(false)
+  })
+
+  it('rejects a game with one tile', () => {
+    const errors = errorsOf({ ...secret, rounds: 1, items: { select: 'ids', ids: ['dog'] } })
+    expect(errors).toContain('nothing to guess')
+  })
+
+  it('rejects a found line naming a tag an item does not carry', () => {
+    expect(errorsOf({ ...secret, found: 'It says {tag:move}!' })).toContain('blocks.1.found:')
+  })
+
+  it('names the size a secret game has too many rounds for', () => {
+    const lesson = topic()
+    lesson.blocks.push({ ...secret, rounds: 3 })
+    const result = validateLesson(lesson)
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    const message = result.errors.join('\n')
+    expect(message).toContain('size "farm"')
+    expect(message).toContain('plays 3 rounds but selects 2 items')
+  })
+})
+
+describe('a block for the whole topic only', () => {
+  it('accepts `all` in a topic with parts, alone or beside a part', () => {
+    const lesson = topic()
+    ;(lesson.blocks[1] as { only: string[] }).only = ['all']
+    expect(validateLesson(lesson).ok).toBe(true)
+    ;(lesson.blocks[1] as { only: string[] }).only = ['wild', 'all']
+    expect(validateLesson(lesson).ok).toBe(true)
+  })
+
+  it('refuses a part named like the whole topic', () => {
+    const lesson = topic()
+    lesson.parts![1]!.id = 'all'
+    ;(lesson.blocks[1] as { only: string[] }).only = ['farm']
+    const result = validateLesson(lesson)
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.errors.join('\n')).toContain('named like the whole topic')
+  })
+
+  it('refuses `all` in a topic with no parts, as any other part name', () => {
+    const lesson = broken((l) => {
+      ;(l.blocks[0] as { only?: string[] }).only = ['all']
+    })
+    const result = validateLesson(lesson)
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.errors.join('\n')).toContain('"all"')
+  })
+})

@@ -168,6 +168,18 @@ export const EXERCISES: readonly {
     child: 'Builds a sentence out of its words, shuffled.',
     teacher: 'Read the finished sentence out first, then let them rebuild it.',
   },
+  {
+    type: 'yesno',
+    name: 'Yes or no?',
+    child: 'Sees a picture with a question, answers out loud, then taps Yes or No and hears the full reply.',
+    teacher: 'Ask the question yourself before they tap. When the question is a trick, your key says the true answer.',
+  },
+  {
+    type: 'secret',
+    name: 'Guess my secret',
+    child: 'Asks about one picture after another until the hidden one is found.',
+    teacher: 'Your key names the secret. Make them say the whole question before every tap.',
+  },
 ]
 
 /**

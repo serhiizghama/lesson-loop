@@ -6,7 +6,7 @@ import { applyAction, blockStateOf } from '../../src/shared/reducer'
 import type { Action, Block, Lesson, LessonState } from '../../src/shared/types'
 import type {
   CardsState, DescribeState, HotspotState, ListenState, MatchState, MemoryState, QuizState,
-  ScrambleState, SortState, TprState,
+  ScrambleState, SecretState, SortState, TprState, YesNoState,
 } from '../../src/shared/types'
 import { faceValue } from '../../src/shared/text'
 import { cardId, cardItem, sentenceWords } from '../../src/shared/blocks'
@@ -141,6 +141,25 @@ export function complete(lesson: Lesson, state: LessonState, block: Block): Less
       }
       break
     }
+    case 'yesno':
+      // The true answer, then on to the next item — a check refuses the other one.
+      for (let i = 0; i < current<YesNoState>().order.length; i++) {
+        const yesno = current<YesNoState>()
+        const shown = yesno.order[yesno.index]
+        if (shown === undefined) continue
+        act({ t: 'tap', block: block.id, target: yesno.asked[yesno.index] === shown ? 'yes' : 'no' })
+        act({ t: 'tap', block: block.id, target: shown })
+      }
+      break
+    case 'secret':
+      for (let round = 0; round < block.rounds; round++) {
+        const secret = current<SecretState>()
+        const target = secret.order[secret.round]
+        if (target === undefined) continue
+        act({ t: 'tap', block: block.id, target })
+        act({ t: 'tap', block: block.id, target })
+      }
+      break
     case 'finish':
       act({ t: 'tap', block: block.id, target: block.id })
       break

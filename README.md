@@ -241,6 +241,8 @@ block may also carry `"only": ["<part id>"]`.
 | `hotspot` | Taps a word, then the place on a drawing it names | `scene`, `spots`, `speak` |
 | `memory` | Turns cards face up two at a time to find pairs | `left`, `right` (faces), `count`, `speak` |
 | `scramble` | Builds a sentence from its words, shuffled | `template` |
+| `yesno` | Sees a picture and a question, taps Yes or No, hears the full reply | `question`, `yes`, `no` (templates), `check` |
+| `secret` | Asks about one tile after another until the hidden item is found | `guess`, `found` (templates), `rounds` |
 | `finish` | The closing screen | `message` |
 
 A **face** is one way of showing an item: `emoji`, `en`, `l1`, `example`, or `tag:<name>`.
@@ -270,6 +272,12 @@ and it is drawn narrowly: the scene is artwork and a coordinate space, and never
 which words are asked for or what counts as right. Two lessons can label the same figure
 with different words.
 
+`yesno` asks one question per word. Without `check` it is an opinion — *Do you like
+tea?* — and either answer is right. With `"check": true` the question sometimes names a
+different word than the picture shows (*Is this your sister?* under mom), so only the true
+answer is accepted. `question` is rendered for the word it names, and `yes` / `no` for the
+word shown, so the reply is always true: *No, it isn't. This is my mom.*
+
 `phrases` is the one block whose content is literal text rather than vocabulary. The model
 sentences a child says *around* the words — "Is it a square?", "Yes, it is." — are facts
 about English, not about any one item, so there is nothing to render them from.
@@ -298,7 +306,11 @@ Two rules make one authored block serve every size:
   none belongs to every sitting. This is how a revision exercise stays out of the sitting
   with nothing to revise yet, and how each half keeps its own model phrases.
 
-The whole-topic choice carries every word and every block, in file order.
+The whole-topic choice carries every word and every block, in file order. A block can
+also belong to the whole topic **only**, with `"only": ["all"]` — `all` being the
+whole-topic choice's own name, the one in its address (`/l/fruit/all`). That is how Fruit
+Talk keeps, for the whole lesson, the exercises the teacher's own halves did not have. For
+the same reason no part may be called `all`.
 
 A topic short enough for one sitting declares no `parts`, offers nothing to choose, and
 opens as one lesson — exactly as every lesson did before. Each part is capped at five words

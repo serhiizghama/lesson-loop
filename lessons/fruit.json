@@ -51,15 +51,13 @@
       ]
     },
     {
-      "id": "ask", "type": "phrases", "title": "❓ Ask & Answer",
-      "hint": "Tap 🔊 to hear the question and the answers. Then give your own answer!",
-      "only": ["b"],
-      "lines": [
-        "Do you like oranges?",
-        "Yes, I do. I like oranges.",
-        "Do you like watermelons?",
-        "No, I don't. I don't like watermelons."
-      ]
+      "id": "ask", "type": "yesno", "title": "❓ Ask & Answer",
+      "hint": "Say your answer first, then tap Yes or No!",
+      "only": ["all"],
+      "items": { "select": "all" },
+      "question": "Do you like {en}?",
+      "yes": "Yes, I do. I like {en}.",
+      "no": "No, I don't. I don't like {en}."
     },
     {
       "id": "hear", "type": "listen", "title": "👂 Listen & Pop!",
@@ -98,7 +96,7 @@
     {
       "id": "prefer", "type": "phrases", "title": "⚖️ This or That?",
       "hint": "Which do you prefer? Finish the sentence with your own reason!",
-      "only": ["b"],
+      "only": ["all"],
       "lines": [
         "Which do you prefer?",
         "I prefer grapes to pears because they are sweeter.",
@@ -108,7 +106,7 @@
     {
       "id": "talk", "type": "phrases", "title": "🎤 Talk Time",
       "hint": "Ask, then answer in a full sentence. Swap roles each time.",
-      "only": ["b"],
+      "only": ["all"],
       "lines": [
         "What fruit do you like?",
         "What's your favourite fruit?",

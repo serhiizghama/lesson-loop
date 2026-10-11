@@ -12,6 +12,8 @@ import { DescribeView } from './DescribeView'
 import { HotspotView } from './HotspotView'
 import { MemoryView } from './MemoryView'
 import { ScrambleView } from './ScrambleView'
+import { YesNoView } from './YesNoView'
+import { SecretView } from './SecretView'
 import { FinishView } from './FinishView'
 
 /** Views are registered exactly like the logic: a missing type is a compile error. */
@@ -28,6 +30,8 @@ export const blockViews: { [T in BlockType]: BlockView<T> } = {
   hotspot: HotspotView,
   memory: MemoryView,
   scramble: ScrambleView,
+  yesno: YesNoView,
+  secret: SecretView,
   finish: FinishView,
 }
 
