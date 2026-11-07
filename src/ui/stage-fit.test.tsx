@@ -148,7 +148,7 @@ describe('a diagram, a board and a scrambled sentence lay out at the reference w
   const slidesOf = (types: string[]) =>
     lesson.blocks.flatMap((block, at) => (types.includes(block.type) ? [[block.type, at]] : []))
 
-  it.each(slidesOf(['hotspot', 'memory', 'scramble']))(
+  it.each(slidesOf(['hotspot', 'memory', 'scramble', 'spell']))(
     '%s is laid out at the reference width and scaled from there',
     (_type, slide) => {
       measureAs(380, 900)

@@ -225,6 +225,15 @@
       "count": 5
     },
     {
+      "id": "spell",
+      "type": "spell",
+      "title": "🔤 Spell It",
+      "hint": "Tap the letters in the right order. Press Listen to hear the word.",
+      "items": {
+        "select": "new"
+      }
+    },
+    {
       "id": "meaning",
       "type": "cards",
       "title": "💬 What Does It Mean?",

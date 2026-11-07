@@ -33,9 +33,6 @@ rendered onto the same square (see `THIRD_PARTY_NOTICES.md`). The one drawing of
 them is the fridge, because that set has none. Do not delete one to have it redrawn — the
 script would draw it in the house style, and it would no longer match its topic.
 
-Clothes, At Home, School and Weather have every exercise of the teacher's pages except
-Spell it, which needs a block of its own and is absent by name (D-62).
-
 ## Rooms: two links, two halves of the same lesson
 
 Mid-lesson the teacher presses **Invite student** and the app opens a room carrying the
@@ -249,6 +246,7 @@ block may also carry `"only": ["<part id>"]`.
 | `hotspot` | Taps a word, then the place on a drawing it names | `scene`, `spots`, `speak` |
 | `memory` | Turns cards face up two at a time to find pairs | `left`, `right` (faces), `count`, `speak` |
 | `scramble` | Builds a sentence from its words, shuffled | `template` |
+| `spell` | Taps the letters of a word in order, shuffled, with its picture to go on | none; each selected word must be at least two letters and nothing but letters |
 | `yesno` | Sees a picture and a question, taps Yes or No, hears the full reply | `question`, `yes`, `no` (templates), `check` |
 | `secret` | Asks about one tile after another until the hidden item is found | `guess`, `found` (templates), `rounds` |
 | `reveal` | Guesses a blurred picture, peeks, reveals it and hears its sentence | `speak` (template) |

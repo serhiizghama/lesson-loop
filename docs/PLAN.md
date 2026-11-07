@@ -157,7 +157,7 @@ alternating turns, teacher-vs-student score"; the exercise ships cooperative, co
 and scoring nobody, because an action does not carry who sent it and a turn the app draws
 but cannot enforce is undone by a reload (D-41).
 
-**Backlog (v0.2+):** `spell` (assemble a word from letters / missing letter), `reading` (a
+**Backlog (v0.2+):** a missing-letter variant of `spell`, `reading` (a
 passage with line-by-line highlighting, "my turn / your turn", plus comprehension
 questions), `gapfill` (grammar for adults), `wheel` (a wheel of conversation topics),
 `bingo`.
@@ -440,6 +440,13 @@ her page when it teaches the wrong thing (D-65). **`spell` is next**: Spell it i
 pages and is the one exercise here that is absent by name (D-62), and these four topics are
 its first users.
 
+**Spell it — `add-spell-block`.** A block type of its own: a picture, a Listen control, one
+place per letter, and the word's letters shuffled, tapped in order. A wrong letter is refused
+where it stands rather than checked at the end, which is the one thing here that differs from
+her page (D-66). Clothes, At Home, School and Weather each gain it after Match It, and no other
+topic does yet (D-67). With this, every exercise of her four pages plays. No new picture or
+recording was needed: the words were already there.
+
 **Phase 2 — the mechanics her dialogues need**, not yet planned, ranked by how many of her
 lessons each serves against its cost: `ask` (a yes/no question with an optional right
 answer — four lessons), `secret` (Guess My Secret — three), `reveal` (the blurred guess —
@@ -549,3 +556,5 @@ technical decisions `Dn`, without the hyphen; the two sequences are separate.
 | D-63 | **Say it! is one fixed prompt per word, not a random draw.** Her page deals a random prompt on a random word. Each word now has one of her six prompts, chosen by hand because they do not all suit every word: "What is this?" has no good answer of "sunny", and there is nothing to point at for "hot". A random draw is a new mechanic, closest to the wheel D-52 already declined to approximate. "Say it three times" stays as an instruction only, and nothing counts, so D-39 is not reopened | 2026-11-07 |
 | D-64 | **Her Japanese sentences are cards, with the picture on the front and both sentences on the back.** Her page hides them behind a 日本語 button inside Build the sentence, which that exercise has no place for. A second round of cards just before it gives the child the meaning at the moment it is needed, with no code. The sentence was first put on the card's front and did not fit: that face is set for a picture, and the longer sentences ran past the card's edge. This exercise is ours, not hers, so it is the one she is likeliest to change, and removing it is one block per topic | 2026-11-07 |
 | D-65 | **A picture may correct her page when her emoji teaches the wrong thing.** Her fridge is an ice cube, because Unicode has no fridge, so it is the one drawing of ours in a Fluent topic. Her garden is the park's tree, so it gains tulips. Shoes and boots show two, because the word is plural, as Fruit's pictures already do. Her neutral teacher becomes a woman, because the sentence says "She". Her words and sentences are unchanged | 2026-11-07 |
+| D-66 | **Spell it takes letters in order and refuses a wrong one where it stands; this closes D-62.** Her page takes letters in any order, checks a full attempt, wipes it if it is wrong, and offers an undo. Wiping an attempt removes progress already earned, which no exercise here may do, and it would make this the one tile exercise that behaves differently. The cost is real and is accepted knowingly: a tile-by-tile hint is easier than holding the whole word in mind. It is hers to reverse, and reversing it changes the block's logic and view, not the lessons | 2026-11-07 |
+| D-67 | **Only her four object-word topics spell, until she asks for more.** Some of the others have words that cannot be spelled as tiles (*ice cream*), and some are built around another skill (colours, numbers). Adding it to a topic is one block in its file | 2026-11-07 |

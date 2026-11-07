@@ -166,6 +166,11 @@ export type Block =
    */
   | (BlockBase & { type: 'scramble'; items: ItemRef; template: string })
   /**
+   * Each item's own English word, offered as its letters shuffled. It declares only which
+   * items it spells: the word is already written once, on the item (design D165).
+   */
+  | (BlockBase & { type: 'spell'; items: ItemRef })
+  /**
    * A picture with a question about it, answered Yes or No, each answer with a reply of its
    * own. Without `check` the question is an opinion and both answers count; with it the
    * question names the item shown or another one, and only the true answer counts — the
@@ -362,6 +367,18 @@ export type ScrambleState = {
   /** The word last refused, cleared by the next action. Both screens see the mistake. */
   wrong: string | null
 }
+export type SpellState = {
+  order: string[]
+  /** Index into `order` of the item whose word is being spelled. */
+  index: number
+  /**
+   * How many letters of that word are down. A count rather than a list because a word is
+   * only ever spelled in order, so the letters placed are always its first `n`.
+   */
+  placed: number
+  /** The letter last refused, cleared by the next action. Both screens see the mistake. */
+  wrong: string | null
+}
 /**
  * `asked[i]` is the item the question at position `i` names — `order[i]` itself in an
  * opinion, either it or another item in a check. Decided in `init`, because `reduce` has
@@ -442,6 +459,7 @@ export type BlockStateMap = {
   hotspot: HotspotState
   memory: MemoryState
   scramble: ScrambleState
+  spell: SpellState
   yesno: YesNoState
   secret: SecretState
   reveal: RevealState
@@ -475,14 +493,15 @@ export type Action =
   /**
    * cards: flip · listen: answer · tpr: advance past `target` · sentence: choose item ·
    * phrases: play the phrase at index `target` · quiz: answer with item `target` ·
-   * memory: turn up card `target` · scramble: advance past the item `target`
+   * memory: turn up card `target` · scramble, spell: advance past the item `target`
    */
   | { t: 'tap'; block: string; target: string }
   /**
    * match: side a/b of the pair · sort: 'a' an item, 'b' a bucket key ·
    * describe: 'a' the first question, 'b' the second, `target` the value chosen ·
    * hotspot: 'a' a word from the bank, 'b' a place on the drawing ·
-   * scramble: 'a' the word `target`, which must be the next one in the sentence
+   * scramble: 'a' the word `target`, which must be the next one in the sentence ·
+   * spell: 'a' the letter `target`, which must be the next one in the word
    */
   | { t: 'pick'; block: string; side: Side; target: string }
   | { t: 'level'; block: string; level: number }

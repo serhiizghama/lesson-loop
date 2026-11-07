@@ -84,6 +84,7 @@ export function testLesson(): Lesson {
         id: 'build', type: 'scramble', title: 'Build it', items: { select: 'all' },
         template: '{this} {be} my {en}.',
       },
+      { id: 'letters', type: 'spell', title: 'Spell it', items: { select: 'all' } },
       {
         id: 'is', type: 'yesno', title: 'Is it a…?', items: { select: 'ids', ids: ['dog', 'cat', 'lion'] },
         question: 'Is it a {en}?', yes: 'Yes, it is. It is a {en}.', no: "No, it isn't. It is a {en}.",

@@ -6,11 +6,12 @@ import { applyAction, blockStateOf } from '../../src/shared/reducer'
 import type { Action, Block, Lesson, LessonState } from '../../src/shared/types'
 import type {
   CardsState, DescribeState, HotspotState, ListenState, MatchState, MemoryState, QuizState,
-  ScrambleState, SecretState, SortState, TprState, YesNoState, RevealState, DialogueState,
+  ScrambleState, SecretState, SortState, SpellState, TprState, YesNoState, RevealState,
+  DialogueState,
   PreferState,
 } from '../../src/shared/types'
 import { faceValue } from '../../src/shared/text'
-import { agreeingPicks, cardId, cardItem, sentenceWords } from '../../src/shared/blocks'
+import { agreeingPicks, cardId, cardItem, sentenceWords, spellWord } from '../../src/shared/blocks'
 
 const dir = join(process.cwd(), 'lessons')
 
@@ -137,6 +138,20 @@ export function complete(lesson: Lesson, state: LessonState, block: Block): Less
         if (item === undefined || target === undefined) continue
         for (const word of sentenceWords(block, item)) {
           act({ t: 'pick', block: block.id, side: 'a', target: word })
+        }
+        act({ t: 'tap', block: block.id, target })
+      }
+      break
+    }
+    case 'spell': {
+      const items = new Map(resolveItems(lesson, block.items).map((i) => [i.id, i]))
+      for (let i = 0; i < current<SpellState>().order.length; i++) {
+        const spell = current<SpellState>()
+        const target = spell.order[spell.index]
+        const item = target === undefined ? undefined : items.get(target)
+        if (item === undefined || target === undefined) continue
+        for (const letter of spellWord(item)) {
+          act({ t: 'pick', block: block.id, side: 'a', target: letter })
         }
         act({ t: 'tap', block: block.id, target })
       }

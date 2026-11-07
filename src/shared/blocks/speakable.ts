@@ -97,6 +97,11 @@ function linesOf(lesson: Lesson, block: Block): Array<string | null> {
         renderTemplate(block.template, item),
       )
 
+    case 'spell':
+      // SpellView speaks the word when its last letter lands and when its control is
+      // pressed, and no letter on its own (design D168) — one line per item.
+      return resolveItems(lesson, block.items).map((item) => item.en)
+
     case 'yesno': {
       // YesNoView speaks the question from its control only, never on arrival, and the
       // reply to whichever answer is given. A check's question may name any selected item over any

@@ -131,7 +131,8 @@ A part SHALL name only items the topic declares, and no item SHALL be named by t
 #### Scenario: A valid lesson passes silently
 - **WHEN** a well-formed lesson is loaded
 - **THEN** no warning is produced and the lesson starts
-### Requirement: The format covers the teacher's existing material
+
+### Requirement: The format covers the teacher's material
 
 The format SHALL be sufficient to express the teacher's existing Animals, Body Parts and
 Shapes lessons in full, including the labelled body diagram, and other than the drill in
@@ -172,13 +173,11 @@ words as its parts, and the whole topic as her Review. Each word's sentence SHAL
 by the word itself, so a topic whose words do not share one frame — *It is sunny.*, *I see a
 rainbow.* — needs no grammar in the engine.
 
-Of those four lessons, looking and learning, listening and picking, matching, and building
-the sentence SHALL be playable as exercises. Her Japanese sentences SHALL be carried as cards
+Of those four lessons, looking and learning, listening and picking, matching, spelling and
+building the sentence SHALL be playable as exercises. Her Japanese sentences SHALL be carried as cards
 the learner turns over, placed before the sentence is built. Her Say it! SHALL be carried as
 one fixed prompt per word, without the random draw and without anything that counts or
-scores what the learner says. Spell it SHALL be absent by name, deferred to a change of its
-own because it needs a block the engine does not have, and nothing in the format
-half-implements it.
+scores what the learner says.
 
 #### Scenario: Both existing lessons run on the generic engine
 - **WHEN** the Animals and Body Parts lessons are expressed in the format and played
@@ -276,9 +275,10 @@ half-implements it.
 - **THEN** each word gets one fixed prompt from her page, the same in every run, and nothing
   counts, scores or listens to what the learner says
 
-#### Scenario: Spell it is absent rather than approximated
+#### Scenario: Spell it is played
 - **WHEN** any size of these four topics is played
-- **THEN** no exercise asks the learner to assemble a word from its letters
+- **THEN** it contains a spelling exercise over that size's words, directly after the matching
+  exercise, as on her page
 
 ### Requirement: A lesson teaches one sitting's worth of vocabulary
 
@@ -581,3 +581,24 @@ item through the usual placeholders.
 #### Scenario: A place with nothing to do
 - **WHEN** every option of a row belongs to other places than home
 - **THEN** the file is reported as invalid, naming the block, the row and home
+
+### Requirement: A spelling exercise spells the item's own word
+
+A spelling block SHALL declare only which items it spells. What it asks for SHALL be each item's
+own English word, as the lesson already writes it, and SHALL NOT be written out again in the block.
+
+A lesson SHALL be rejected when a selected item's English word has fewer than two letters or
+contains anything other than letters, since a single letter is nothing to assemble and the
+exercise has no way to offer a space or a mark.
+
+#### Scenario: A block over a lesson's words
+- **WHEN** a spelling block selects a lesson's ten items
+- **THEN** ten words are spelled, each as the item writes it, and the block repeats none of them
+
+#### Scenario: A word with a space in it
+- **WHEN** a spelling block selects an item whose English word is *ice cream*
+- **THEN** the lesson is rejected, and the message names the block and that item
+
+#### Scenario: A word too short to spell
+- **WHEN** a spelling block selects an item whose English word is one letter long
+- **THEN** the lesson is rejected, and the message names the block and that item

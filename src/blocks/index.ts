@@ -12,6 +12,7 @@ import { DescribeView } from './DescribeView'
 import { HotspotView } from './HotspotView'
 import { MemoryView } from './MemoryView'
 import { ScrambleView } from './ScrambleView'
+import { SpellView } from './SpellView'
 import { YesNoView } from './YesNoView'
 import { SecretView } from './SecretView'
 import { RevealView } from './RevealView'
@@ -35,6 +36,7 @@ export const blockViews: { [T in BlockType]: BlockView<T> } = {
   hotspot: HotspotView,
   memory: MemoryView,
   scramble: ScrambleView,
+  spell: SpellView,
   yesno: YesNoView,
   secret: SecretView,
   reveal: RevealView,

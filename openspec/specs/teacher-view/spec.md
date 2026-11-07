@@ -151,7 +151,7 @@ which, which bucket each item belongs in, which word is being asked, the sentenc
 level produces for the selected item, the phrases a phrase list contains and which of them
 have been heard, the item a quiz prompt names, both answers a description is asking for,
 where on a drawing each word belongs, where the two halves of a face-down pair are lying,
-the sentence being assembled, the true answer to a checked yes/no question with its reply,
+the sentence being assembled, the word being spelled, the true answer to a checked yes/no question with its reply,
 the item a secret game is hiding, the item behind a blurred picture, the whole dialogue
 of a role-play with the next line marked, the questions of each talk level, the pair each
 preference round offers, and the sentence a combination makes. An exercise with nothing to be right about SHALL show no
@@ -202,6 +202,11 @@ coordinates.
 - **WHEN** a sentence-assembly exercise is on screen
 - **THEN** the teacher sees the sentence being built right now, in full, and which
   sentences are already done
+
+#### Scenario: The key for a spelling exercise
+- **WHEN** a spelling exercise is on screen
+- **THEN** the teacher sees each word with its letters written out, which word is on screen now,
+  and which words are already done
 
 #### Scenario: The key for a yes/no question
 - **WHEN** a yes/no exercise is on screen

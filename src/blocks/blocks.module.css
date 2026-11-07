@@ -783,6 +783,56 @@
   box-shadow: var(--shadow);
 }
 
+/* ── Spell ────────────────────────────────────────────────────────────────── */
+
+.spell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.spellPlaces {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.spellPlace {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  font-size: 2.1rem;
+  font-weight: 700;
+}
+
+.spellWhole .spellPlace {
+  background: var(--correct-soft);
+}
+
+.spellLetters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/*
+ * Over twice the default tile, because the stage scales as a whole: at the narrowest
+ * supported width this is about 45 px under a finger, and the default would be about 21
+ * (design D169).
+ */
+.spellTile {
+  width: 7rem;
+  height: 7rem;
+  font-size: 3rem;
+  font-weight: 700;
+}
+
 /* ── yesno ─────────────────────────────────────────────────────────────────── */
 
 .yesno {

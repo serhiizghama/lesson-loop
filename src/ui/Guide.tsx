@@ -169,6 +169,12 @@ export const EXERCISES: readonly {
     teacher: 'Read the finished sentence out first, then let them rebuild it.',
   },
   {
+    type: 'spell',
+    name: 'Spell it',
+    child: 'Sees a picture and taps the letters of its word, in order.',
+    teacher: 'Your key has each word letter by letter. A wrong letter costs nothing, so let them try before you help.',
+  },
+  {
     type: 'yesno',
     name: 'Yes or no?',
     child: 'Sees a picture with a question, answers out loud, then taps Yes or No and hears the full reply.',

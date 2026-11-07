@@ -159,6 +159,11 @@ const blockSchema = z.discriminatedUnion('type', [
   }),
   z.object({
     ...blockBase,
+    type: z.literal('spell'),
+    items: itemRefSchema,
+  }),
+  z.object({
+    ...blockBase,
     type: z.literal('yesno'),
     items: itemRefSchema,
     question: z.string().min(1),
@@ -476,6 +481,19 @@ function crossCheck(lesson: Lesson): string[] {
         }
         break
       }
+      case 'spell': {
+        // Rejected, not adapted: spelling "ice cream" without its space teaches a word that
+        // does not exist, and a single letter is nothing to assemble (design D170).
+        for (const item of items) {
+          if (!/^\p{L}{2,}$/u.test(item.en)) {
+            errors.push(
+              `${at}.items: block "${block.id}" cannot spell "${item.en}" for "${item.id}" — ` +
+                `a word needs at least two letters and nothing but letters`,
+            )
+          }
+        }
+        break
+      }
       case 'describe': {
         for (const [qi, question] of block.questions.entries()) {
           requireFace(question.face, `questions.${qi}.face`)
@@ -638,6 +656,7 @@ function templatesOf(block: Block): Array<[string, string]> {
     case 'listen':
     case 'phrases':
     case 'talk':
+    case 'spell':
     case 'finish':
       return []
   }

@@ -599,6 +599,49 @@ describe('the three exercises added for the body diagram', () => {
     expect(errors).toContain('"build"')
     expect(errors).toContain('nothing to assemble')
   })
+
+  // ── spell ──────────────────────────────────────────────────────────────────
+
+  function spellingWord(en: string, items: unknown = { select: 'all' }) {
+    const lesson = structuredClone(base()) as unknown as {
+      items: Array<{ en: string }>
+      blocks: unknown[]
+    }
+    ;(lesson.items[0] as { en: string }).en = en
+    lesson.blocks.push({ id: 'letters', type: 'spell', title: 'Spell it', items })
+    return validateLesson(lesson)
+  }
+
+  it('accepts a word that is only letters, whatever their case', () => {
+    expect(spellingWord('TV').ok).toBe(true)
+    expect(spellingWord('scissors').ok).toBe(true)
+  })
+
+  it.each([
+    ['a space', 'ice cream'],
+    ['a mark', "o'clock"],
+    ['a single letter', 'a'],
+  ])('rejects a word with %s, naming the block and the item', (_what, en) => {
+    const result = spellingWord(en)
+    expect(result.ok).toBe(false)
+    const errors = result.ok ? '' : result.errors.join('\n')
+    expect(errors).toContain('"letters"')
+    expect(errors).toContain('"dog"')
+  })
+
+  it('judges only the words it selects', () => {
+    const unspellable = structuredClone(base()) as unknown as {
+      items: Array<{ id: string; en: string }>
+      blocks: unknown[]
+    }
+    const selected = (unspellable.items.at(-1) as { id: string }).id
+    expect(unspellable.items.length).toBeGreaterThan(1)
+    ;(unspellable.items[0] as { en: string }).en = 'ice cream'
+    unspellable.blocks.push({
+      id: 'letters', type: 'spell', title: 'Spell it', items: { select: 'ids', ids: [selected] },
+    })
+    expect(validateLesson(unspellable).ok).toBe(true)
+  })
 })
 
 describe('the two exercises added for the sentence lessons', () => {
