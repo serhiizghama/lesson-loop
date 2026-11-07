@@ -2,9 +2,11 @@
 
 ## Microsoft Fluent Emoji
 
-The vocabulary pictures of four topics are rendered from
+The vocabulary pictures of eight topics are rendered from
 [Microsoft Fluent Emoji](https://github.com/microsoft/fluentui-emoji) (the *Color* SVGs, light
-skin tone for people), composed onto a 512×512 white square and saved as JPEG:
+skin tone for people), composed onto a 512×512 white square and saved as JPEG. The one
+exception is `home/fridge.jpg`, which is the project's own drawing, because Fluent has no
+fridge:
 
 - `public/pics/fruit/` — orange (three tangerines), pear (two), grape, watermelon (two)
 - `public/pics/drinks/` — milk, juice (beverage box), water (droplet), tea (teacup without handle)
@@ -12,6 +14,15 @@ skin tone for people), composed onto a 512×512 white square and saved as JPEG:
   grandma (old woman), grandpa (old man)
 - `public/pics/places/` — park (deciduous tree + playground slide), school, home (house),
   zoo (giraffe + elephant)
+- `public/pics/clothes/` — shirt (t-shirt), pants (jeans), shoes (two running shoes), socks,
+  hat (woman's hat), dress, jacket (coat), gloves, scarf, boots (two woman's boots)
+- `public/pics/home/` — bed, door, window, sofa (couch and lamp), tv (television), house,
+  bath (bathtub), key, garden (deciduous tree + three tulips); fridge is not from this set
+- `public/pics/school/` — pencil, pen, book (open book), notebook, bag (backpack),
+  ruler (straight ruler), scissors, chair, teacher (woman teacher), clock (one o'clock)
+- `public/pics/weather/` — sunny (sun), rainy (cloud with rain), cloudy (cloud),
+  windy (dashing away), hot (hot face), snowy (snowflake), cold (cold face), rainbow,
+  thunder (cloud with lightning and rain), umbrella
 
 They are used under the following license:
 

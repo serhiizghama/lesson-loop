@@ -1,0 +1,269 @@
+{
+  "id": "clothes",
+  "title": "Clothes",
+  "emoji": "👕",
+  "audience": "kids",
+  "l1": "ja",
+  "parts": [
+    {
+      "id": "everyday",
+      "title": "Clothes 1 · Everyday Clothes",
+      "emoji": "👕",
+      "items": [
+        "shirt",
+        "pants",
+        "shoes",
+        "socks",
+        "hat"
+      ]
+    },
+    {
+      "id": "warm",
+      "title": "Clothes 2 · Warm & Pretty Clothes",
+      "emoji": "👗",
+      "items": [
+        "dress",
+        "jacket",
+        "gloves",
+        "scarf",
+        "boots"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "shirt",
+      "en": "shirt",
+      "emoji": "👕",
+      "l1": {
+        "word": "シャツ",
+        "romaji": "shatsu"
+      },
+      "example": "I wear a shirt.",
+      "tags": {
+        "s": "I wear a shirt.",
+        "sj": "シャツをきます。",
+        "say": "Say \"shirt\" three times!"
+      }
+    },
+    {
+      "id": "pants",
+      "en": "pants",
+      "emoji": "👖",
+      "plural": true,
+      "l1": {
+        "word": "ズボン",
+        "romaji": "zubon"
+      },
+      "example": "I wear pants.",
+      "tags": {
+        "s": "I wear pants.",
+        "sj": "ズボンをはきます。",
+        "say": "Ask your teacher: \"What is this?\" Then answer: \"pants\"."
+      }
+    },
+    {
+      "id": "shoes",
+      "en": "shoes",
+      "emoji": "👟",
+      "plural": true,
+      "l1": {
+        "word": "くつ",
+        "romaji": "kutsu"
+      },
+      "example": "I wear shoes.",
+      "tags": {
+        "s": "I wear shoes.",
+        "sj": "くつをはきます。",
+        "say": "Point to something like this, or draw it in the air. Say \"shoes\"."
+      }
+    },
+    {
+      "id": "socks",
+      "en": "socks",
+      "emoji": "🧦",
+      "plural": true,
+      "l1": {
+        "word": "くつした",
+        "romaji": "kutsushita"
+      },
+      "example": "I wear socks.",
+      "tags": {
+        "s": "I wear socks.",
+        "sj": "くつしたをはきます。",
+        "say": "Say \"socks\" very quietly. Now very loudly!"
+      }
+    },
+    {
+      "id": "hat",
+      "en": "hat",
+      "emoji": "👒",
+      "l1": {
+        "word": "ぼうし",
+        "romaji": "boushi"
+      },
+      "example": "I wear a hat.",
+      "tags": {
+        "s": "I wear a hat.",
+        "sj": "ぼうしをかぶります。",
+        "say": "Say the sentence: \"I wear a hat.\""
+      }
+    },
+    {
+      "id": "dress",
+      "en": "dress",
+      "emoji": "👗",
+      "l1": {
+        "word": "ワンピース",
+        "romaji": "wanpiisu"
+      },
+      "example": "She wears a dress.",
+      "tags": {
+        "s": "She wears a dress.",
+        "sj": "かのじょはワンピースをきます。",
+        "say": "Make your own sentence with \"dress\"."
+      }
+    },
+    {
+      "id": "jacket",
+      "en": "jacket",
+      "emoji": "🧥",
+      "l1": {
+        "word": "ジャケット",
+        "romaji": "jaketto"
+      },
+      "example": "He wears a jacket.",
+      "tags": {
+        "s": "He wears a jacket.",
+        "sj": "かれはジャケットをきます。",
+        "say": "Point to something like this, or draw it in the air. Say \"jacket\"."
+      }
+    },
+    {
+      "id": "gloves",
+      "en": "gloves",
+      "emoji": "🧤",
+      "plural": true,
+      "l1": {
+        "word": "てぶくろ",
+        "romaji": "tebukuro"
+      },
+      "example": "I wear gloves.",
+      "tags": {
+        "s": "I wear gloves.",
+        "sj": "てぶくろをします。",
+        "say": "Say \"gloves\" three times!"
+      }
+    },
+    {
+      "id": "scarf",
+      "en": "scarf",
+      "emoji": "🧣",
+      "l1": {
+        "word": "マフラー",
+        "romaji": "mafuraa"
+      },
+      "example": "I wear a scarf.",
+      "tags": {
+        "s": "I wear a scarf.",
+        "sj": "マフラーをします。",
+        "say": "Ask your teacher: \"What is this?\" Then answer: \"scarf\"."
+      }
+    },
+    {
+      "id": "boots",
+      "en": "boots",
+      "emoji": "👢",
+      "plural": true,
+      "l1": {
+        "word": "ブーツ",
+        "romaji": "buutsu"
+      },
+      "example": "I wear boots.",
+      "tags": {
+        "s": "I wear boots.",
+        "sj": "ブーツをはきます。",
+        "say": "Say \"boots\" very quietly. Now very loudly!"
+      }
+    }
+  ],
+  "blocks": [
+    {
+      "id": "learn",
+      "type": "cards",
+      "title": "👀 Look and Learn",
+      "hint": "Tap each card to hear the word and see the Japanese. Say it out loud!",
+      "items": {
+        "select": "new"
+      },
+      "front": "emoji",
+      "back": [
+        "en",
+        "l1"
+      ]
+    },
+    {
+      "id": "hear",
+      "type": "listen",
+      "title": "👂 Listen and Pick",
+      "hint": "Listen, then tap the right picture.",
+      "items": {
+        "select": "new"
+      },
+      "choices": 3
+    },
+    {
+      "id": "pairs",
+      "type": "match",
+      "title": "🎯 Match It",
+      "hint": "Tap a word, then tap its picture.",
+      "items": {
+        "select": "new"
+      },
+      "left": "en",
+      "right": "emoji",
+      "count": 5
+    },
+    {
+      "id": "meaning",
+      "type": "cards",
+      "title": "💬 What Does It Mean?",
+      "hint": "Tap a picture to hear its sentence and see it in Japanese.",
+      "items": {
+        "select": "new"
+      },
+      "front": "emoji",
+      "back": [
+        "tag:s",
+        "tag:sj"
+      ],
+      "speak": "{tag:s}"
+    },
+    {
+      "id": "build",
+      "type": "scramble",
+      "title": "🧩 Build the Sentence",
+      "hint": "Tap the words in the right order.",
+      "items": {
+        "select": "new"
+      },
+      "template": "{tag:s}"
+    },
+    {
+      "id": "say",
+      "type": "tpr",
+      "title": "🗣️ Say It!",
+      "hint": "Listen, then do what the card says!",
+      "items": {
+        "select": "new"
+      },
+      "prompt": "{tag:say}"
+    },
+    {
+      "id": "done",
+      "type": "finish",
+      "title": "🎉 Great job!",
+      "message": "Great job! Now you can say what you wear!"
+    }
+  ]
+}

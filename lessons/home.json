@@ -1,0 +1,264 @@
+{
+  "id": "home",
+  "title": "At Home",
+  "emoji": "🏠",
+  "audience": "kids",
+  "l1": "ja",
+  "parts": [
+    {
+      "id": "inside",
+      "title": "At Home 1 · In the House",
+      "emoji": "🛏️",
+      "items": [
+        "bed",
+        "door",
+        "window",
+        "sofa",
+        "tv"
+      ]
+    },
+    {
+      "id": "around",
+      "title": "At Home 2 · Around the House",
+      "emoji": "🔑",
+      "items": [
+        "house",
+        "bath",
+        "key",
+        "garden",
+        "fridge"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "bed",
+      "en": "bed",
+      "emoji": "🛏️",
+      "l1": {
+        "word": "ベッド",
+        "romaji": "beddo"
+      },
+      "example": "I sleep in bed.",
+      "tags": {
+        "s": "I sleep in bed.",
+        "sj": "ベッドでねます。",
+        "say": "Say \"bed\" three times!"
+      }
+    },
+    {
+      "id": "door",
+      "en": "door",
+      "emoji": "🚪",
+      "l1": {
+        "word": "ドア",
+        "romaji": "doa"
+      },
+      "example": "I open the door.",
+      "tags": {
+        "s": "I open the door.",
+        "sj": "ドアをあけます。",
+        "say": "Point to something like this, or draw it in the air. Say \"door\"."
+      }
+    },
+    {
+      "id": "window",
+      "en": "window",
+      "emoji": "🪟",
+      "l1": {
+        "word": "まど",
+        "romaji": "mado"
+      },
+      "example": "I look out the window.",
+      "tags": {
+        "s": "I look out the window.",
+        "sj": "まどのそとをみます。",
+        "say": "Say the sentence: \"I look out the window.\""
+      }
+    },
+    {
+      "id": "sofa",
+      "en": "sofa",
+      "emoji": "🛋️",
+      "l1": {
+        "word": "ソファ",
+        "romaji": "sofa"
+      },
+      "example": "I sit on the sofa.",
+      "tags": {
+        "s": "I sit on the sofa.",
+        "sj": "ソファにすわります。",
+        "say": "Say \"sofa\" very quietly. Now very loudly!"
+      }
+    },
+    {
+      "id": "tv",
+      "en": "TV",
+      "emoji": "📺",
+      "l1": {
+        "word": "テレビ",
+        "romaji": "terebi"
+      },
+      "example": "I watch TV.",
+      "tags": {
+        "s": "I watch TV.",
+        "sj": "テレビをみます。",
+        "say": "Ask your teacher: \"What is this?\" Then answer: \"TV\"."
+      }
+    },
+    {
+      "id": "house",
+      "en": "house",
+      "emoji": "🏠",
+      "l1": {
+        "word": "いえ",
+        "romaji": "ie"
+      },
+      "example": "This is my house.",
+      "tags": {
+        "s": "This is my house.",
+        "sj": "これはわたしのいえです。",
+        "say": "Ask your teacher: \"What is this?\" Then answer: \"house\"."
+      }
+    },
+    {
+      "id": "bath",
+      "en": "bath",
+      "emoji": "🛁",
+      "l1": {
+        "word": "おふろ",
+        "romaji": "ofuro"
+      },
+      "example": "I take a bath.",
+      "tags": {
+        "s": "I take a bath.",
+        "sj": "おふろにはいります。",
+        "say": "Say \"bath\" very quietly. Now very loudly!"
+      }
+    },
+    {
+      "id": "key",
+      "en": "key",
+      "emoji": "🔑",
+      "l1": {
+        "word": "かぎ",
+        "romaji": "kagi"
+      },
+      "example": "I have a key.",
+      "tags": {
+        "s": "I have a key.",
+        "sj": "かぎをもっています。",
+        "say": "Point to something like this, or draw it in the air. Say \"key\"."
+      }
+    },
+    {
+      "id": "garden",
+      "en": "garden",
+      "emoji": "🌳",
+      "l1": {
+        "word": "にわ",
+        "romaji": "niwa"
+      },
+      "example": "I play in the garden.",
+      "tags": {
+        "s": "I play in the garden.",
+        "sj": "にわであそびます。",
+        "say": "Make your own sentence with \"garden\"."
+      }
+    },
+    {
+      "id": "fridge",
+      "en": "fridge",
+      "emoji": "🧊",
+      "l1": {
+        "word": "れいぞうこ",
+        "romaji": "reizouko"
+      },
+      "example": "I open the fridge.",
+      "tags": {
+        "s": "I open the fridge.",
+        "sj": "れいぞうこをあけます。",
+        "say": "Say \"fridge\" three times!"
+      }
+    }
+  ],
+  "blocks": [
+    {
+      "id": "learn",
+      "type": "cards",
+      "title": "👀 Look and Learn",
+      "hint": "Tap each card to hear the word and see the Japanese. Say it out loud!",
+      "items": {
+        "select": "new"
+      },
+      "front": "emoji",
+      "back": [
+        "en",
+        "l1"
+      ]
+    },
+    {
+      "id": "hear",
+      "type": "listen",
+      "title": "👂 Listen and Pick",
+      "hint": "Listen, then tap the right picture.",
+      "items": {
+        "select": "new"
+      },
+      "choices": 3
+    },
+    {
+      "id": "pairs",
+      "type": "match",
+      "title": "🎯 Match It",
+      "hint": "Tap a word, then tap its picture.",
+      "items": {
+        "select": "new"
+      },
+      "left": "en",
+      "right": "emoji",
+      "count": 5
+    },
+    {
+      "id": "meaning",
+      "type": "cards",
+      "title": "💬 What Does It Mean?",
+      "hint": "Tap a picture to hear its sentence and see it in Japanese.",
+      "items": {
+        "select": "new"
+      },
+      "front": "emoji",
+      "back": [
+        "tag:s",
+        "tag:sj"
+      ],
+      "speak": "{tag:s}"
+    },
+    {
+      "id": "build",
+      "type": "scramble",
+      "title": "🧩 Build the Sentence",
+      "hint": "Tap the words in the right order.",
+      "items": {
+        "select": "new"
+      },
+      "template": "{tag:s}"
+    },
+    {
+      "id": "say",
+      "type": "tpr",
+      "title": "🗣️ Say It!",
+      "hint": "Listen, then do what the card says!",
+      "items": {
+        "select": "new"
+      },
+      "prompt": "{tag:say}"
+    },
+    {
+      "id": "done",
+      "type": "finish",
+      "title": "🎉 Great job!",
+      "message": "Great job! Now you can talk about your home!"
+    }
+  ]
+}

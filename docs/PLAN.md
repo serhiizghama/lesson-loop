@@ -425,6 +425,21 @@ her six pages plays, except the five absent by name (D-52): the picture hunt, th
 three-times speaking meter, the wheel, the silly voices, and the survey / family album.
 Decisions D-58…D-61.
 
+**Her object words — `add-clothes-home-school-weather`.** The teacher sent four more pages,
+Clothes, At Home, School and Weather, and they are one template filled four times: ten words
+in two halves of five, with a Review tab that is exactly the whole topic. As four topics and
+no code:
+- Look and learn, Listen and pick, Match it and Build the sentence play on the blocks that
+  already exist;
+- her Japanese sentences are a second round of cards just before the sentence is built
+  (D-64);
+- Say it! is one fixed prompt per word rather than a random draw (D-63).
+
+Thirty-nine pictures are Fluent Emoji and the fridge is our own, since a picture may correct
+her page when it teaches the wrong thing (D-65). **`spell` is next**: Spell it is on all four
+pages and is the one exercise here that is absent by name (D-62), and these four topics are
+its first users.
+
 **Phase 2 — the mechanics her dialogues need**, not yet planned, ranked by how many of her
 lessons each serves against its cost: `ask` (a yes/no question with an optional right
 answer — four lessons), `secret` (Guess My Secret — three), `reveal` (the blurred guess —
@@ -530,3 +545,7 @@ technical decisions `Dn`, without the hyphen; the two sequences are separate.
 | D-59 | **A role-play's swap changes the labels, not the rules.** "Shopkeeper — Teacher / Customer — Student" becomes the other way round, and either person can still tap. An action carries no sender, and a rule about who may tap would be one the app draws and cannot enforce — the reasoning of D-41, applied again | 2026-10-11 |
 | D-60 | **"I prefer grapes to pears" ends at a full stop.** Her page says "…because" and the voice stops mid-sentence, leaving the child to finish it. Here the recorded sentence is whole, and the "because…" is in the hint and the teacher's mouth: a recording that trails off sounds like a broken recording, not an invitation | 2026-10-11 |
 | D-61 | **Combiner chips carry no Japanese gloss, and the lesson-21 dialogue has one voice.** Her family and places pages put a gloss under every chip and read the A/B dialogue at two pitches. A gloss under each of sixteen options doubles the rows' height on a tablet-sized stage, and the topic's cards already carry the glosses; recordings and the device voice have one voice each. Both can come back if she asks | 2026-10-11 |
+| D-62 | **Spell it is absent by name until it has a block of its own.** It is on all four of her object-word pages and has been in the backlog since v0.2, so it is deferred rather than declined. The four topics ship first because five of her six exercises already play, and a child should not wait for the sixth. Nothing stands in for it: assembling a sentence from its words is a different exercise, and calling that spelling would teach the teacher that the app half-does it | 2026-11-07 |
+| D-63 | **Say it! is one fixed prompt per word, not a random draw.** Her page deals a random prompt on a random word. Each word now has one of her six prompts, chosen by hand because they do not all suit every word: "What is this?" has no good answer of "sunny", and there is nothing to point at for "hot". A random draw is a new mechanic, closest to the wheel D-52 already declined to approximate. "Say it three times" stays as an instruction only, and nothing counts, so D-39 is not reopened | 2026-11-07 |
+| D-64 | **Her Japanese sentences are cards, with the picture on the front and both sentences on the back.** Her page hides them behind a 日本語 button inside Build the sentence, which that exercise has no place for. A second round of cards just before it gives the child the meaning at the moment it is needed, with no code. The sentence was first put on the card's front and did not fit: that face is set for a picture, and the longer sentences ran past the card's edge. This exercise is ours, not hers, so it is the one she is likeliest to change, and removing it is one block per topic | 2026-11-07 |
+| D-65 | **A picture may correct her page when her emoji teaches the wrong thing.** Her fridge is an ice cube, because Unicode has no fridge, so it is the one drawing of ours in a Fluent topic. Her garden is the park's tree, so it gains tulips. Shoes and boots show two, because the word is plural, as Fruit's pictures already do. Her neutral teacher becomes a woman, because the sentence says "She". Her words and sentences are unchanged | 2026-11-07 |

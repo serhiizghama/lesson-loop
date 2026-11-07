@@ -165,6 +165,54 @@ const SUBJECTS: Record<string, Recipe> = {
   'places/school': { subject: 'a small school building as an isolated vignette, with a clock above the door and no sign' },
   'places/home': { subject: 'a small cosy house as an isolated vignette, with a red roof, a door and two windows' },
   'places/zoo': { subject: 'a zoo entrance as an isolated vignette: a plain arched gate with no sign, and a giraffe looking over it' },
+
+  // ── clothes, home, school, weather ───────────────────────────────────────
+  // NOT drawn either, for the reason above: Fluent Emoji, except the fridge, which Fluent does
+  // not have and which is our own SVG (.pics-src/home-fridge.svg). The fridge's recipe is the
+  // one meant to be used: it is the fallback if that drawing is ever deleted.
+  'clothes/shirt': { subject: 'one short-sleeved shirt laid flat' },
+  'clothes/pants': { subject: 'one pair of blue trousers laid flat' },
+  'clothes/shoes': { subject: 'a pair of two running shoes side by side' },
+  'clothes/socks': { subject: 'a pair of two striped socks' },
+  'clothes/hat': { subject: 'one sun hat with a ribbon' },
+  'clothes/dress': { subject: 'one blue dress on no hanger' },
+  'clothes/jacket': { subject: 'one warm buttoned jacket laid flat' },
+  'clothes/gloves': { subject: 'a pair of two woollen gloves' },
+  'clothes/scarf': { subject: 'one red woollen scarf' },
+  'clothes/boots': { subject: 'a pair of two red boots side by side' },
+
+  'home/bed': { subject: 'one single bed with a blue blanket, seen from the side' },
+  'home/door': { subject: 'one closed wooden front door in its frame' },
+  'home/window': { subject: 'one square window with four panes, seen from the front' },
+  'home/sofa': { subject: 'one small blue sofa, seen from the front' },
+  'home/tv': { subject: 'one small television on two short legs, with a blank screen' },
+  'home/house': { subject: 'one small cosy house with a red roof, a door and a window' },
+  'home/bath': { subject: 'one white bathtub full of bubbles' },
+  'home/key': { subject: 'one golden door key' },
+  'home/garden': { subject: 'a small garden as an isolated vignette: one tree with three tulips in front of it' },
+  'home/fridge': { subject: 'a small white two-door kitchen fridge, seen from the front' },
+
+  'school/pencil': { subject: 'one yellow pencil, sharpened' },
+  'school/pen': { subject: 'one blue ballpoint pen with its clip' },
+  'school/book': { subject: 'one open book, seen from the front' },
+  'school/notebook': { subject: 'one closed notebook with a plain label and no writing' },
+  'school/bag': { subject: 'one red school backpack' },
+  'school/ruler': { subject: 'one straight ruler with tick marks and no numbers' },
+  'school/scissors': { subject: 'one pair of scissors with round red handles' },
+  'school/chair': { subject: 'one plain wooden chair, seen from the front' },
+  'school/teacher': { subject: 'one smiling woman teacher with light skin and glasses, in front of a blank green chalkboard, head and shoulders' },
+  'school/clock': { subject: 'one round wall clock showing one o\'clock, with no numbers' },
+
+  'weather/sunny': { subject: 'one smiling-free golden sun with short rays' },
+  'weather/rainy': { subject: 'one grey cloud with blue raindrops falling from it' },
+  'weather/cloudy': { subject: 'one soft white cloud' },
+  'weather/windy': { subject: 'one puff of wind with curling lines and no face' },
+  'weather/hot': { subject: 'one red, sweating, overheated round face' },
+  'weather/snowy': { subject: 'one large blue snowflake' },
+  'weather/cold': { subject: 'one blue, shivering, frozen round face' },
+  'weather/rainbow': { subject: 'one rainbow arc' },
+  'weather/thunder': { subject: 'one dark storm cloud with a yellow lightning bolt and rain' },
+  'weather/umbrella': { subject: 'one open purple umbrella' },
 }
 
 /**

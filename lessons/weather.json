@@ -1,0 +1,272 @@
+{
+  "id": "weather",
+  "title": "Weather",
+  "emoji": "🌦️",
+  "audience": "kids",
+  "l1": "ja",
+  "parts": [
+    {
+      "id": "today",
+      "title": "Weather 1 · Today's Weather",
+      "emoji": "☀️",
+      "items": [
+        "sunny",
+        "rainy",
+        "cloudy",
+        "windy",
+        "hot"
+      ]
+    },
+    {
+      "id": "more",
+      "title": "Weather 2 · Cold, Storms & Rainbows",
+      "emoji": "❄️",
+      "items": [
+        "snowy",
+        "cold",
+        "rainbow",
+        "thunder",
+        "umbrella"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "sunny",
+      "en": "sunny",
+      "emoji": "☀️",
+      "article": "none",
+      "l1": {
+        "word": "はれ",
+        "romaji": "hare"
+      },
+      "example": "It is sunny.",
+      "tags": {
+        "s": "It is sunny.",
+        "sj": "はれです。",
+        "say": "Say \"sunny\" three times!"
+      }
+    },
+    {
+      "id": "rainy",
+      "en": "rainy",
+      "emoji": "🌧️",
+      "article": "none",
+      "l1": {
+        "word": "あめ",
+        "romaji": "ame"
+      },
+      "example": "It is rainy.",
+      "tags": {
+        "s": "It is rainy.",
+        "sj": "あめです。",
+        "say": "Say the sentence: \"It is rainy.\""
+      }
+    },
+    {
+      "id": "cloudy",
+      "en": "cloudy",
+      "emoji": "☁️",
+      "article": "none",
+      "l1": {
+        "word": "くもり",
+        "romaji": "kumori"
+      },
+      "example": "It is cloudy.",
+      "tags": {
+        "s": "It is cloudy.",
+        "sj": "くもりです。",
+        "say": "Say \"cloudy\" very quietly. Now very loudly!"
+      }
+    },
+    {
+      "id": "windy",
+      "en": "windy",
+      "emoji": "💨",
+      "article": "none",
+      "l1": {
+        "word": "かぜがつよい",
+        "romaji": "kaze ga tsuyoi"
+      },
+      "example": "It is windy.",
+      "tags": {
+        "s": "It is windy.",
+        "sj": "かぜがつよいです。",
+        "say": "Make your own sentence with \"windy\"."
+      }
+    },
+    {
+      "id": "hot",
+      "en": "hot",
+      "emoji": "🥵",
+      "article": "none",
+      "l1": {
+        "word": "あつい",
+        "romaji": "atsui"
+      },
+      "example": "It is hot.",
+      "tags": {
+        "s": "It is hot.",
+        "sj": "あついです。",
+        "say": "Say \"hot\" three times!"
+      }
+    },
+    {
+      "id": "snowy",
+      "en": "snowy",
+      "emoji": "❄️",
+      "article": "none",
+      "l1": {
+        "word": "ゆき",
+        "romaji": "yuki"
+      },
+      "example": "It is snowy.",
+      "tags": {
+        "s": "It is snowy.",
+        "sj": "ゆきです。",
+        "say": "Say \"snowy\" very quietly. Now very loudly!"
+      }
+    },
+    {
+      "id": "cold",
+      "en": "cold",
+      "emoji": "🥶",
+      "article": "none",
+      "l1": {
+        "word": "さむい",
+        "romaji": "samui"
+      },
+      "example": "It is cold.",
+      "tags": {
+        "s": "It is cold.",
+        "sj": "さむいです。",
+        "say": "Say the sentence: \"It is cold.\""
+      }
+    },
+    {
+      "id": "rainbow",
+      "en": "rainbow",
+      "emoji": "🌈",
+      "l1": {
+        "word": "にじ",
+        "romaji": "niji"
+      },
+      "example": "I see a rainbow.",
+      "tags": {
+        "s": "I see a rainbow.",
+        "sj": "にじがみえます。",
+        "say": "Point to something like this, or draw it in the air. Say \"rainbow\"."
+      }
+    },
+    {
+      "id": "thunder",
+      "en": "thunder",
+      "emoji": "⛈️",
+      "article": "none",
+      "l1": {
+        "word": "かみなり",
+        "romaji": "kaminari"
+      },
+      "example": "I hear thunder.",
+      "tags": {
+        "s": "I hear thunder.",
+        "sj": "かみなりがきこえます。",
+        "say": "Say \"thunder\" three times!"
+      }
+    },
+    {
+      "id": "umbrella",
+      "en": "umbrella",
+      "emoji": "☂️",
+      "l1": {
+        "word": "かさ",
+        "romaji": "kasa"
+      },
+      "example": "I have an umbrella.",
+      "tags": {
+        "s": "I have an umbrella.",
+        "sj": "かさをもっています。",
+        "say": "Ask your teacher: \"What is this?\" Then answer: \"umbrella\"."
+      }
+    }
+  ],
+  "blocks": [
+    {
+      "id": "learn",
+      "type": "cards",
+      "title": "👀 Look and Learn",
+      "hint": "Tap each card to hear the word and see the Japanese. Say it out loud!",
+      "items": {
+        "select": "new"
+      },
+      "front": "emoji",
+      "back": [
+        "en",
+        "l1"
+      ]
+    },
+    {
+      "id": "hear",
+      "type": "listen",
+      "title": "👂 Listen and Pick",
+      "hint": "Listen, then tap the right picture.",
+      "items": {
+        "select": "new"
+      },
+      "choices": 3
+    },
+    {
+      "id": "pairs",
+      "type": "match",
+      "title": "🎯 Match It",
+      "hint": "Tap a word, then tap its picture.",
+      "items": {
+        "select": "new"
+      },
+      "left": "en",
+      "right": "emoji",
+      "count": 5
+    },
+    {
+      "id": "meaning",
+      "type": "cards",
+      "title": "💬 What Does It Mean?",
+      "hint": "Tap a picture to hear its sentence and see it in Japanese.",
+      "items": {
+        "select": "new"
+      },
+      "front": "emoji",
+      "back": [
+        "tag:s",
+        "tag:sj"
+      ],
+      "speak": "{tag:s}"
+    },
+    {
+      "id": "build",
+      "type": "scramble",
+      "title": "🧩 Build the Sentence",
+      "hint": "Tap the words in the right order.",
+      "items": {
+        "select": "new"
+      },
+      "template": "{tag:s}"
+    },
+    {
+      "id": "say",
+      "type": "tpr",
+      "title": "🗣️ Say It!",
+      "hint": "Listen, then do what the card says!",
+      "items": {
+        "select": "new"
+      },
+      "prompt": "{tag:say}"
+    },
+    {
+      "id": "done",
+      "type": "finish",
+      "title": "🎉 Great job!",
+      "message": "Great job! Now you can talk about the weather!"
+    }
+  ]
+}

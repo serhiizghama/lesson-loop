@@ -1,0 +1,265 @@
+{
+  "id": "school",
+  "title": "School",
+  "emoji": "🎒",
+  "audience": "kids",
+  "l1": "ja",
+  "parts": [
+    {
+      "id": "things",
+      "title": "School 1 · My School Things",
+      "emoji": "✏️",
+      "items": [
+        "pencil",
+        "pen",
+        "book",
+        "notebook",
+        "bag"
+      ]
+    },
+    {
+      "id": "classroom",
+      "title": "School 2 · In the Classroom",
+      "emoji": "📏",
+      "items": [
+        "ruler",
+        "scissors",
+        "chair",
+        "teacher",
+        "clock"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "pencil",
+      "en": "pencil",
+      "emoji": "✏️",
+      "l1": {
+        "word": "えんぴつ",
+        "romaji": "enpitsu"
+      },
+      "example": "I have a pencil.",
+      "tags": {
+        "s": "I have a pencil.",
+        "sj": "えんぴつをもっています。",
+        "say": "Point to something like this, or draw it in the air. Say \"pencil\"."
+      }
+    },
+    {
+      "id": "pen",
+      "en": "pen",
+      "emoji": "🖊️",
+      "l1": {
+        "word": "ペン",
+        "romaji": "pen"
+      },
+      "example": "I have a pen.",
+      "tags": {
+        "s": "I have a pen.",
+        "sj": "ペンをもっています。",
+        "say": "Say \"pen\" three times!"
+      }
+    },
+    {
+      "id": "book",
+      "en": "book",
+      "emoji": "📖",
+      "l1": {
+        "word": "ほん",
+        "romaji": "hon"
+      },
+      "example": "I read a book.",
+      "tags": {
+        "s": "I read a book.",
+        "sj": "ほんをよみます。",
+        "say": "Ask your teacher: \"What is this?\" Then answer: \"book\"."
+      }
+    },
+    {
+      "id": "notebook",
+      "en": "notebook",
+      "emoji": "📓",
+      "l1": {
+        "word": "ノート",
+        "romaji": "nooto"
+      },
+      "example": "I write in my notebook.",
+      "tags": {
+        "s": "I write in my notebook.",
+        "sj": "ノートにかきます。",
+        "say": "Say \"notebook\" very quietly. Now very loudly!"
+      }
+    },
+    {
+      "id": "bag",
+      "en": "bag",
+      "emoji": "🎒",
+      "l1": {
+        "word": "かばん",
+        "romaji": "kaban"
+      },
+      "example": "I have a bag.",
+      "tags": {
+        "s": "I have a bag.",
+        "sj": "かばんをもっています。",
+        "say": "Say the sentence: \"I have a bag.\""
+      }
+    },
+    {
+      "id": "ruler",
+      "en": "ruler",
+      "emoji": "📏",
+      "l1": {
+        "word": "じょうぎ",
+        "romaji": "jougi"
+      },
+      "example": "I use a ruler.",
+      "tags": {
+        "s": "I use a ruler.",
+        "sj": "じょうぎをつかいます。",
+        "say": "Point to something like this, or draw it in the air. Say \"ruler\"."
+      }
+    },
+    {
+      "id": "scissors",
+      "en": "scissors",
+      "emoji": "✂️",
+      "plural": true,
+      "l1": {
+        "word": "はさみ",
+        "romaji": "hasami"
+      },
+      "example": "I cut with scissors.",
+      "tags": {
+        "s": "I cut with scissors.",
+        "sj": "はさみできります。",
+        "say": "Say \"scissors\" three times!"
+      }
+    },
+    {
+      "id": "chair",
+      "en": "chair",
+      "emoji": "🪑",
+      "l1": {
+        "word": "いす",
+        "romaji": "isu"
+      },
+      "example": "I sit on a chair.",
+      "tags": {
+        "s": "I sit on a chair.",
+        "sj": "いすにすわります。",
+        "say": "Ask your teacher: \"What is this?\" Then answer: \"chair\"."
+      }
+    },
+    {
+      "id": "teacher",
+      "en": "teacher",
+      "emoji": "👩‍🏫",
+      "l1": {
+        "word": "せんせい",
+        "romaji": "sensei"
+      },
+      "example": "She is my teacher.",
+      "tags": {
+        "s": "She is my teacher.",
+        "sj": "かのじょはわたしのせんせいです。",
+        "say": "Say the sentence: \"She is my teacher.\""
+      }
+    },
+    {
+      "id": "clock",
+      "en": "clock",
+      "emoji": "🕐",
+      "l1": {
+        "word": "とけい",
+        "romaji": "tokei"
+      },
+      "example": "I see a clock.",
+      "tags": {
+        "s": "I see a clock.",
+        "sj": "とけいがみえます。",
+        "say": "Say \"clock\" very quietly. Now very loudly!"
+      }
+    }
+  ],
+  "blocks": [
+    {
+      "id": "learn",
+      "type": "cards",
+      "title": "👀 Look and Learn",
+      "hint": "Tap each card to hear the word and see the Japanese. Say it out loud!",
+      "items": {
+        "select": "new"
+      },
+      "front": "emoji",
+      "back": [
+        "en",
+        "l1"
+      ]
+    },
+    {
+      "id": "hear",
+      "type": "listen",
+      "title": "👂 Listen and Pick",
+      "hint": "Listen, then tap the right picture.",
+      "items": {
+        "select": "new"
+      },
+      "choices": 3
+    },
+    {
+      "id": "pairs",
+      "type": "match",
+      "title": "🎯 Match It",
+      "hint": "Tap a word, then tap its picture.",
+      "items": {
+        "select": "new"
+      },
+      "left": "en",
+      "right": "emoji",
+      "count": 5
+    },
+    {
+      "id": "meaning",
+      "type": "cards",
+      "title": "💬 What Does It Mean?",
+      "hint": "Tap a picture to hear its sentence and see it in Japanese.",
+      "items": {
+        "select": "new"
+      },
+      "front": "emoji",
+      "back": [
+        "tag:s",
+        "tag:sj"
+      ],
+      "speak": "{tag:s}"
+    },
+    {
+      "id": "build",
+      "type": "scramble",
+      "title": "🧩 Build the Sentence",
+      "hint": "Tap the words in the right order.",
+      "items": {
+        "select": "new"
+      },
+      "template": "{tag:s}"
+    },
+    {
+      "id": "say",
+      "type": "tpr",
+      "title": "🗣️ Say It!",
+      "hint": "Listen, then do what the card says!",
+      "items": {
+        "select": "new"
+      },
+      "prompt": "{tag:say}"
+    },
+    {
+      "id": "done",
+      "type": "finish",
+      "title": "🎉 Great job!",
+      "message": "Great job! Now you can talk about your school things!"
+    }
+  ]
+}

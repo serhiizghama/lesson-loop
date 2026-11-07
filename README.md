@@ -26,11 +26,15 @@ with no picture falls back to its emoji, so a lesson plays the moment its JSON e
 is illustrated afterwards — `npm run pictures` draws whatever is missing. Two lessons opt
 out on purpose: colours are exact SVG swatches rather than drawings, because "red" has to
 be red, and numbers keep their keycap emoji, because a drawn four that reads as a nine is
-a wrong answer rather than a style problem. Four topics — fruit, drinks, family and places —
-are not drawn either: their words are plain enough that an openly licensed set already
-has them, so their pictures are Microsoft Fluent Emoji rendered onto the same square (see
-`THIRD_PARTY_NOTICES.md`). Do not delete one to have it redrawn — the script would draw it
-in the house style, and it would no longer match its topic.
+a wrong answer rather than a style problem. Eight topics — fruit, drinks, family, places,
+clothes, home, school and weather — are not drawn either: their words are plain enough that
+an openly licensed set already has them, so their pictures are Microsoft Fluent Emoji
+rendered onto the same square (see `THIRD_PARTY_NOTICES.md`). The one drawing of ours among
+them is the fridge, because that set has none. Do not delete one to have it redrawn — the
+script would draw it in the house style, and it would no longer match its topic.
+
+Clothes, At Home, School and Weather have every exercise of the teacher's pages except
+Spell it, which needs a block of its own and is absent by name (D-62).
 
 ## Rooms: two links, two halves of the same lesson
 
